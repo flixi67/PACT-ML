@@ -39,7 +39,7 @@ def parse_reports(input_folder: Path, output_folder: Path):
 def main():
     input_folder = Path("./data/")         # Change to your actual folder
     output_folder = Path("./data/parsed/")   # Where .md files will be saved
-    convert_pdfs_to_markdown(input_folder, output_folder)
+    parse_reports(input_folder, output_folder)
 
 if __name__ == "__main__":
     main()
