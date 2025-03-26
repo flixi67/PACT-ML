@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from docling.document_converter import DocumentConverter  
+from docling.document_converter import DocumentConverter
 
 def parse_reports(input_folder: Path, output_folder: Path):
     logging.basicConfig(level=logging.INFO)
@@ -37,7 +37,7 @@ def parse_reports(input_folder: Path, output_folder: Path):
             logging.error(f"Failed to process {pdf_path.name}: {e}")
 
 def main():
-    input_folder = Path("./data/")         # Change to your actual folder
+    input_folder = Path("./data/pdfs")         # Change to your actual folder
     output_folder = Path("./data/parsed/")   # Where .md files will be saved
     parse_reports(input_folder, output_folder)
 
