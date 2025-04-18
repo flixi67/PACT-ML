@@ -25,7 +25,7 @@ def parse_reports(input_folder: Path, output_folder: Path):
             logging.info(f"Processing: {pdf_path.name}")
             result = converter.convert(str(pdf_path))
 
-            markdown_content = result.document.export
+            markdown_content = result.document.export_to_markdown()
 
             output_path = output_folder / f"{pdf_path.stem}.md"
             with output_path.open("w", encoding="utf-8") as f:
@@ -37,8 +37,8 @@ def parse_reports(input_folder: Path, output_folder: Path):
             logging.error(f"Failed to process {pdf_path.name}: {e}")
 
 def main():
-    input_folder = Path("./data/pdfs")         # Change to your actual folder
-    output_folder = Path("./data/parsed/")   # Where .md files will be saved
+    input_folder = Path("./data/pdfs")      # Change to your actual folder
+    output_folder = Path("./data/parsed")   # Where .md files will be saved
     parse_reports(input_folder, output_folder)
 
 if __name__ == "__main__":
