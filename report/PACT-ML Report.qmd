@@ -11,17 +11,25 @@ date: last-modified
 author:
   - name: Felix Kube
     acknowledgements: | 
-      Thanks for good advice during the semester, Chris and Killian.
+      Thanks for good advice during the semester, Chris and Killian. Also all the peers I talked to while tackling this group project alone :) it was not so alone after all.
     affiliations:
       - name: Hertie School
-        department: Department of YYY
+        department: Data Science Lab
 abstract: |
-  The text of your abstract. 200 or fewer words.
+  The Peacekeeping Activity Dataset (PACT) is the first of its kind data collection to shine light on what peacekeepers actually implement while deployed. In the past, many projects have looked towards mandates to study how specific tasks and mission success are related. PACT used report data from the mission heads to the Secretary-General of the UN to code up to 39 categories of task implementation on six different engagement levels. This project, PACT-ML, aims to extend the data collections of PACT 1.0 (Blair, XXX) and PACT 2.0 (Otto, 2020) by using selected reports of PACT 2.0 to examine the application of Machine Learning / Natural Language Processing techniques to automatically code this kind of data from the reports.
 keywords:
-  - 3 to 6 keywords
-  - that do not appear in the title
+  - Machine Learning
+  - Natural Language Processing
+  - United Nations Peacekeeping
+  - BERT
+  - roBERTa
 bibliography: bibliography.bib  
 ---
+
+## Notes
+
+- ONUCA reports left out due to super old report format and issues in preprocessing.
+- 
 
 ## Introduction {#sec-intro}
 
