@@ -14,7 +14,7 @@ def extract_text_within_margins(pdf_path, margins, minujusth_margins=None):
     Returns:
         list: List of paragraphs found within the specified margins.
     """
-    paragraphs = []
+    full_text = []
 
     # Determine if the file is a "MINUJUSTH" report
     is_minujusth = "MINUJUSTH" in pdf_path.upper()
@@ -25,29 +25,71 @@ def extract_text_within_margins(pdf_path, margins, minujusth_margins=None):
     with pdfplumber.open(pdf_path) as pdf:
         for page_number, page in enumerate(pdf.pages):
             # Determine the top margin based on the page number
-            top_margin = (
-                selected_margins["first_page_top"] if page_number == 0 else selected_margins["other_pages_top"]
-            )
+            if page_number == 0:
+                top_margin = selected_margins["first_page_top"]
+            else:
+                top_margin = selected_margins["other_pages_top"]
 
             # Crop the page to the specified margins
             cropped_page = page.within_bbox((
                 selected_margins["left"],
-                top_margin,
+                selected_margins["bottom"],
                 selected_margins["right"],
-                selected_margins["bottom"]
+                top_margin
             ))
 
             # Extract text from the cropped region
             text = cropped_page.extract_text()
 
-            if text:
-                # Split the text into paragraphs
-                raw_paragraphs = text.split("\n\n")
+            # if text:
+            #     # Split the text into paragraphs
+            #     lines = text.split("\n")
                 
-                for paragraph in raw_paragraphs:
-                    # Check if the paragraph starts with a numbered line (e.g., "1.    ")
-                    if re.match(r"^\d+\.\s{2,}", paragraph.strip()):
-                        paragraphs.append(paragraph.strip())
+            #     for line in lines:
+            #         # paragraphs.append(paragraph.strip())
+            #         # Check if the paragraph starts with a numbered line (e.g., "1.    ")
+            #         if re.match(r"(?m)^\d+\.\s.*(?:\n(?!\d+\.).*)*", paragraph.strip()):
+            #             paragraphs.append(line.strip())
+
+            full_text.append(text)
+
+    return full_text
+
+def extract_paragraphs(text):
+    """
+    Extracts paragraphs starting with Arabic numbers (e.g., 1., 2., 3.) and appends
+    subsequent lines that do not start a new numbered paragraph.
+
+    Args:
+        text (str): The text to process.
+
+    Returns:
+        list: A list of extracted paragraphs.
+    """
+    # Define the regex for numbered paragraphs
+    regex = r"(?m)^\d+\.\s.*(?:\n(?!\d+\.).*)*"
+
+    # Split the text into lines
+    lines = text.split("\n")
+
+    paragraphs = []
+    current_paragraph = ""
+
+    for line in lines:
+        # Check if the line starts a new numbered paragraph
+        if re.match(regex, line):
+            # Save the current paragraph if it exists
+            if current_paragraph:
+                paragraphs.append(current_paragraph.strip())
+            # Start a new paragraph with the current line
+            current_paragraph = line
+        else:
+            # Append the line to the current paragraph if it doesn't start a new one
+            current_paragraph += " " + line
+
+    # Add the last paragraph if it exists
+    if current_paragraph:
+        paragraphs.append(current_paragraph.strip())
 
     return paragraphs
 
@@ -75,7 +117,12 @@ def main():
     }
 
     # Extract paragraphs within the margins
-    paragraphs = extract_text_within_margins(pdf_path, margins, minujusth_margins)
+    text = extract_text_within_margins(pdf_path, margins, minujusth_margins)
+
+    # Join the list into a single string
+    text = "\n".join(text)
+
+    paragraphs = extract_paragraphs(text)
 
     # Print the extracted paragraphs
     print("Extracted Paragraphs:")
