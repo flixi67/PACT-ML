@@ -29,6 +29,7 @@ bibliography: bibliography.bib
 ## Notes
 
 - ONUCA reports left out due to super old report format and issues in preprocessing.
+- UNMIBH and UNTAET reports left out due to 2 column layout
 - maybe make cutoff at the introduction of the newer format?
 - leave out cross-country missions due to problems in data parsing and different language format (only coded on state-level, when that state's name is explicitely mentioned)
   - could also preprocess data and merge those states back together
@@ -58,11 +59,9 @@ PACT 2.0 data, parsed reports
 
 The UNPKOs included are: MINUGUA, MINUJUSTH, MINUSTAH, MIPONUH, ONUCA, ONUSAL, UNCPSG, UNCRO, UNMIBH, UNMIH, UNMIK, UNMISET, UNMIT, UNMOP, UNMOT, UNOMIG, UNPREDEP, UNPROFOR, UNSMIH, UNTAC, UNTAES, UNTAET and UNTMIH.
 
-Include table of how many reports per mission in the whole dataset
+Some old reports (e.g. ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are at the country level. For identifying the reports to parse and use for the model, we used 'PyMuPDF' and wrote scripts with the help of GitHub Copilot. there were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data corresponds with all post-2000 UN reports included in the PACT 2.0 data set, which in academical language coincides with the third and fourth generations of UN Peacekeeping Missions.
 
-Exclusion of very old reports due to issues in parsing
-
-Exclusion of cross-country reports due to issues with the difference in language and adjacent codings, which we ignore for our language model approach.
+- Include table of how many reports per mission in the whole dataset and selected for parsing
 
 Discuss how the data is structured (PACT 2.0)
 
