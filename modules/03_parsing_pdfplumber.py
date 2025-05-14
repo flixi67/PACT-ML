@@ -1,62 +1,88 @@
-from pathlib import Path
 import pdfplumber
+import re
 
-def extract_clean_paragraphs(pdf_path):
-    paragraphs_all_pages = []
+def extract_text_within_margins(pdf_path, margins, minujusth_margins=None):
+    """
+    Extracts text from a PDF within specified margins, allowing for separate margins
+    for reports containing "MINUJUSTH" in their name.
+
+    Args:
+        pdf_path (str): Path to the PDF file.
+        margins (dict): Dictionary with general margins (first_page_top, other_pages_top, left, right, bottom).
+        minujusth_margins (dict, optional): Margins specific to "MINUJUSTH" reports.
+
+    Returns:
+        list: List of paragraphs found within the specified margins.
+    """
+    paragraphs = []
+
+    # Determine if the file is a "MINUJUSTH" report
+    is_minujusth = "MINUJUSTH" in pdf_path.upper()
+
+    # Select margins based on the file type
+    selected_margins = minujusth_margins if is_minujusth and minujusth_margins else margins
 
     with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            words = page.extract_words()
+        for page_number, page in enumerate(pdf.pages):
+            # Determine the top margin based on the page number
+            top_margin = (
+                selected_margins["first_page_top"] if page_number == 0 else selected_margins["other_pages_top"]
+            )
 
-            # Remove likely headers/footers
-            words = [w for w in words if 70 < w['top'] < 750]
+            # Crop the page to the specified margins
+            cropped_page = page.within_bbox((
+                selected_margins["left"],
+                top_margin,
+                selected_margins["right"],
+                selected_margins["bottom"]
+            ))
 
-            # Sort top to bottom, left to right
-            words = sorted(words, key=lambda w: (round(w['top'], 1), w['x0']))
+            # Extract text from the cropped region
+            text = cropped_page.extract_text()
 
-            # Group into lines
-            lines_dict = {}
-            for w in words:
-                key = round(w['top'], 1)
-                if key not in lines_dict:
-                    lines_dict[key] = []
-                lines_dict[key].append(w)
-            lines = list(lines_dict.values())
+            if text:
+                # Split the text into paragraphs
+                raw_paragraphs = text.split("\n\n")
+                
+                for paragraph in raw_paragraphs:
+                    # Check if the paragraph starts with a numbered line (e.g., "1.    ")
+                    if re.match(r"^\d+\.\s{2,}", paragraph.strip()):
+                        paragraphs.append(paragraph.strip())
 
-            # Group into paragraphs
-            paragraphs = []
-            current_para = []
-            last_y = None
-            for line in lines:
-                y = min(w['top'] for w in line)
-                line_text = " ".join(w['text'] for w in line)
-                if last_y is not None and abs(y - last_y) > 15:
-                    if current_para:
-                        paragraphs.append(" ".join(current_para))
-                        current_para = []
-                current_para.append(line_text)
-                last_y = y
-            if current_para:
-                paragraphs.append(" ".join(current_para))
+    return paragraphs
 
-            paragraphs_all_pages.extend(paragraphs)
 
-    return paragraphs_all_pages
+def main():
+    # Path to the PDF file
+    pdf_path = "data/pdfs/UNIKOM_S_2003_393.pdf"
 
-def convert_pdf_to_markdown(pdf_path):
-    paragraphs = extract_clean_paragraphs(pdf_path)
-    output_path = Path(pdf_path).with_suffix(".md")
-    with open(output_path, "w", encoding="utf-8") as f:
-        for para in paragraphs:
-            f.write(para + "\n\n")
-    print(f"Saved: {output_path}")
+    # General margins for most reports
+    margins = {
+        "first_page_top": 575,  # Top margin for the first page in points
+        "other_pages_top": 720,  # Top margin for all other pages in points
+        "left": 50,   # Left margin in points
+        "right": 495,  # Right margin in points
+        "bottom": 92  # Bottom margin in points
+    }
+
+    # Specific margins for "MINUJUSTH" reports
+    minujusth_margins = {
+        "first_page_top": 582,  # Top margin for the first page in points
+        "other_pages_top": 727,  # Top margin for all other pages in points
+        "left": 50,   # Left margin in points
+        "right": 495,  # Right margin in points
+        "bottom": 57  # Bottom margin in points
+    }
+
+    # Extract paragraphs within the margins
+    paragraphs = extract_text_within_margins(pdf_path, margins, minujusth_margins)
+
+    # Print the extracted paragraphs
+    print("Extracted Paragraphs:")
+    for paragraph in paragraphs:
+        print(paragraph)
+        print("-" * 80)
+
 
 if __name__ == "__main__":
-    pdf_files = [
-        "data/pdfs/S_2000_738_UNTAET.pdf",
-        "data/pdfs/S_25719_UNTAC.pdf",
-        "data/pdfs/S_1995_444_UNPROFOR.pdf"
-    ]
-
-    for pdf_file in pdf_files:
-        convert_pdf_to_markdown(pdf_file)
+    main()
