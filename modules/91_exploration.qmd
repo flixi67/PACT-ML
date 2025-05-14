@@ -1,0 +1,31 @@
+---
+title: "Exploring structure and coverage of old data"
+author: Felix Kube
+format:
+    html:
+        code-fold: true
+---
+
+
+```{r}
+#| label: included-reports
+
+library(tidyverse)
+
+report_data <- readRDS("data/transformed-paragraphs.Rds")
+
+report_data$report_namePKO %>%
+    unique() %>%
+    print()
+
+report_data$report_namePKO %>%
+    unique() %>%
+    length() %>%
+    paste("There are", . , "reports in total") %>%
+    print()
+
+report_data %>%
+    select(report_namePKO, numberParagraphs, paragraphRelevant) %>%
+    distinct()
+
+```

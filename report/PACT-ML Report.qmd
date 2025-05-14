@@ -29,12 +29,12 @@ bibliography: bibliography.bib
 ## Notes
 
 - ONUCA reports left out due to super old report format and issues in preprocessing.
-- 
+- maybe make cutoff at the introduction of the newer format?
+- leave out cross-country missions due to problems in data parsing and different language format (only coded on state-level, when that state's name is explicitely mentioned)
+  - could also preprocess data and merge those states back together
+
 
 ## Introduction {#sec-intro}
-
-Body of paper.
-Margins in this document are roughly 0.75 inches all around, letter size paper.
 
 | one  | two  | three | four | five |
 |------|------|-------|------|------|
@@ -45,160 +45,45 @@ Margins in this document are roughly 0.75 inches all around, letter size paper.
 : D-optimality values for design X under five different scenarios. {#tbl-one}
 
 - Note that figures and tables (such as @tbl-one) should appear in the paper, not at the end or in separate files.
-- In document front matter, you may set the key `blinded` under a `journal` key to hide the authors and acknowledgements, producing the required anonymized version.
-- Remember that in the anonymized version, you should not identify authors indirectly in the text.  That is, don't say "In Smith et. al.  (2009) we showed that ...". Instead, say "Smith et. al. (2009) showed that ...".
-- These points are only intended to remind you of some requirements.
-Please refer to the instructions for authors
-at [http://amstat.tandfonline.com/action/authorSubmission?journalCode=uasa20&page=instructions#.VFkk7fnF_0c](http://amstat.tandfonline.com/action/authorSubmission?journalCode=uasa20&page=instructions#.VFkk7fnF_0c)
-- For more about ASA\ style, please see [https://files.taylorandfrancis.com/asa-style-guide.pdf](https://files.taylorandfrancis.com/asa-style-guide.pdf).
-- If you have supplementary material (e.g., software, data, technical
-proofs), identify them in the section below.  In early stages of the
-submission process, you may be unsure what to include as supplementary
-material.  Don't worry---this is something that can be worked out at later stages.
+
+Motivation: Feasibility test to use data of this kind to automatically code newly written reports.
+
+Background on the research project itself
+
+
+
+## Data {#sec-data}
+
+PACT 2.0 data, parsed reports
+
+The UNPKOs included are: MINUGUA, MINUJUSTH, MINUSTAH, MIPONUH, ONUCA, ONUSAL, UNCPSG, UNCRO, UNMIBH, UNMIH, UNMIK, UNMISET, UNMIT, UNMOP, UNMOT, UNOMIG, UNPREDEP, UNPROFOR, UNSMIH, UNTAC, UNTAES, UNTAET and UNTMIH.
+
+Include table of how many reports per mission in the whole dataset
+
+Exclusion of very old reports due to issues in parsing
+
+Exclusion of cross-country reports due to issues with the difference in language and adjacent codings, which we ignore for our language model approach.
+
+Discuss how the data is structured (PACT 2.0)
+
+Describe process how the data is parsed to extract the paragraphs
+
+### Validity checks
+
+To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the reported paragraph, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database. On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. XXXX reports reported no activity and can be therefore be left out for parsing.
+
+To check if parsing was sucessful and our data quality is sufficient, we compare the number of paragraphs extracted from each PDF with the number of total paragraphs reported in the PACT 2.0 data, and only use the data for our model if the number of paragraphs align.
 
 ## Methods {#sec-meth}
 
 Don't take any of these section titles seriously.
 They're just for illustration.
 
-## Verifications {#sec-verify}
+## Results {#sec-results}
 
-This section will be just long enough to illustrate what a full page of text looks like, for margins and spacing.
-
-
-:::{add-textheight=".5in"}
-
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-**With this spacing we have 25 lines per page.**
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-
-:::
-
-
-:::{add-textheight=".2in"}
-
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog.
-
-:::
 
 ## Conclusion {#sec-conc}
 
-## Disclosure statement
-
-The authors have the following conflicts of interest to declare (or replace with a statement that no conflicts of interest exist).
-
-## Data Availability Statement
-
-Deidentified data have been made available at the following URL: XX.
 
 ## Supplementary Material {.supplementary}
 
@@ -207,15 +92,7 @@ Title:
 :   Brief description. (file type)
 
 
-R-package for  MYNEW routine: 
 
-:   R-package MYNEW containing code to perform the diagnostic methods described in the article. The package also contains all datasets used as examples in the article. (GNU zipped tar file)
 
-HIV data set:
 
-:   Data set used in the illustration of MYNEW method in @sec-verify (.txt file).
-
-## BibTeX 
-
-We encourage you to use BibTeX.
-If you have, please feel free to use the package natbib with any bibliography style you're comfortable with. The .bst file agsm has been included here for your convenience. 
+ 
