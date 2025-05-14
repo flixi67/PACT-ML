@@ -153,7 +153,7 @@ Nations Peacekeeping, BERT, roBERTa},
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\date{May 2, 2025}
+\date{May 14, 2025}
 \title{\bf PACT-ML: Coding United Nation Peacekeeping Data from reports
 to the Secretary-General}
 \author{
@@ -196,12 +196,20 @@ Nations Peacekeeping, BERT, roBERTa
   ONUCA reports left out due to super old report format and issues in
   preprocessing.
 \item
+  maybe make cutoff at the introduction of the newer format?
+\item
+  leave out cross-country missions due to problems in data parsing and
+  different language format (only coded on state-level, when that
+  state's name is explicitely mentioned)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    could also preprocess data and merge those states back together
+  \end{itemize}
 \end{itemize}
 
 \section{Introduction}\label{sec-intro}
-
-Body of paper. Margins in this document are roughly 0.75 inches all
-around, letter size paper.
 
 \begin{longtable}[]{@{}lllll@{}}
 \caption{D-optimality values for design X under five different
@@ -224,145 +232,63 @@ one & two & three & four & five \\
 \begin{itemize}
 \tightlist
 \item
-  Note that figures and tables (such as \textbf{?@fig-first} and
-  Table~\ref{tbl-one}) should appear in the paper, not at the end or in
-  separate files.
-\item
-  In document front matter, you may set the key \texttt{blinded} under a
-  \texttt{journal} key to hide the authors and acknowledgements,
-  producing the required anonymized version.
-\item
-  Remember that in the anonymized version, you should not identify
-  authors indirectly in the text. That is, don't say ``In Smith et.
-  al.~(2009) we showed that \ldots{}''. Instead, say ``Smith et.
-  al.~(2009) showed that \ldots{}''.
-\item
-  These points are only intended to remind you of some requirements.
-  Please refer to the instructions for authors at
-  \url{http://amstat.tandfonline.com/action/authorSubmission?journalCode=uasa20&page=instructions\#.VFkk7fnF_0c}
-\item
-  For more about ASA~style, please see
-  \url{https://files.taylorandfrancis.com/asa-style-guide.pdf}.
-\item
-  If you have supplementary material (e.g., software, data, technical
-  proofs), identify them in the section below. In early stages of the
-  submission process, you may be unsure what to include as supplementary
-  material. Don't worry---this is something that can be worked out at
-  later stages.
+  Note that figures and tables (such as Table~\ref{tbl-one}) should
+  appear in the paper, not at the end or in separate files.
 \end{itemize}
+
+Motivation: Feasibility test to use data of this kind to automatically
+code newly written reports.
+
+Background on the research project itself
+
+\section{Data}\label{sec-data}
+
+PACT 2.0 data, parsed reports
+
+The UNPKOs included are: MINUGUA, MINUJUSTH, MINUSTAH, MIPONUH, ONUCA,
+ONUSAL, UNCPSG, UNCRO, UNMIBH, UNMIH, UNMIK, UNMISET, UNMIT, UNMOP,
+UNMOT, UNOMIG, UNPREDEP, UNPROFOR, UNSMIH, UNTAC, UNTAES, UNTAET and
+UNTMIH.
+
+Include table of how many reports per mission in the whole dataset
+
+Exclusion of very old reports due to issues in parsing
+
+Exclusion of cross-country reports due to issues with the difference in
+language and adjacent codings, which we ignore for our language model
+approach.
+
+Discuss how the data is structured (PACT 2.0)
+
+Describe process how the data is parsed to extract the paragraphs
+
+\subsection{Validity checks}\label{validity-checks}
+
+To be able to use our models on the data, we need to identify which
+paragraph text belongs to the specific coding in the PACT 2.0 data set.
+We take the reported paragraph, from which the manual coders at the
+University of Uppsala made their judgement, as ground truth. We do this
+because it is highly unlikely that mistakes happened, as each paragraph
+as per the UN reporting scheme carries its paragraph number at the
+beginning, and coders had to mark the relevant sentences within the PDFs
+before adding them to the database. On a side note, this fine-grained
+data which would allow us to train our models beyond the scope here, is
+only available for 143 out of 473 total reports. Three reports reported
+no activity and can be therefore be left out for parsing.
+
+To check if parsing was sucessful and our data quality is sufficient, we
+compare the number of paragraphs extracted from each PDF with the number
+of total paragraphs reported in the PACT 2.0 data, and only use the data
+for our model if the number of paragraphs align.
 
 \section{Methods}\label{sec-meth}
 
 Don't take any of these section titles seriously. They're just for
 illustration.
 
-\section{Verifications}\label{sec-verify}
-
-This section will be just long enough to illustrate what a full page of
-text looks like, for margins and spacing.
-
-\addtolength{\textheight}{.5in}%
-
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. \textbf{With this spacing we
-have 25 lines per page.} The quick brown fox jumped over the lazy dog.
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog.
-
-\addtolength{\textheight}{-.5in}%
-
-\addtolength{\textheight}{.2in}%
-
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog.
-
-The quick brown fox jumped over the lazy dog. The quick brown fox jumped
-over the lazy dog. The quick brown fox jumped over the lazy dog. The
-quick brown fox jumped over the lazy dog.
-
-\addtolength{\textheight}{-.2in}%
+\section{Results}\label{sec-results}
 
 \section{Conclusion}\label{sec-conc}
-
-\section{Disclosure statement}\label{disclosure-statement}
-
-The authors have the following conflicts of interest to declare (or
-replace with a statement that no conflicts of interest exist).
-
-\section{Data Availability Statement}\label{data-availability-statement}
-
-Deidentified data have been made available at the following URL: XX.
 
 \phantomsection\label{supplementary-material}
 \bigskip
@@ -376,20 +302,7 @@ Deidentified data have been made available at the following URL: XX.
 \begin{description}
 \item[Title:]
 Brief description. (file type)
-\item[R-package for MYNEW routine:]
-R-package MYNEW containing code to perform the diagnostic methods
-described in the article. The package also contains all datasets used as
-examples in the article. (GNU zipped tar file)
-\item[HIV data set:]
-Data set used in the illustration of MYNEW method in
-Section~\ref{sec-verify} (.txt file).
 \end{description}
-
-\section{BibTeX}\label{bibtex}
-
-We encourage you to use BibTeX. If you have, please feel free to use the
-package natbib with any bibliography style you're comfortable with. The
-.bst file agsm has been included here for your convenience.
 
 
   \bibliography{bibliography.bib}
