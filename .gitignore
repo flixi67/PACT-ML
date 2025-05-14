@@ -1,6 +1,3 @@
-# Project-specific
-data/og_reports/
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
