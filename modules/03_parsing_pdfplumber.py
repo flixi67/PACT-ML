@@ -128,11 +128,7 @@ def main():
 
     # Get a list of all PDF files in the folder
     # pdf_files = glob.glob(os.path.join(pdf_folder, "*.pdf"))
-    pdf_files = [
-        "data/pdfs/MINUJUSTH_S_2018_1059.pdf",
-        "data/pdfs/UNMIK_2011_514.pdf",
-        "data/pdfs/UNIKOM_S_2003_393.pdf"
-    ]
+    pdf_files = [f for f in glob.glob(os.path.join(pdf_folder, "*.pdf")) if "MINUJUSTH" in os.path.basename(f)]
 
     data = []
 
