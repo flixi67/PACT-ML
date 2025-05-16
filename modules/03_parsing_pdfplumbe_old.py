@@ -53,10 +53,14 @@ def convert_pdf_to_markdown(pdf_path):
 
 if __name__ == "__main__":
     pdf_files = [
-        "data/pdfs/S_2000_738_UNTAET.pdf",
-        "data/pdfs/S_25719_UNTAC.pdf",
-        "data/pdfs/S_1995_444_UNPROFOR.pdf"
+        "data/pdfs/UNIKOM_S_2003_393.pdf"
     ]
 
     for pdf_file in pdf_files:
-        convert_pdf_to_markdown(pdf_file)
+        paragraphs = extract_clean_paragraphs(pdf_file)
+
+        # Print the extracted paragraphs
+        print("Extracted Paragraphs:")
+        for paragraph in paragraphs:
+            print(paragraph)
+            print("-" * 80)
