@@ -2,6 +2,7 @@ import pdfplumber
 import re
 import glob
 import os
+import pandas as pd
 from modules.helpers.validity_check import check_paragraphs, load_expected_counts, fuzzy_match_report_key
 
 def extract_text_within_margins(pdf_path, margins, minujusth_margins=None):
@@ -230,7 +231,9 @@ def main():
         else:
             print(f"No matching key found for {pdf_filename}")
 
-    data.to_csv("data/PACT_paragraphs_training.csv", index=False)        
+    df = pd.DataFrame(data)
+
+    df.to_csv("data/PACT_paragraphs_training.csv", index=False)        
 
 
 if __name__ == "__main__":
