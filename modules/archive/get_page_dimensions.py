@@ -14,5 +14,5 @@ def get_page_dimensions(pdf_path):
             print(f"  Height: {page.height} points\n")
 
 # Example usage
-pdf_path = "data/pdfs/UNMIK_S_2003_421.pdf"
+pdf_path = "data/pdfs/UNOMIG_S_2008_631.pdf"
 get_page_dimensions(pdf_path)
