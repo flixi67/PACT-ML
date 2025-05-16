@@ -1,5 +1,8 @@
 import pdfplumber
 import re
+import glob
+import os
+from modules.helpers.validity_check import check_paragraphs, load_expected_counts, pdf_filename_to_dict_key
 
 def extract_text_within_margins(pdf_path, margins, minujusth_margins=None):
     """
@@ -68,24 +71,31 @@ def extract_paragraphs(text):
     """
     # Define the regex for numbered paragraphs
     regex = r"(?m)^\d+\.\s.*(?:\n(?!\d+\.).*)*"
+    roman_header_pattern = r"^[IVXLCDM]+\.\s+[A-Z]"
 
     # Split the text into lines
     lines = text.split("\n")
 
     paragraphs = []
     current_paragraph = ""
+    started = False  # Flag to start collecting after the first numbered paragraph
 
     for line in lines:
-        # Check if the line starts a new numbered paragraph
+        line = line.strip()
+
+        # Skip Roman numeral section headers
+        if re.match(roman_header_pattern, line):
+            continue
+
+        # If the line starts a numbered paragraph
         if re.match(regex, line):
-            # Save the current paragraph if it exists
-            if current_paragraph:
+            if started and current_paragraph:
                 paragraphs.append(current_paragraph.strip())
-            # Start a new paragraph with the current line
             current_paragraph = line
+            started = True
         else:
-            # Append the line to the current paragraph if it doesn't start a new one
-            current_paragraph += " " + line
+            if started:  # Only collect text after numbered paragraphs begin
+                current_paragraph += " " + line
 
     # Add the last paragraph if it exists
     if current_paragraph:
@@ -95,40 +105,64 @@ def extract_paragraphs(text):
 
 
 def main():
-    # Path to the PDF file
-    pdf_path = "data/pdfs/UNIKOM_S_2003_393.pdf"
-
+    # Path to the folder containing PDFs
+    pdf_folder = "data/pdfs"
+    
     # General margins for most reports
     margins = {
-        "first_page_top": 575,  # Top margin for the first page in points
-        "other_pages_top": 720,  # Top margin for all other pages in points
-        "left": 50,   # Left margin in points
-        "right": 495,  # Right margin in points
-        "bottom": 92  # Bottom margin in points
+        "first_page_top": 575,
+        "other_pages_top": 720,
+        "left": 50,
+        "right": 495,
+        "bottom": 92
     }
 
     # Specific margins for "MINUJUSTH" reports
     minujusth_margins = {
-        "first_page_top": 582,  # Top margin for the first page in points
-        "other_pages_top": 727,  # Top margin for all other pages in points
-        "left": 50,   # Left margin in points
-        "right": 495,  # Right margin in points
-        "bottom": 57  # Bottom margin in points
+        "first_page_top": 582,
+        "other_pages_top": 727,
+        "left": 50,
+        "right": 495,
+        "bottom": 57
     }
 
-    # Extract paragraphs within the margins
-    text = extract_text_within_margins(pdf_path, margins, minujusth_margins)
+    # Get a list of all PDF files in the folder
+    # pdf_files = glob.glob(os.path.join(pdf_folder, "*.pdf"))
+    pdf_files = [
+        "data/pdfs/MINUJUSTH_S_2018_1059.pdf",
+        "data/pdfs/UNMIK_2011_514.pdf",
+        "data/pdfs/UNIKOM_S_2003_393.pdf"
+    ]
 
-    # Join the list into a single string
-    text = "\n".join(text)
+    data = []
 
-    paragraphs = extract_paragraphs(text)
+    for pdf_path in pdf_files:
+        print(f"\nProcessing: {pdf_path}")
+        
+        # Extract text from each PDF
+        text = extract_text_within_margins(pdf_path, margins, minujusth_margins)
+        text = "\n".join(filter(None, text))  # Join and skip None pages
 
-    # Print the extracted paragraphs
-    print("Extracted Paragraphs:")
-    for paragraph in paragraphs:
-        print(paragraph)
-        print("-" * 80)
+        # Extract paragraphs
+        paragraphs = extract_paragraphs(text)
+
+        # Validity check and only write to training data if it passes
+        actual_paragraphs = len(paragraphs)
+        if check_paragraphs(pdf_path, actual_paragraphs):
+            # Add each paragraph to the data with consecutive numbering
+            for i, paragraph in enumerate(paragraphs, 1):
+                data.append({
+                    'paragraph': paragraph,
+                    'paragraphNumber': i,
+                    'filePath': pdf_path,  # Store original file path
+                    'fileName': os.path.basename(pdf_path)  # Store just the filename
+                })
+            print(f"Added {len(paragraphs)} paragraphs from {pdf_path}")
+        else:
+            expected_counts = load_expected_counts()
+            report_name = pdf_filename_to_dict_key(os.path.basename(pdf_path))
+            expected = expected_counts.get(report_name, "unknown")
+            print(f"Paragraph count mismatch for {pdf_path}. Expected: {expected}, Got: {actual_paragraphs}")
 
 
 if __name__ == "__main__":
