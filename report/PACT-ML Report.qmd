@@ -37,13 +37,7 @@ bibliography: bibliography.bib
 
 ## Introduction {#sec-intro}
 
-| one  | two  | three | four | five |
-|------|------|-------|------|------|
-| 1.23 | 3.45 | 5.00  | 1.21 | 3.41 |
-| 1.23 | 3.45 | 5.00  | 1.21 | 3.42 |
-| 1.23 | 3.45 | 5.00  | 1.21 | 3.43 |
 
-: D-optimality values for design X under five different scenarios. {#tbl-one}
 
 - Note that figures and tables (such as @tbl-one) should appear in the paper, not at the end or in separate files.
 
@@ -55,23 +49,35 @@ Background on the research project itself
 
 ## Data {#sec-data}
 
-PACT 2.0 data, parsed reports
+- Describe PACT data, describe report formats, reference the PACT/PEMA codebooks with same coding categories for all reports since 1989
 
 The UNPKOs included are: MINUGUA, MINUJUSTH, MINUSTAH, MIPONUH, ONUCA, ONUSAL, UNCPSG, UNCRO, UNMIBH, UNMIH, UNMIK, UNMISET, UNMIT, UNMOP, UNMOT, UNOMIG, UNPREDEP, UNPROFOR, UNSMIH, UNTAC, UNTAES, UNTAET and UNTMIH.
 
-Some old reports (e.g. ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are at the country level. For identifying the reports to parse and use for the model, we used 'PyMuPDF' and wrote scripts with the help of GitHub Copilot. there were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data corresponds with all post-2000 UN reports included in the PACT 2.0 data set, which in academical language coincides with the third and fourth generations of UN Peacekeeping Missions.
-
-- Include table of how many reports per mission in the whole dataset and selected for parsing
-
-Discuss how the data is structured (PACT 2.0)
-
-Describe process how the data is parsed to extract the paragraphs
+Some old reports (e.g. ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are sometimes at the country level and sometimes at the report level. For identifying the reports to parse and use for the model, we used 'PyMuPDF' and selected based on some characteristics from the file, like first page margins. The reports were then clustered using kNN, and the second cluster included the report types that could be parsed. There were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data corresponds with all post-2000 UN reports included in the PACT 2.0 data set, which in academical language coincides with the third and fourth generations of UN Peacekeeping Missions.
 
 ### Validity checks
 
-To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the reported paragraph, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database. On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. XXXX reports reported no activity and can be therefore be left out for parsing.
+To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the reported paragraph, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.[^1]
 
-To check if parsing was sucessful and our data quality is sufficient, we compare the number of paragraphs extracted from each PDF with the number of total paragraphs reported in the PACT 2.0 data, and only use the data for our model if the number of paragraphs align.
+The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at '1.' in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraphs number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures that the good data quality of parsed reports.[^2]
+
+[^1]: On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. Therefore, pre-trained BERT-class models were used.
+[^2]: Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units like the others, the bounding box to extract text failed for these reports.
+
+| one  | two  | three | four | five |
+|------|------|-------|------|------|
+| 1.23 | 3.45 | 5.00  | 1.21 | 3.41 |
+| 1.23 | 3.45 | 5.00  | 1.21 | 3.42 |
+| 1.23 | 3.45 | 5.00  | 1.21 | 3.43 |
+
+: Included reports in PACT 2.0, after pre-selection and after parsing. {#tbl-included}
+
+Above table (@tbl-included) shows the number of reports per UNPKO in PACT 2.0, as well as shares of the reports that made it through pre-selection and parsing.
+
+
+
+Describe process how the data is parsed to extract the paragraphs
+
 
 ## Methods {#sec-meth}
 
