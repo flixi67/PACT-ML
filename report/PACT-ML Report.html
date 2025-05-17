@@ -76,6 +76,7 @@ div.csl-indent {
   <li><a href="#sec-data" id="toc-sec-data" class="nav-link" data-scroll-target="#sec-data"><span class="header-section-number">2</span> Data</a>
   <ul class="collapse">
   <li><a href="#validity-checks" id="toc-validity-checks" class="nav-link" data-scroll-target="#validity-checks"><span class="header-section-number">2.1</span> Validity checks</a></li>
+  <li><a href="#uncertainty-quantification" id="toc-uncertainty-quantification" class="nav-link" data-scroll-target="#uncertainty-quantification"><span class="header-section-number">2.2</span> Uncertainty quantification</a></li>
   </ul></li>
   <li><a href="#sec-eda" id="toc-sec-eda" class="nav-link" data-scroll-target="#sec-eda"><span class="header-section-number">3</span> Exploratory Data Analysis</a></li>
   <li><a href="#sec-meth" id="toc-sec-meth" class="nav-link" data-scroll-target="#sec-meth"><span class="header-section-number">4</span> Modeling approach</a>
@@ -199,12 +200,12 @@ Table&nbsp;1: D-optimality values for design X under five different scenarios.
 <ul>
 <li>Describe PACT data, describe report formats, reference the PACT/PEMA codebooks with same coding categories for all reports since 1989</li>
 </ul>
-<p>The UNPKOs included are: MINUGUA, MINUJUSTH, MINUSTAH, MIPONUH, ONUCA, ONUSAL, UNCPSG, UNCRO, UNMIBH, UNMIH, UNMIK, UNMISET, UNMIT, UNMOP, UNMOT, UNOMIG, UNPREDEP, UNPROFOR, UNSMIH, UNTAC, UNTAES, UNTAET and UNTMIH.</p>
+<p>This is a sentence.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <p>Some old reports (e.g.&nbsp;ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are sometimes at the country level and sometimes at the report level. For identifying the reports to parse and use for the model, we used ‘PyMuPDF’ and selected based on some characteristics from the file, like first page margins. The reports were then clustered using kNN, and the second cluster included the report types that could be parsed. There were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data mostly corresponds to post-2000 UN reports included in the PACT 2.0 data set, which coincides with the third and fourth generations of UN Peacekeeping Missions.</p>
 <section id="validity-checks" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="validity-checks"><span class="header-section-number">2.1</span> Validity checks</h3>
-<p>To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the reported paragraph, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<p>The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at ‘1.’ in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraphs number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures that the good data quality of parsed reports.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the reported paragraph, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at ‘1.’ in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraphs number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures that the good data quality of parsed reports.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
 <div id="fig-parsing" class="quarto-layout-panel">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-parsing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -240,7 +241,7 @@ Figure&nbsp;1: Examples of the parsing pipeline in action.
 </figcaption>
 </figure>
 </div>
-<p>Table 1 shows the number of reports per UNPKO in PACT 2.0, as well as shares of the reports that made it through pre-selection and parsing. As can be seen, the PDF-formats that the parsing pipeline was able to process is heavily skewed towards a few missions. This is not surprising, as some missions took place only in the 1990s, while the included missions are mostly of the newer peacekeeping generations.</p>
+<p>Table 2 shows the number of reports per UNPKO in PACT 2.0, as well as shares of the reports that made it through pre-selection and parsing. As can be seen, the PDF-formats that the parsing pipeline was able to process is heavily skewed towards a few missions. This is not surprising, as some missions took place only in the 1990s, while the included missions are mostly of the newer peacekeeping generations.</p>
 <div class="cell" data-caption="Included reports in PACT 2.0, after pre-selection and after parsing (also in %).">
 <div id="tbl-included" class="cell quarto-float anchored" data-caption="Included reports in PACT 2.0, after pre-selection and after parsing (also in %).">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -478,9 +479,38 @@ Table&nbsp;2: Included reports in PACT 2.0, after pre-selection and after parsin
 <p>For our models, this means that results are generalizable only to a certain extent.</p>
 <p>In total, we were able to extract 6029, from which 1819 were matched to codings in PACT 2.0. There were multi-label paragraphs (paragraphs that reported more than one activity) in 256 cases. For 29 paragraphs out of the included reports, parsing failed on the paragraph level.</p>
 </section>
+<section id="uncertainty-quantification" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="uncertainty-quantification"><span class="header-section-number">2.2</span> Uncertainty quantification</h3>
+<p>Unlike the paragraph number, which we take as ground truth, the coding itself can not be considered to be ground truth. <span class="citation" data-cites="Bachl2024">Bachl and Scharkow (<a href="#ref-Bachl2024" role="doc-biblioref">forthcoming</a>)</span> discuss the importance of accurate and consistent human classification, particularly in the context of supervised computational text analysis (CTA) methods. This human input is analogous to the role of human coders in traditional content analysis, where intercoder reliability is a key concern.</p>
+<p>Errors in this input (akin to having training data that is not “ground truth”, or low intercoder reliability for this case) can increase error rates:</p>
+<ol type="1">
+<li><p>Supervised CTA relies on human judgment: Supervised approaches to CTA require human intervention. Researchers must provide either pre-defined classification rules or example texts that have been classified by humans. These classified examples or rules serve as the training material from which computational algorithms learn to classify large amounts of text.</p></li>
+<li><p>Errors bias the analysis results: These errors can, in turn, bias the results of an analysis based on the classification. This means if the human-classified training data contains errors or inconsistencies (i.e., is not “ground truth”), the model trained on this data will learn these errors and inconsistencies, leading to biased or inaccurate classifications on new data and increasing the overall error rate of the CTA. Generally, the error rate grows exponentially if a bias is introduced at the first stage.</p></li>
+</ol>
+<p>Sadly, the intercoder reliability checks for the process of coding PACT 2.0 were not available to me, which is why the uncertainty estimates and error rates are not quantified further based on the reliability of the training sources. Without multiple codings for the same paragraph, and the decision that was made for the final data set, potential systematic bias can not be worked out. In general, the error rates reported in <a href="#sec-results" class="quarto-xref">Section&nbsp;5</a> are therefore likely to underestimate the true error rates of classification.</p>
+</section>
 </section>
 <section id="sec-eda" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="sec-eda"><span class="header-section-number">3</span> Exploratory Data Analysis</h2>
+<p>Text Corpus Analysis</p>
+<p>Basic Statistics</p>
+<p>Document counts (total paragraphs, documents per category) Text length distribution (words per paragraph, sentences per paragraph) Document distribution across reports/sources Visualization: Histogram of text lengths with mean/median markers</p>
+<p>Vocabulary Analysis</p>
+<p>Vocabulary size (unique words) Word frequency distribution (Zipf’s law plot) Top words overall (excluding stopwords) Token-to-type ratio (measure of lexical diversity)</p>
+<p>N-gram Analysis</p>
+<p>Most frequent bigrams and trigrams Category-specific phrases (distinctive collocations)</p>
+<p>Category-Specific Analysis</p>
+<p>Label Distribution</p>
+<p>Class imbalance visualization (bar chart of your categories) Multi-label statistics (paragraphs with multiple categories) Co-occurrence matrix (which categories appear together)</p>
+<p>Category Characterization</p>
+<p>Word clouds for each category Most distinctive terms per category (TF-IDF analysis) Average paragraph length by category</p>
+<p>Semantic Analysis</p>
+<p>Term Importance</p>
+<p>TF-IDF scores for important terms Create a visualization showing the most distinctive words per category</p>
+<p>Topic Modeling</p>
+<p>Latent Dirichlet Allocation (LDA) to identify underlying topics Topic distribution visualization Topic coherence across categories</p>
+<p>Word Embeddings Exploration</p>
+<p>t-SNE or UMAP visualization of word vectors Clustering of semantically similar terms Analogy relationships between key terms</p>
 </section>
 <section id="sec-meth" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="sec-meth"><span class="header-section-number">4</span> Modeling approach</h2>
@@ -829,6 +859,9 @@ Table&nbsp;4: Class distributions in full PACT 2.0 data.
 
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Bachl2024" class="csl-entry" role="listitem">
+Bachl, M., and Scharkow, M. (forthcoming), <span>“Computational text analysis,”</span> in <em>Handbook of quantitative research methods in communication science</em>, ed. L. Shen, De Gruyter Mouton.
+</div>
 <div id="ref-Blair2022" class="csl-entry" role="listitem">
 Blair, R. A., Di Salvatore, J., and Smidt, H. M. (2022), <span>“When do <span>UN</span> peacekeeping operations implement their mandates?”</span> <em>American Journal of Political Science</em>, 66, 664–680. https://doi.org/<a href="https://doi.org/10.1111/ajps.12650">https://doi.org/10.1111/ajps.12650</a>.
 </div>
@@ -847,8 +880,9 @@ Salvatore, J. D., Lundgren, M., Oksamytna, K., and Smidt, H. M. (2022), <span>�
 </div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. Therefore, pre-trained BERT-class models were used.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units like the others, the bounding box to extract text failed for these reports.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>The UNPKOs included are: MINUGUA, MINUJUSTH, MINUSTAH, MIPONUH, ONUCA, ONUSAL, UNCPSG, UNCRO, UNMIBH, UNMIH, UNMIK, UNMISET, UNMIT, UNMOP, UNMOT, UNOMIG, UNPREDEP, UNPROFOR, UNSMIH, UNTAC, UNTAES, UNTAET and UNTMIH.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. Therefore, pre-trained BERT-class models were used.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units like the others, the bounding box to extract text failed for these reports.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main>
 <!-- /main column -->
