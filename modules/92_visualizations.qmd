@@ -1,5 +1,5 @@
 ---
-title: "Exploring structure and coverage of old data"
+title: "Visualizations for the reports"
 author: Felix Kube
 format:
     html:
@@ -56,5 +56,14 @@ report_data %>%
     mutate(matchingKey = str_replace_all(report_namePKO, "/", "_") %>%
     select(matchingKey, paragraphNumber) %>%
     distinct()
+
+```
+
+
+
+```{r}
+#| label: tbl-included
+
+
 
 ```
