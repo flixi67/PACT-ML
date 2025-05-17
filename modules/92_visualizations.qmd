@@ -12,58 +12,19 @@ format:
 
 library(tidyverse)
 
-report_data <- readRDS("data/transformed-paragraphs.Rds")
-
-report_data$report_namePKO %>%
-    unique() %>%
-    print()
-
-report_data$report_namePKO %>%
-    unique() %>%
-    length() %>%
-    paste("There are", . , "reports in total") %>%
-    print()
-
-report_data %>%
-    select(report_namePKO, numberParagraphs, paragraphRelevant) %>%
-    distinct()
-
-```
-
-## Check data validity after parsing
-
-
-```{r}
-#| label: data-validity
+report_data <- read_csv2("data/paragraphs.csv") %>%
+    mutate(matchingKey = str_replace_all(report_namePKO, "/", "_")
 
 para_data <- read_csv("data/PACT_paragraphs_training.csv")
 
-para_data$matchingKey %>%
-    unique() %>%
-    print()
-
-para_data $matchingKey %>%
-    unique() %>%
-    length() %>%
-    paste("There are", . , "reports in total after parsing.") %>%
-    print()
-
-para_data %>%
-    select(matchingKey, paragraph, paragraphNumber) %>%
-    distinct()
-
-report_data %>%
-    mutate(matchingKey = str_replace_all(report_namePKO, "/", "_") %>%
-    select(matchingKey, paragraphNumber) %>%
-    distinct()
-
 ```
 
-
+## Included reports after pre-selection and parsing
 
 ```{r}
 #| label: tbl-included
 
-
+mission_names <- report_data$report_namePKO %>%
+    str_extract(pattern = "[A-Z]+")
 
 ```
