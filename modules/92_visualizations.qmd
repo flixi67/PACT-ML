@@ -24,7 +24,7 @@ para_data <- read_csv("data/PACT_paragraphs_training.csv")
 ```{r}
 #| label: tbl-included
 
-mission_names <- report_data$report_namePKO %>%
-    str_extract(pattern = "[A-Z]+")
+report_data %>%
+    mutate(PKO = str_split(report_namePKO, "_"))
 
 ```
