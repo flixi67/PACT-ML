@@ -2,11 +2,12 @@
 title: "PACT-ML: Coding United Nation Peacekeeping Data from reports to the Secretary-General"
 subtitle: "Using Bag-of-Words approaches and BERT models"
 format:
-  jasa-pdf:
-    keep-tex: true  
-    journal:
-      blinded: false
   jasa-html: default
+execute:
+  echo: false       # hide code
+  warning: false    # suppress warnings
+  message: false    # suppress messages
+  error: false      # suppress errors (render fails if an error occurs)
 date: last-modified
 author:
   - name: Felix Kube
@@ -26,43 +27,15 @@ keywords:
 bibliography: bibliography.bib  
 ---
 
-## Notes
-
-- ONUCA reports left out due to super old report format and issues in preprocessing.
-- UNMIBH and UNTAET reports left out due to 2 column layout
-- maybe make cutoff at the introduction of the newer format?
-- leave out cross-country missions due to problems in data parsing and different language format (only coded on state-level, when that state's name is explicitely mentioned)
-  - could also preprocess data and merge those states back together
-
-
 ## Introduction {#sec-intro}
 
+In recent years, United Nations peacekeeping operations (UNPKOs) have faced growing political resistance and resource constraints, resulting in a stagnation of new mission mandates and increasing difficulty in sustaining existing ones. At the same time, efforts to systematically monitor and evaluate peacekeeping effectiveness—particularly through structured data collection—have become more difficult to maintain. This study explores the feasibility of using natural language processing (NLP) and machine learning methods to automatically code newly written peacekeeping mission reports. The motivation stems from the recognition that manual coding efforts, such as those employed in the PACT project, are resource-intensive and unlikely to be extended to cover post-2018 mission data. As such, automated coding presents a scalable alternative to support continued research and institutional monitoring.
 
+The empirical foundation of this effort is the PACT 2.0 dataset (@PACT2), which codes the activities of peacekeeping missions based on United Nations Secretary-General (UNSG) progress reports. PACT 2.0 builds on the original Peacekeeping Activity Dataset (PACT 1.0, yet unreleased) and extends its geographic scope beyond Africa to include 23 missions across Europe, the Americas, and Asia, all mandated after 1988 in civil war contexts (@PACT2CB). The dataset captures operational behavior at the paragraph level—tracking specific actions undertaken by peacekeepers, the nature of their engagement, and whether these activities involved international partners. Reports are coded in fine detail, producing a rich training corpus for supervised machine learning approaches. The goal of this work is to assess whether models trained on PACT-coded data can automatically identify similar activities in new, uncoded reports.
 
-- Note that figures and tables (such as @tbl-one) should appear in the paper, not at the end or in separate files.
+This initiative also draws inspiration from related efforts such as the PEMA (Peacekeeping Mandates) dataset (@Salvatore2022), which systematically codes peacekeeping tasks as defined in Security Council resolutions. PEMA distinguishes among various modalities (e.g., monitoring, assisting, securing) and levels of directive authority (requested vs. encouraged), offering insights into how mandates evolve and guide operational priorities. While PEMA focuses on mandated intent, PACT focuses on reported implementation, offering a valuable complement for understanding peacekeeping effectiveness on the ground. Automating this kind of report-level analysis could help bridge the gap between what peacekeepers are tasked to do and what they actually report doing—at scale and in near real time.
 
-Motivation: Feasibility test to use data of this kind to automatically code newly written reports.
-
-Background on the research project itself
-
-
-
-## Data {#sec-data}
-
-- Describe PACT data, describe report formats, reference the PACT/PEMA codebooks with same coding categories for all reports since 1989
-
-The UNPKOs included are: MINUGUA, MINUJUSTH, MINUSTAH, MIPONUH, ONUCA, ONUSAL, UNCPSG, UNCRO, UNMIBH, UNMIH, UNMIK, UNMISET, UNMIT, UNMOP, UNMOT, UNOMIG, UNPREDEP, UNPROFOR, UNSMIH, UNTAC, UNTAES, UNTAET and UNTMIH.
-
-Some old reports (e.g. ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are sometimes at the country level and sometimes at the report level. For identifying the reports to parse and use for the model, we used 'PyMuPDF' and selected based on some characteristics from the file, like first page margins. The reports were then clustered using kNN, and the second cluster included the report types that could be parsed. There were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data corresponds with all post-2000 UN reports included in the PACT 2.0 data set, which in academical language coincides with the third and fourth generations of UN Peacekeeping Missions.
-
-### Validity checks
-
-To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the reported paragraph, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.[^1]
-
-The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at '1.' in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraphs number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures that the good data quality of parsed reports.[^2]
-
-[^1]: On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. Therefore, pre-trained BERT-class models were used.
-[^2]: Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units like the others, the bounding box to extract text failed for these reports.
+In sum, this study tests whether combining high-quality annotated data from the PACT project with modern NLP techniques can offer a scalable solution to peacekeeping data collection, thereby enabling continuous monitoring of peacekeeping behavior even in the absence of new manual coding efforts.
 
 | one  | two  | three | four | five |
 |------|------|-------|------|------|
@@ -70,19 +43,233 @@ The reports were then parsed. Since the Annexes were not as expected in a separa
 | 1.23 | 3.45 | 5.00  | 1.21 | 3.42 |
 | 1.23 | 3.45 | 5.00  | 1.21 | 3.43 |
 
-: Included reports in PACT 2.0, after pre-selection and after parsing. {#tbl-included}
+: D-optimality values for design X under five different scenarios. {#tbl-one}
 
-Above table (@tbl-included) shows the number of reports per UNPKO in PACT 2.0, as well as shares of the reports that made it through pre-selection and parsing.
-
-
-
-Describe process how the data is parsed to extract the paragraphs
+- Note that figures and tables (such as @tbl-one) should appear in the paper, not at the end or in separate files.
 
 
-## Methods {#sec-meth}
+
+## Data {#sec-data}
+
+- Describe PACT data, describe report formats, reference the PACT/PEMA codebooks with same coding categories for all reports since 1989
+
+This is a sentence.[^1]
+
+[^1]: The UNPKOs included are: MINUGUA, MINUJUSTH, MINUSTAH, MIPONUH, ONUCA, ONUSAL, UNCPSG, UNCRO, UNMIBH, UNMIH, UNMIK, UNMISET, UNMIT, UNMOP, UNMOT, UNOMIG, UNPREDEP, UNPROFOR, UNSMIH, UNTAC, UNTAES, UNTAET and UNTMIH.
+
+Some old reports (e.g. ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are sometimes at the country level and sometimes at the report level. For identifying the reports to parse and use for the model, we used 'PyMuPDF' and selected based on some characteristics from the file, like first page margins. The reports were then clustered using kNN, and the second cluster included the report types that could be parsed. There were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data mostly corresponds to post-2000 UN reports included in the PACT 2.0 data set, which coincides with the third and fourth generations of UN Peacekeeping Missions.
+
+### Validity checks
+
+To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the reported paragraph, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.[^2]
+
+The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at '1.' in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraphs number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures that the good data quality of parsed reports.[^3]
+
+[^2]: On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. Therefore, pre-trained BERT-class models were used.
+[^3]: Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units like the others, the bounding box to extract text failed for these reports.
+
+::: {#fig-parsing layout-ncol=2}
+
+![Removing annex paragraphs during parsing](_static/Annex_parsing.png){#fig-annex}
+
+![Parsing fails due to 10% threshold](_static/Parsing_fails.png){#fig-fails}
+
+Examples of the parsing pipeline in action.
+:::
+
+Table 2 shows the number of reports per UNPKO in PACT 2.0, as well as shares of the reports that made it through pre-selection and parsing. As can be seen, the PDF-formats that the parsing pipeline was able to process is heavily skewed towards a few missions. This is not surprising, as some missions took place only in the 1990s, while the included missions are mostly of the newer peacekeeping generations.
+
+```{r}
+#| label: included-reports
+
+library(tidyverse)
+
+report_data <- read_csv2("../data/paragraphs.csv") %>%
+    mutate(matchingKey = str_replace_all(report_namePKO, "/", "_"))
+
+para_data <- read_csv("../data/PACT_paragraphs_training.csv")
+
+```
+
+
+```{r}
+#| label: tbl-included
+#| caption: "Included reports in PACT 2.0, after pre-selection and after parsing (also in %)."
+
+library(knitr)
+library(kableExtra)
+
+# 1. Reports in report_data
+report_counts <- report_data %>%
+  mutate(
+    split = str_split_fixed(report_namePKO, "_", n = 2),
+    PKO = split[, 1],
+    report = split[, 2]
+  ) %>%
+  select(PKO, report) %>%
+  distinct() %>%
+  count(PKO, name = "n_report_data")
+
+# 2. Reports in data/pdfs
+pdf_counts <- dir("data/pdfs", full.names = FALSE) %>%
+  enframe(name = NULL, value = "filename") %>%
+  mutate(
+    split = str_split_fixed(filename, "_", n = 2),
+    PKO = split[, 1],
+    report = split[, 2]
+  ) %>%
+  count(PKO, name = "n_pdfs")
+
+# 3. Reports in para_data
+para_counts <- para_data %>%
+  mutate(
+    split = str_split_fixed(matchingKey, "_", n = 2),
+    PKO = split[, 1],
+    report = split[, 2]
+  ) %>%
+  select(PKO, report) %>%
+  distinct() %>%
+  count(PKO, name = "n_para")
+
+# 4. Combine all counts and compute percentages
+report_summary <- report_counts %>%
+  full_join(pdf_counts, by = "PKO") %>%
+  full_join(para_counts, by = "PKO") %>%
+  mutate(
+    pct_pdfs = 100 * n_pdfs / n_report_data,
+    pct_para = 100 * n_para / n_report_data
+  )
+
+# View result
+report_summary %>%
+  rename(
+    `PKO` = PKO,
+    `Total Reports` = n_report_data,
+    `After pre-selection` = n_pdfs,
+    `Coverage (Selection)` = pct_pdfs,
+    `After parsing` = n_para,
+    `Coverage (Parsing)` = pct_para
+  ) %>%
+  mutate(
+    `Coverage (Selection)` = sprintf("%.1f%%", `Coverage (Selection)`),
+    `Coverage (Parsing)` = sprintf("%.1f%%", `Coverage (Parsing)`)
+  ) %>%
+  kable(format = "html", caption = "Included reports in PACT 2.0, after pre-selection and after parsing (also in %).", digits = 1, align = "c") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+                full_width = FALSE,
+                position = "center")
+
+```
+
+Interestingly, we can see that some reports included after pre-selection do not appear in the PACT 2.0 dataset, meaning that there were no peackeeping activities carried out at the time of the report. This concerns three reports in UNIKOM, as well as one report in UNMIT. Most reports were filtered out for UNOMIG, which is again not surprising, as the mission lasted from 1993 until 2009, meaning that most early reports were in the typewritten and therefore discarded.
+
+For our models, this means that results are generalizable only to a certain extent. 
+
+In total, we were able to extract `{r} dim(para_data)[1]`, from which 1819 were matched to codings in PACT 2.0. There were multi-label paragraphs (paragraphs that reported more than one activity) in 256 cases. For 29 paragraphs out of the included reports, parsing failed on the paragraph level.
+
+### Uncertainty quantification
+
+Unlike the paragraph number, which we take as ground truth, the coding itself can not be considered to be ground truth. @Bachl2024 discuss the importance of accurate and consistent human classification, particularly in the context of supervised computational text analysis (CTA) methods. This human input is analogous to the role of human coders in traditional content analysis, where intercoder reliability is a key concern.
+
+Errors in this input (akin to having training data that is not "ground truth", or low intercoder reliability for this case) can increase error rates:
+
+1. Supervised CTA relies on human judgment: Supervised approaches to CTA require human intervention. Researchers must provide either pre-defined classification rules or example texts that have been classified by humans. These classified examples or rules serve as the training material from which computational algorithms learn to classify large amounts of text.
+
+2. Errors bias the analysis results: These errors can, in turn, bias the results of an analysis based on the classification. This means if the human-classified training data contains errors or inconsistencies (i.e., is not "ground truth"), the model trained on this data will learn these errors and inconsistencies, leading to biased or inaccurate classifications on new data and increasing the overall error rate of the CTA. Generally, the error rate grows exponentially if a bias is introduced at the first stage.
+
+Sadly, the intercoder reliability checks for the process of coding PACT 2.0 were not available to me, which is why the uncertainty estimates and error rates are not quantified further based on the reliability of the training sources. Without multiple codings for the same paragraph, and the decision that was made for the final data set, potential systematic bias can not be worked out. In general, the error rates reported in @sec-results are therefore likely to underestimate the true error rates of classification.
+
+## Exploratory Data Analysis {#sec-eda}
+
+Text Corpus Analysis
+
+Basic Statistics
+
+Document counts (total paragraphs, documents per category)
+Text length distribution (words per paragraph, sentences per paragraph)
+Document distribution across reports/sources
+Visualization: Histogram of text lengths with mean/median markers
+
+
+Vocabulary Analysis
+
+Vocabulary size (unique words)
+Word frequency distribution (Zipf's law plot)
+Top words overall (excluding stopwords)
+Token-to-type ratio (measure of lexical diversity)
+
+
+N-gram Analysis
+
+Most frequent bigrams and trigrams
+Category-specific phrases (distinctive collocations)
+
+
+
+
+Category-Specific Analysis
+
+Label Distribution
+
+Class imbalance visualization (bar chart of your categories)
+Multi-label statistics (paragraphs with multiple categories)
+Co-occurrence matrix (which categories appear together)
+
+
+Category Characterization
+
+Word clouds for each category
+Most distinctive terms per category (TF-IDF analysis)
+Average paragraph length by category
+
+
+
+Semantic Analysis
+
+Term Importance
+
+TF-IDF scores for important terms
+Create a visualization showing the most distinctive words per category
+
+
+Topic Modeling
+
+Latent Dirichlet Allocation (LDA) to identify underlying topics
+Topic distribution visualization
+Topic coherence across categories
+
+
+Word Embeddings Exploration
+
+t-SNE or UMAP visualization of word vectors
+Clustering of semantically similar terms
+Analogy relationships between key terms
+
+## Modeling approach {#sec-meth}
 
 Don't take any of these section titles seriously.
 They're just for illustration.
+
+### Cross-Validation strategy
+
+| Category | Count | Proportion | Percentage |
+|----------|-------|------------|------------|
+| PoliceReform | 525 | 0.2886 | 28.86% |
+| Operations_PatrolsInterventions | 151 | 0.0830 | 8.30% |
+| StateAdministration | 219 | 0.1204 | 12.04% |
+| RefugeeAssistance | 103 | 0.0566 | 5.66% |
+| ElectionAssistance | 112 | 0.0616 | 6.16% |
+| LegalReform | 129 | 0.0709 | 7.09% |
+| CivilSocietyAssistance | 161 | 0.0885 | 8.85% |
+| **Total** | 1819 | 1.0000 | 100.00% |
+
+: Class distributions in training data. {#tbl-class-distribution}
+
+As can be seen in @tbl-class-distribution, the seven most coded categories selected for this feasibility test were still highly unbalanced. The imbalance ratio between the most frequent and least frequent was 5.1, compared to 5.31 for our target categories among the whole PACT 2.0 data set. The class distribution table for the full PACT 2.0 data set can be found in @tbl-class-distribution-full in the Annex.
+
+To ensure robust model evaluation, we employed Stratified K-Fold Cross-Validation. Specifically, we used Stratified K-Fold Cross-Validation using the 'IterativeStratification' strategy from the 'skmultilearn' library, which is tailored for multilabel classification. This strategy splits the data into _K_ folds while preserving the label distribution across each fold, which is critical given the imbalanced and multilabel nature of the dataset. Unlike standard K-Fold, stratification helps prevent biased performance estimates that can occur if rare labels are unevenly distributed. By training and testing across multiple stratified splits, we obtain a more reliable estimate of model performance and ensure that each model is evaluated on diverse subsets of the data while still maintaining representative label proportions. This makes the approach well-suited for our multi-class, multi-label classification task.
+
+The typical StratifiedKFold in 'scikit-learn' has a random_state parameter to shuffle the data before splitting, which is useful to ensure reproducibility. However, 'IterativeStratification' from 'skmultilearn.model_selection' does not support a random_state parameter, because it uses a deterministic algorithm to ensure that label distributions are balanced in each fold. Shuffling or adding randomness would disrupt the iterative label-balancing process, which is the entire point of using this strategy. Since the same cross-validation was used across models, results are still comparable.
 
 ## Results {#sec-results}
 
@@ -90,14 +277,51 @@ They're just for illustration.
 ## Conclusion {#sec-conc}
 
 
-## Supplementary Material {.supplementary}
+## Annex {.annex}
+
+| Category | Count | Proportion | Percentage |
+|----------|-------|------------|------------|
+| PoliceReform | 1232 | 0.2532 | 25.32% |
+| Operations_PatrolsInterventions | 587 | 0.1207 | 12.07% |
+| StateAdministration | 581 | 0.1194 | 11.94% |
+| HumanRights | 450 | 0.0925 | 9.25% |
+| JusticeSectorReform | 435 | 0.0894 | 8.94% |
+| Demilitarization | 350 | 0.0719 | 7.19% |
+| RefugeeAssistance | 312 | 0.0641 | 6.41% |
+| ElectionAssistance | 265 | 0.0545 | 5.45% |
+| BorderControl | 251 | 0.0516 | 5.16% |
+| MilitaryReform | 247 | 0.0508 | 5.08% |
+| LegalReform | 235 | 0.0483 | 4.83% |
+| CivilSocietyAssistance | 232 | 0.0477 | 4.77% |
+| PrisonReform | 228 | 0.0469 | 4.69% |
+| HumanitarianRelief | 222 | 0.0456 | 4.56% |
+| Gender | 209 | 0.0430 | 4.30% |
+| PartyAssistance | 178 | 0.0366 | 3.66% |
+| DemocraticInstitutions | 144 | 0.0296 | 2.96% |
+| SexualViolence | 142 | 0.0292 | 2.92% |
+| ControlSALW | 133 | 0.0273 | 2.73% |
+| Operations_UseOfForce | 132 | 0.0271 | 2.71% |
+| TransitionalJustice | 123 | 0.0253 | 2.53% |
+| PublicHealth | 109 | 0.0224 | 2.24% |
+| LocalReconciliation | 102 | 0.0210 | 2.10% |
+| ElectoralSecurity | 99 | 0.0203 | 2.03% |
+| EconomicDevelopment | 98 | 0.0201 | 2.01% |
+| ChildRights | 96 | 0.0197 | 1.97% |
+| DisarmamentDemobilization | 95 | 0.0195 | 1.95% |
+| Media | 80 | 0.0164 | 1.64% |
+| Demining | 79 | 0.0162 | 1.62% |
+| National_Reconciliation | 77 | 0.0158 | 1.58% |
+| CivilianProtection | 61 | 0.0125 | 1.25% |
+| Reintegration | 54 | 0.0111 | 1.11% |
+| Resources | 38 | 0.0078 | 0.78% |
+| VoterEducation | 30 | 0.0062 | 0.62% |
+| StateAuthority | 23 | 0.0047 | 0.47% |
+| PowerSharing | 9 | 0.0018 | 0.18% |
+| ArmsEmbargo | 0 | 0.0000 | 0.00% |
+| **Total Documents** | 4865 | - | - |
+
+: Class distributions in full PACT 2.0 data. {#tbl-class-distribution-full}
 
 Title:
 
 :   Brief description. (file type)
-
-
-
-
-
- 

@@ -13,7 +13,7 @@ format:
 library(tidyverse)
 
 report_data <- read_csv2("data/paragraphs.csv") %>%
-    mutate(matchingKey = str_replace_all(report_namePKO, "/", "_")
+    mutate(matchingKey = str_replace_all(report_namePKO, "/", "_"))
 
 para_data <- read_csv("data/PACT_paragraphs_training.csv")
 
@@ -24,7 +24,67 @@ para_data <- read_csv("data/PACT_paragraphs_training.csv")
 ```{r}
 #| label: tbl-included
 
-report_data %>%
-    mutate(PKO = str_split(report_namePKO, "_"))
+library(knitr)
+library(kableExtra)
+
+# 1. Reports in report_data
+report_counts <- report_data %>%
+  mutate(
+    split = str_split_fixed(report_namePKO, "_", n = 2),
+    PKO = split[, 1],
+    report = split[, 2]
+  ) %>%
+  select(PKO, report) %>%
+  distinct() %>%
+  count(PKO, name = "n_report_data")
+
+# 2. Reports in data/pdfs
+pdf_counts <- dir("data/pdfs", full.names = FALSE) %>%
+  enframe(name = NULL, value = "filename") %>%
+  mutate(
+    split = str_split_fixed(filename, "_", n = 2),
+    PKO = split[, 1],
+    report = split[, 2]
+  ) %>%
+  count(PKO, name = "n_pdfs")
+
+# 3. Reports in para_data
+para_counts <- para_data %>%
+  mutate(
+    split = str_split_fixed(matchingKey, "_", n = 2),
+    PKO = split[, 1],
+    report = split[, 2]
+  ) %>%
+  select(PKO, report) %>%
+  distinct() %>%
+  count(PKO, name = "n_para")
+
+# 4. Combine all counts and compute percentages
+report_summary <- report_counts %>%
+  full_join(pdf_counts, by = "PKO") %>%
+  full_join(para_counts, by = "PKO") %>%
+  mutate(
+    pct_pdfs = 100 * n_pdfs / n_report_data,
+    pct_para = 100 * n_para / n_report_data
+  )
+
+# View result
+report_summary %>%
+  rename(
+    `PKO` = PKO,
+    `Total Reports` = n_report_data,
+    `After pre-selection` = n_pdfs,
+    `Coverage (Selection)` = pct_pdfs,
+    `After parsing` = n_para,
+    `Coverage (Parsing)` = pct_para
+  ) %>%
+  mutate(
+    `Coverage (Selection)` = sprintf("%.1f%%", `Coverage (Selection)`),
+    `Coverage (Parsing)` = sprintf("%.1f%%", `Coverage (Parsing)`)
+  ) %>%
+  kable(format = "html", digits = 1, align = "c") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+                full_width = FALSE,
+                position = "center")
 
 ```

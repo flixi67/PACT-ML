@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Felix Kube">
-<meta name="dcterms.date" content="2025-05-02">
+<meta name="dcterms.date" content="2025-05-17">
 <meta name="keywords" content="Machine Learning, Natural Language Processing, United Nations Peacekeeping, BERT, roBERTa">
 
 <title>PACT-ML: Coding United Nation Peacekeeping Data from reports to the Secretary-General</title>
@@ -56,6 +56,10 @@ div.csl-indent {
 <script src="PACT-ML Report_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="PACT-ML Report_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="PACT-ML Report_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="PACT-ML Report_files/libs/kePrint-0.0.1/kePrint.js"></script>
+
+<link href="PACT-ML Report_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
 
 
 </head>
@@ -68,17 +72,21 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#notes" id="toc-notes" class="nav-link active" data-scroll-target="#notes"><span class="header-section-number">1</span> Notes</a></li>
-  <li><a href="#sec-intro" id="toc-sec-intro" class="nav-link" data-scroll-target="#sec-intro"><span class="header-section-number">2</span> Introduction</a></li>
-  <li><a href="#sec-meth" id="toc-sec-meth" class="nav-link" data-scroll-target="#sec-meth"><span class="header-section-number">3</span> Methods</a></li>
-  <li><a href="#sec-verify" id="toc-sec-verify" class="nav-link" data-scroll-target="#sec-verify"><span class="header-section-number">4</span> Verifications</a></li>
-  <li><a href="#sec-conc" id="toc-sec-conc" class="nav-link" data-scroll-target="#sec-conc"><span class="header-section-number">5</span> Conclusion</a></li>
-  <li><a href="#disclosure-statement" id="toc-disclosure-statement" class="nav-link" data-scroll-target="#disclosure-statement"><span class="header-section-number">6</span> Disclosure statement</a></li>
-  <li><a href="#data-availability-statement" id="toc-data-availability-statement" class="nav-link" data-scroll-target="#data-availability-statement"><span class="header-section-number">7</span> Data Availability Statement</a></li>
-  <li><a href="#supplementary-material" id="toc-supplementary-material" class="nav-link" data-scroll-target="#supplementary-material">Supplementary Material</a></li>
-  <li><a href="#bibtex" id="toc-bibtex" class="nav-link" data-scroll-target="#bibtex"><span class="header-section-number">8</span> BibTeX</a></li>
+  <li><a href="#sec-intro" id="toc-sec-intro" class="nav-link active" data-scroll-target="#sec-intro"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#sec-data" id="toc-sec-data" class="nav-link" data-scroll-target="#sec-data"><span class="header-section-number">2</span> Data</a>
+  <ul class="collapse">
+  <li><a href="#validity-checks" id="toc-validity-checks" class="nav-link" data-scroll-target="#validity-checks"><span class="header-section-number">2.1</span> Validity checks</a></li>
+  </ul></li>
+  <li><a href="#sec-eda" id="toc-sec-eda" class="nav-link" data-scroll-target="#sec-eda"><span class="header-section-number">3</span> Exploratory Data Analysis</a></li>
+  <li><a href="#sec-meth" id="toc-sec-meth" class="nav-link" data-scroll-target="#sec-meth"><span class="header-section-number">4</span> Modeling approach</a>
+  <ul class="collapse">
+  <li><a href="#cross-validation-strategy" id="toc-cross-validation-strategy" class="nav-link" data-scroll-target="#cross-validation-strategy"><span class="header-section-number">4.1</span> Cross-Validation strategy</a></li>
+  </ul></li>
+  <li><a href="#sec-results" id="toc-sec-results" class="nav-link" data-scroll-target="#sec-results"><span class="header-section-number">5</span> Results</a></li>
+  <li><a href="#sec-conc" id="toc-sec-conc" class="nav-link" data-scroll-target="#sec-conc"><span class="header-section-number">6</span> Conclusion</a></li>
+  <li><a href="#annex" id="toc-annex" class="nav-link" data-scroll-target="#annex"><span class="header-section-number">7</span> Annex</a></li>
   </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="..\PACT-ML-Report.pdf"><i class="bi bi-file-pdf"></i>PDF (jasa)</a></li></ul></div></nav>
+</nav>
 </div>
 <main class="content" id="quarto-document-content">
 
@@ -109,7 +117,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 2, 2025</p>
+      <p class="date">May 17, 2025</p>
     </div>
   </div>
   
@@ -133,16 +141,12 @@ div.csl-indent {
 </header>
 
 
-<section id="notes" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="notes"><span class="header-section-number">1</span> Notes</h2>
-<ul>
-<li>ONUCA reports left out due to super old report format and issues in preprocessing.</li>
-<li></li>
-</ul>
-</section>
-<section id="sec-intro" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="sec-intro"><span class="header-section-number">2</span> Introduction</h2>
-<p>Body of paper. Margins in this document are roughly 0.75 inches all around, letter size paper.</p>
+<section id="sec-intro" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="sec-intro"><span class="header-section-number">1</span> Introduction</h2>
+<p>In recent years, United Nations peacekeeping operations (UNPKOs) have faced growing political resistance and resource constraints, resulting in a stagnation of new mission mandates and increasing difficulty in sustaining existing ones. At the same time, efforts to systematically monitor and evaluate peacekeeping effectiveness—particularly through structured data collection—have become more difficult to maintain. This study explores the feasibility of using natural language processing (NLP) and machine learning methods to automatically code newly written peacekeeping mission reports. The motivation stems from the recognition that manual coding efforts, such as those employed in the PACT project, are resource-intensive and unlikely to be extended to cover post-2018 mission data. As such, automated coding presents a scalable alternative to support continued research and institutional monitoring.</p>
+<p>The empirical foundation of this effort is the PACT 2.0 dataset (<span class="citation" data-cites="PACT2">Otto (<a href="#ref-PACT2" role="doc-biblioref">2024</a>)</span>), which codes the activities of peacekeeping missions based on United Nations Secretary-General (UNSG) progress reports. PACT 2.0 builds on the original Peacekeeping Activity Dataset (PACT 1.0, yet unreleased) and extends its geographic scope beyond Africa to include 23 missions across Europe, the Americas, and Asia, all mandated after 1988 in civil war contexts (<span class="citation" data-cites="PACT2CB">Otto and Honda (<a href="#ref-PACT2CB" role="doc-biblioref">2024</a>)</span>). The dataset captures operational behavior at the paragraph level—tracking specific actions undertaken by peacekeepers, the nature of their engagement, and whether these activities involved international partners. Reports are coded in fine detail, producing a rich training corpus for supervised machine learning approaches. The goal of this work is to assess whether models trained on PACT-coded data can automatically identify similar activities in new, uncoded reports.</p>
+<p>This initiative also draws inspiration from related efforts such as the PEMA (Peacekeeping Mandates) dataset (<span class="citation" data-cites="Salvatore2022">Salvatore et al. (<a href="#ref-Salvatore2022" role="doc-biblioref">2022</a>)</span>), which systematically codes peacekeeping tasks as defined in Security Council resolutions. PEMA distinguishes among various modalities (e.g., monitoring, assisting, securing) and levels of directive authority (requested vs.&nbsp;encouraged), offering insights into how mandates evolve and guide operational priorities. While PEMA focuses on mandated intent, PACT focuses on reported implementation, offering a valuable complement for understanding peacekeeping effectiveness on the ground. Automating this kind of report-level analysis could help bridge the gap between what peacekeepers are tasked to do and what they actually report doing—at scale and in near real time.</p>
+<p>In sum, this study tests whether combining high-quality annotated data from the PACT project with modern NLP techniques can offer a scalable solution to peacekeeping data collection, thereby enabling continuous monitoring of peacekeeping behavior even in the absence of new manual coding efforts.</p>
 <div id="tbl-one" class="quarto-float anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-one-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -187,82 +191,666 @@ Table&nbsp;1: D-optimality values for design X under five different scenarios.
 </figure>
 </div>
 <ul>
-<li>Note that figures and tables (such as <strong>?@fig-first</strong> and <a href="#tbl-one" class="quarto-xref">Table&nbsp;1</a>) should appear in the paper, not at the end or in separate files.</li>
-<li>In document front matter, you may set the key <code>blinded</code> under a <code>journal</code> key to hide the authors and acknowledgements, producing the required anonymized version.</li>
-<li>Remember that in the anonymized version, you should not identify authors indirectly in the text. That is, don’t say “In Smith et. al.&nbsp;(2009) we showed that …”. Instead, say “Smith et. al.&nbsp;(2009) showed that …”.</li>
-<li>These points are only intended to remind you of some requirements. Please refer to the instructions for authors at <a href="http://amstat.tandfonline.com/action/authorSubmission?journalCode=uasa20&amp;page=instructions#.VFkk7fnF_0c">http://amstat.tandfonline.com/action/authorSubmission?journalCode=uasa20&amp;page=instructions#.VFkk7fnF_0c</a></li>
-<li>For more about ASA&nbsp;style, please see <a href="https://files.taylorandfrancis.com/asa-style-guide.pdf">https://files.taylorandfrancis.com/asa-style-guide.pdf</a>.</li>
-<li>If you have supplementary material (e.g., software, data, technical proofs), identify them in the section below. In early stages of the submission process, you may be unsure what to include as supplementary material. Don’t worry—this is something that can be worked out at later stages.</li>
+<li>Note that figures and tables (such as <a href="#tbl-one" class="quarto-xref">Table&nbsp;1</a>) should appear in the paper, not at the end or in separate files.</li>
 </ul>
 </section>
-<section id="sec-meth" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="sec-meth"><span class="header-section-number">3</span> Methods</h2>
+<section id="sec-data" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="sec-data"><span class="header-section-number">2</span> Data</h2>
+<ul>
+<li>Describe PACT data, describe report formats, reference the PACT/PEMA codebooks with same coding categories for all reports since 1989</li>
+</ul>
+<p>The UNPKOs included are: MINUGUA, MINUJUSTH, MINUSTAH, MIPONUH, ONUCA, ONUSAL, UNCPSG, UNCRO, UNMIBH, UNMIH, UNMIK, UNMISET, UNMIT, UNMOP, UNMOT, UNOMIG, UNPREDEP, UNPROFOR, UNSMIH, UNTAC, UNTAES, UNTAET and UNTMIH.</p>
+<p>Some old reports (e.g.&nbsp;ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are sometimes at the country level and sometimes at the report level. For identifying the reports to parse and use for the model, we used ‘PyMuPDF’ and selected based on some characteristics from the file, like first page margins. The reports were then clustered using kNN, and the second cluster included the report types that could be parsed. There were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data mostly corresponds to post-2000 UN reports included in the PACT 2.0 data set, which coincides with the third and fourth generations of UN Peacekeeping Missions.</p>
+<section id="validity-checks" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="validity-checks"><span class="header-section-number">2.1</span> Validity checks</h3>
+<p>To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the reported paragraph, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at ‘1.’ in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraphs number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures that the good data quality of parsed reports.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<div id="fig-parsing" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-parsing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-parsing" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-annex" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-annex-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="_static/Annex_parsing.png" class="img-fluid figure-img" data-ref-parent="fig-parsing">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-annex-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Removing annex paragraphs during parsing
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-parsing" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-fails" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-fails-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="_static/Parsing_fails.png" class="img-fluid figure-img" data-ref-parent="fig-parsing">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-fails-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Parsing fails due to 10% threshold
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-parsing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Examples of the parsing pipeline in action.
+</figcaption>
+</figure>
+</div>
+<p>Table 1 shows the number of reports per UNPKO in PACT 2.0, as well as shares of the reports that made it through pre-selection and parsing. As can be seen, the PDF-formats that the parsing pipeline was able to process is heavily skewed towards a few missions. This is not surprising, as some missions took place only in the 1990s, while the included missions are mostly of the newer peacekeeping generations.</p>
+<div class="cell" data-caption="Included reports in PACT 2.0, after pre-selection and after parsing (also in %).">
+<div id="tbl-included" class="cell quarto-float anchored" data-caption="Included reports in PACT 2.0, after pre-selection and after parsing (also in %).">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-included-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Included reports in PACT 2.0, after pre-selection and after parsing (also in %).
+</figcaption>
+<div aria-describedby="tbl-included-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed do-not-create-environment cell table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: center;" data-quarto-table-cell-role="th">PKO</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Total Reports</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">After pre-selection</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">After parsing</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Coverage (Selection)</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Coverage (Parsing)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">MINUGUA</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">MINUJUSTH</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">MINUSTAH</td>
+<td style="text-align: center;">38</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">30</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">78.9%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">MIPONHU</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">MIPONUH</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ONUCA</td>
+<td style="text-align: center;">27</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ONUSAL</td>
+<td style="text-align: center;">21</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UNCRO</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">UNMIBH</td>
+<td style="text-align: center;">23</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UNMIH</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">UNMIK</td>
+<td style="text-align: center;">74</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">38</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">51.4%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UNMISET</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">40.0%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">UNMISH</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UNMIT</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">100.0%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">UNMOP</td>
+<td style="text-align: center;">56</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UNMOT</td>
+<td style="text-align: center;">23</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">UNOMIG</td>
+<td style="text-align: center;">63</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">11.1%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UNPREDEP</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">UNPROFOR</td>
+<td style="text-align: center;">38</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UNPSG</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">UNSMIH</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UNTAC</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">UNTAES</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UNTAET</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">UNTMIH</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Interestingly, we can see that some reports included after pre-selection do not appear in the PACT 2.0 dataset, meaning that there were no peackeeping activities carried out at the time of the report. This concerns three reports in UNIKOM, as well as one report in UNMIT. Most reports were filtered out for UNOMIG, which is again not surprising, as the mission lasted from 1993 until 2009, meaning that most early reports were in the typewritten and therefore discarded.</p>
+<p>For our models, this means that results are generalizable only to a certain extent.</p>
+<p>In total, we were able to extract 6029, from which 1819 were matched to codings in PACT 2.0. There were multi-label paragraphs (paragraphs that reported more than one activity) in 256 cases. For 29 paragraphs out of the included reports, parsing failed on the paragraph level.</p>
+</section>
+</section>
+<section id="sec-eda" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="sec-eda"><span class="header-section-number">3</span> Exploratory Data Analysis</h2>
+</section>
+<section id="sec-meth" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="sec-meth"><span class="header-section-number">4</span> Modeling approach</h2>
 <p>Don’t take any of these section titles seriously. They’re just for illustration.</p>
-</section>
-<section id="sec-verify" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="sec-verify"><span class="header-section-number">4</span> Verifications</h2>
-<p>This section will be just long enough to illustrate what a full page of text looks like, for margins and spacing.</p>
-<div data-add-textheight=".5in">
-<p>The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. <strong>With this spacing we have 25 lines per page.</strong> The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.</p>
-<p>The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.</p>
-<p>The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.</p>
-<p>The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.</p>
+<section id="cross-validation-strategy" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="cross-validation-strategy"><span class="header-section-number">4.1</span> Cross-Validation strategy</h3>
+<div id="tbl-class-distribution" class="quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-class-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Class distributions in training data.
+</figcaption>
+<div aria-describedby="tbl-class-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table">
+<thead>
+<tr class="header">
+<th>Category</th>
+<th>Count</th>
+<th>Proportion</th>
+<th>Percentage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PoliceReform</td>
+<td>525</td>
+<td>0.2886</td>
+<td>28.86%</td>
+</tr>
+<tr class="even">
+<td>Operations_PatrolsInterventions</td>
+<td>151</td>
+<td>0.0830</td>
+<td>8.30%</td>
+</tr>
+<tr class="odd">
+<td>StateAdministration</td>
+<td>219</td>
+<td>0.1204</td>
+<td>12.04%</td>
+</tr>
+<tr class="even">
+<td>RefugeeAssistance</td>
+<td>103</td>
+<td>0.0566</td>
+<td>5.66%</td>
+</tr>
+<tr class="odd">
+<td>ElectionAssistance</td>
+<td>112</td>
+<td>0.0616</td>
+<td>6.16%</td>
+</tr>
+<tr class="even">
+<td>LegalReform</td>
+<td>129</td>
+<td>0.0709</td>
+<td>7.09%</td>
+</tr>
+<tr class="odd">
+<td>CivilSocietyAssistance</td>
+<td>161</td>
+<td>0.0885</td>
+<td>8.85%</td>
+</tr>
+<tr class="even">
+<td><strong>Total</strong></td>
+<td>1819</td>
+<td>1.0000</td>
+<td>100.00%</td>
+</tr>
+</tbody>
+</table>
 </div>
-<div data-add-textheight=".2in">
-<p>The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.</p>
-<p>The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.</p>
-<p>The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.</p>
-<p>The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.</p>
-<p>The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.</p>
-<p>The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.</p>
-<p>The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.</p>
+</figure>
 </div>
+<p>As can be seen in <a href="#tbl-class-distribution" class="quarto-xref">Table&nbsp;3</a>, the seven most coded categories selected for this feasibility test were still highly unbalanced. The imbalance ratio between the most frequent and least frequent was 5.1, compared to 5.31 for our target categories among the whole PACT 2.0 data set. The class distribution table for the full PACT 2.0 data set can be found in <a href="#tbl-class-distribution-full" class="quarto-xref">Table&nbsp;4</a> in the Annex.</p>
+<p>To ensure robust model evaluation, we employed Stratified K-Fold Cross-Validation. Specifically, we used Stratified K-Fold Cross-Validation using the ‘IterativeStratification’ strategy from the ‘skmultilearn’ library, which is tailored for multilabel classification. This strategy splits the data into <em>K</em> folds while preserving the label distribution across each fold, which is critical given the imbalanced and multilabel nature of the dataset. Unlike standard K-Fold, stratification helps prevent biased performance estimates that can occur if rare labels are unevenly distributed. By training and testing across multiple stratified splits, we obtain a more reliable estimate of model performance and ensure that each model is evaluated on diverse subsets of the data while still maintaining representative label proportions. This makes the approach well-suited for our multi-class, multi-label classification task.</p>
+<p>The typical StratifiedKFold in ‘scikit-learn’ has a random_state parameter to shuffle the data before splitting, which is useful to ensure reproducibility. However, ‘IterativeStratification’ from ‘skmultilearn.model_selection’ does not support a random_state parameter, because it uses a deterministic algorithm to ensure that label distributions are balanced in each fold. Shuffling or adding randomness would disrupt the iterative label-balancing process, which is the entire point of using this strategy. Since the same cross-validation was used across models, results are still comparable.</p>
 </section>
-<section id="sec-conc" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="sec-conc"><span class="header-section-number">5</span> Conclusion</h2>
 </section>
-<section id="disclosure-statement" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="disclosure-statement"><span class="header-section-number">6</span> Disclosure statement</h2>
-<p>The authors have the following conflicts of interest to declare (or replace with a statement that no conflicts of interest exist).</p>
+<section id="sec-results" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="sec-results"><span class="header-section-number">5</span> Results</h2>
 </section>
-<section id="data-availability-statement" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="data-availability-statement"><span class="header-section-number">7</span> Data Availability Statement</h2>
-<p>Deidentified data have been made available at the following URL: XX.</p>
+<section id="sec-conc" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="sec-conc"><span class="header-section-number">6</span> Conclusion</h2>
 </section>
-<section id="supplementary-material" class="level2 supplementary unnumbered">
-<h2 class="supplementary unnumbered anchored" data-anchor-id="supplementary-material">Supplementary Material</h2>
+<section id="annex" class="level2 annex" data-number="7">
+<h2 class="annex anchored" data-number="7" data-anchor-id="annex"><span class="header-section-number">7</span> Annex</h2>
+<div id="tbl-class-distribution-full" class="quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-class-distribution-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Class distributions in full PACT 2.0 data.
+</figcaption>
+<div aria-describedby="tbl-class-distribution-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table">
+<thead>
+<tr class="header">
+<th>Category</th>
+<th>Count</th>
+<th>Proportion</th>
+<th>Percentage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PoliceReform</td>
+<td>1232</td>
+<td>0.2532</td>
+<td>25.32%</td>
+</tr>
+<tr class="even">
+<td>Operations_PatrolsInterventions</td>
+<td>587</td>
+<td>0.1207</td>
+<td>12.07%</td>
+</tr>
+<tr class="odd">
+<td>StateAdministration</td>
+<td>581</td>
+<td>0.1194</td>
+<td>11.94%</td>
+</tr>
+<tr class="even">
+<td>HumanRights</td>
+<td>450</td>
+<td>0.0925</td>
+<td>9.25%</td>
+</tr>
+<tr class="odd">
+<td>JusticeSectorReform</td>
+<td>435</td>
+<td>0.0894</td>
+<td>8.94%</td>
+</tr>
+<tr class="even">
+<td>Demilitarization</td>
+<td>350</td>
+<td>0.0719</td>
+<td>7.19%</td>
+</tr>
+<tr class="odd">
+<td>RefugeeAssistance</td>
+<td>312</td>
+<td>0.0641</td>
+<td>6.41%</td>
+</tr>
+<tr class="even">
+<td>ElectionAssistance</td>
+<td>265</td>
+<td>0.0545</td>
+<td>5.45%</td>
+</tr>
+<tr class="odd">
+<td>BorderControl</td>
+<td>251</td>
+<td>0.0516</td>
+<td>5.16%</td>
+</tr>
+<tr class="even">
+<td>MilitaryReform</td>
+<td>247</td>
+<td>0.0508</td>
+<td>5.08%</td>
+</tr>
+<tr class="odd">
+<td>LegalReform</td>
+<td>235</td>
+<td>0.0483</td>
+<td>4.83%</td>
+</tr>
+<tr class="even">
+<td>CivilSocietyAssistance</td>
+<td>232</td>
+<td>0.0477</td>
+<td>4.77%</td>
+</tr>
+<tr class="odd">
+<td>PrisonReform</td>
+<td>228</td>
+<td>0.0469</td>
+<td>4.69%</td>
+</tr>
+<tr class="even">
+<td>HumanitarianRelief</td>
+<td>222</td>
+<td>0.0456</td>
+<td>4.56%</td>
+</tr>
+<tr class="odd">
+<td>Gender</td>
+<td>209</td>
+<td>0.0430</td>
+<td>4.30%</td>
+</tr>
+<tr class="even">
+<td>PartyAssistance</td>
+<td>178</td>
+<td>0.0366</td>
+<td>3.66%</td>
+</tr>
+<tr class="odd">
+<td>DemocraticInstitutions</td>
+<td>144</td>
+<td>0.0296</td>
+<td>2.96%</td>
+</tr>
+<tr class="even">
+<td>SexualViolence</td>
+<td>142</td>
+<td>0.0292</td>
+<td>2.92%</td>
+</tr>
+<tr class="odd">
+<td>ControlSALW</td>
+<td>133</td>
+<td>0.0273</td>
+<td>2.73%</td>
+</tr>
+<tr class="even">
+<td>Operations_UseOfForce</td>
+<td>132</td>
+<td>0.0271</td>
+<td>2.71%</td>
+</tr>
+<tr class="odd">
+<td>TransitionalJustice</td>
+<td>123</td>
+<td>0.0253</td>
+<td>2.53%</td>
+</tr>
+<tr class="even">
+<td>PublicHealth</td>
+<td>109</td>
+<td>0.0224</td>
+<td>2.24%</td>
+</tr>
+<tr class="odd">
+<td>LocalReconciliation</td>
+<td>102</td>
+<td>0.0210</td>
+<td>2.10%</td>
+</tr>
+<tr class="even">
+<td>ElectoralSecurity</td>
+<td>99</td>
+<td>0.0203</td>
+<td>2.03%</td>
+</tr>
+<tr class="odd">
+<td>EconomicDevelopment</td>
+<td>98</td>
+<td>0.0201</td>
+<td>2.01%</td>
+</tr>
+<tr class="even">
+<td>ChildRights</td>
+<td>96</td>
+<td>0.0197</td>
+<td>1.97%</td>
+</tr>
+<tr class="odd">
+<td>DisarmamentDemobilization</td>
+<td>95</td>
+<td>0.0195</td>
+<td>1.95%</td>
+</tr>
+<tr class="even">
+<td>Media</td>
+<td>80</td>
+<td>0.0164</td>
+<td>1.64%</td>
+</tr>
+<tr class="odd">
+<td>Demining</td>
+<td>79</td>
+<td>0.0162</td>
+<td>1.62%</td>
+</tr>
+<tr class="even">
+<td>National_Reconciliation</td>
+<td>77</td>
+<td>0.0158</td>
+<td>1.58%</td>
+</tr>
+<tr class="odd">
+<td>CivilianProtection</td>
+<td>61</td>
+<td>0.0125</td>
+<td>1.25%</td>
+</tr>
+<tr class="even">
+<td>Reintegration</td>
+<td>54</td>
+<td>0.0111</td>
+<td>1.11%</td>
+</tr>
+<tr class="odd">
+<td>Resources</td>
+<td>38</td>
+<td>0.0078</td>
+<td>0.78%</td>
+</tr>
+<tr class="even">
+<td>VoterEducation</td>
+<td>30</td>
+<td>0.0062</td>
+<td>0.62%</td>
+</tr>
+<tr class="odd">
+<td>StateAuthority</td>
+<td>23</td>
+<td>0.0047</td>
+<td>0.47%</td>
+</tr>
+<tr class="even">
+<td>PowerSharing</td>
+<td>9</td>
+<td>0.0018</td>
+<td>0.18%</td>
+</tr>
+<tr class="odd">
+<td>ArmsEmbargo</td>
+<td>0</td>
+<td>0.0000</td>
+<td>0.00%</td>
+</tr>
+<tr class="even">
+<td><strong>Total Documents</strong></td>
+<td>4865</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
 <dl>
 <dt>Title:</dt>
 <dd>
 <p>Brief description. (file type)</p>
 </dd>
-<dt>R-package for MYNEW routine:</dt>
-<dd>
-<p>R-package MYNEW containing code to perform the diagnostic methods described in the article. The package also contains all datasets used as examples in the article. (GNU zipped tar file)</p>
-</dd>
-<dt>HIV data set:</dt>
-<dd>
-<p>Data set used in the illustration of MYNEW method in <a href="#sec-verify" class="quarto-xref">Section&nbsp;4</a> (.txt file).</p>
-</dd>
 </dl>
-</section>
-<section id="bibtex" class="level2" data-number="8">
-<h2 data-number="8" class="anchored" data-anchor-id="bibtex"><span class="header-section-number">8</span> BibTeX</h2>
-<p>We encourage you to use BibTeX. If you have, please feel free to use the package natbib with any bibliography style you’re comfortable with. The .bst file agsm has been included here for your convenience.</p>
 
 </section>
+
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-Blair2022" class="csl-entry" role="listitem">
-Blair, R. A., Di Salvatore, J., and Smidt, H. M. (2022), <span>“When do UN peacekeeping operations implement their mandates?”</span> <em>American Journal of Political Science</em>, 66, 664–680. https://doi.org/<a href="https://doi.org/10.1111/ajps.12650">https://doi.org/10.1111/ajps.12650</a>.
+Blair, R. A., Di Salvatore, J., and Smidt, H. M. (2022), <span>“When do <span>UN</span> peacekeeping operations implement their mandates?”</span> <em>American Journal of Political Science</em>, 66, 664–680. https://doi.org/<a href="https://doi.org/10.1111/ajps.12650">https://doi.org/10.1111/ajps.12650</a>.
 </div>
 <div id="ref-PACT2" class="csl-entry" role="listitem">
 Otto, S. (2024), <span>“<span>Peacekeeping Activity (PACT) Dataset 2.0</span>,”</span> Harvard Dataverse. <a href="https://doi.org/10.7910/DVN/TQ8ETA">https://doi.org/10.7910/DVN/TQ8ETA</a>.
 </div>
-<div id="ref-Otto2024" class="csl-entry" role="listitem">
-Otto, S., Kube, F., and Smidt, H. (2024), <span>“UN peacekeeping upon deployment: Peacekeeping activities in theory and practice,”</span> <em>Cooperation and Conflict</em>, 59, 488–509. <a href="https://doi.org/10.1177/00108367241235888">https://doi.org/10.1177/00108367241235888</a>.
+<div id="ref-PACT2CB" class="csl-entry" role="listitem">
+Otto, S., and Honda, M. (2024), <span>“Codebook for the <span>Peacekeeping Activity (PACT) Dataset 2.0</span>,”</span> <a href="https://dataverse.harvard.edu/file.xhtml?fileId=10266552&amp;version=2.0" class="uri">https://dataverse.harvard.edu/file.xhtml?fileId=10266552&amp;version=2.0</a>.
 </div>
-</div></section></div></main>
+<div id="ref-Otto2024" class="csl-entry" role="listitem">
+Otto, S., Kube, F., and Smidt, H. (2024), <span>“<span>UN</span> peacekeeping upon deployment: Peacekeeping activities in theory and practice,”</span> <em>Cooperation and Conflict</em>, 59, 488–509. <a href="https://doi.org/10.1177/00108367241235888">https://doi.org/10.1177/00108367241235888</a>.
+</div>
+<div id="ref-Salvatore2022" class="csl-entry" role="listitem">
+Salvatore, J. D., Lundgren, M., Oksamytna, K., and Smidt, H. M. (2022), <span>“Introducing the <span>Peacekeeping Mandates (PEMA)</span> dataset,”</span> <em>Journal of Conflict Resolution</em>, 66, 924–951. <a href="https://doi.org/10.1177/00220027211068897">https://doi.org/10.1177/00220027211068897</a>.
+</div>
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. Therefore, pre-trained BERT-class models were used.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units like the others, the bounding box to extract text failed for these reports.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
