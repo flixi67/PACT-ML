@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Felix Kube">
-<meta name="dcterms.date" content="2025-05-17">
+<meta name="dcterms.date" content="2025-05-18">
 <meta name="keywords" content="Machine Learning, Natural Language Processing, United Nations Peacekeeping, BERT, roBERTa">
 
 <title>PACT-ML: Coding United Nation Peacekeeping Data from reports to the Secretary-General</title>
@@ -78,7 +78,12 @@ div.csl-indent {
   <li><a href="#validity-checks" id="toc-validity-checks" class="nav-link" data-scroll-target="#validity-checks"><span class="header-section-number">2.1</span> Validity checks</a></li>
   <li><a href="#uncertainty-quantification" id="toc-uncertainty-quantification" class="nav-link" data-scroll-target="#uncertainty-quantification"><span class="header-section-number">2.2</span> Uncertainty quantification</a></li>
   </ul></li>
-  <li><a href="#sec-eda" id="toc-sec-eda" class="nav-link" data-scroll-target="#sec-eda"><span class="header-section-number">3</span> Exploratory Data Analysis</a></li>
+  <li><a href="#sec-eda" id="toc-sec-eda" class="nav-link" data-scroll-target="#sec-eda"><span class="header-section-number">3</span> Exploratory Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#text-corpus-analysis" id="toc-text-corpus-analysis" class="nav-link" data-scroll-target="#text-corpus-analysis"><span class="header-section-number">3.1</span> Text Corpus Analysis</a></li>
+  <li><a href="#category-specific-analysis" id="toc-category-specific-analysis" class="nav-link" data-scroll-target="#category-specific-analysis"><span class="header-section-number">3.2</span> Category-Specific Analysis</a></li>
+  <li><a href="#semantic-analysis" id="toc-semantic-analysis" class="nav-link" data-scroll-target="#semantic-analysis"><span class="header-section-number">3.3</span> Semantic Analysis</a></li>
+  </ul></li>
   <li><a href="#sec-meth" id="toc-sec-meth" class="nav-link" data-scroll-target="#sec-meth"><span class="header-section-number">4</span> Modeling approach</a>
   <ul class="collapse">
   <li><a href="#cross-validation-strategy" id="toc-cross-validation-strategy" class="nav-link" data-scroll-target="#cross-validation-strategy"><span class="header-section-number">4.1</span> Cross-Validation strategy</a></li>
@@ -118,7 +123,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 17, 2025</p>
+      <p class="date">May 18, 2025</p>
     </div>
   </div>
   
@@ -148,52 +153,6 @@ div.csl-indent {
 <p>The empirical foundation of this effort is the PACT 2.0 dataset (<span class="citation" data-cites="PACT2">Otto (<a href="#ref-PACT2" role="doc-biblioref">2024</a>)</span>), which codes the activities of peacekeeping missions based on United Nations Secretary-General (UNSG) progress reports. PACT 2.0 builds on the original Peacekeeping Activity Dataset (PACT 1.0, yet unreleased) and extends its geographic scope beyond Africa to include 23 missions across Europe, the Americas, and Asia, all mandated after 1988 in civil war contexts (<span class="citation" data-cites="PACT2CB">Otto and Honda (<a href="#ref-PACT2CB" role="doc-biblioref">2024</a>)</span>). The dataset captures operational behavior at the paragraph level—tracking specific actions undertaken by peacekeepers, the nature of their engagement, and whether these activities involved international partners. Reports are coded in fine detail, producing a rich training corpus for supervised machine learning approaches. The goal of this work is to assess whether models trained on PACT-coded data can automatically identify similar activities in new, uncoded reports.</p>
 <p>This initiative also draws inspiration from related efforts such as the PEMA (Peacekeeping Mandates) dataset (<span class="citation" data-cites="Salvatore2022">Salvatore et al. (<a href="#ref-Salvatore2022" role="doc-biblioref">2022</a>)</span>), which systematically codes peacekeeping tasks as defined in Security Council resolutions. PEMA distinguishes among various modalities (e.g., monitoring, assisting, securing) and levels of directive authority (requested vs.&nbsp;encouraged), offering insights into how mandates evolve and guide operational priorities. While PEMA focuses on mandated intent, PACT focuses on reported implementation, offering a valuable complement for understanding peacekeeping effectiveness on the ground. Automating this kind of report-level analysis could help bridge the gap between what peacekeepers are tasked to do and what they actually report doing—at scale and in near real time.</p>
 <p>In sum, this study tests whether combining high-quality annotated data from the PACT project with modern NLP techniques can offer a scalable solution to peacekeeping data collection, thereby enabling continuous monitoring of peacekeeping behavior even in the absence of new manual coding efforts.</p>
-<div id="tbl-one" class="quarto-float anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-one-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: D-optimality values for design X under five different scenarios.
-</figcaption>
-<div aria-describedby="tbl-one-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="table">
-<thead>
-<tr class="header">
-<th>one</th>
-<th>two</th>
-<th>three</th>
-<th>four</th>
-<th>five</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1.23</td>
-<td>3.45</td>
-<td>5.00</td>
-<td>1.21</td>
-<td>3.41</td>
-</tr>
-<tr class="even">
-<td>1.23</td>
-<td>3.45</td>
-<td>5.00</td>
-<td>1.21</td>
-<td>3.42</td>
-</tr>
-<tr class="odd">
-<td>1.23</td>
-<td>3.45</td>
-<td>5.00</td>
-<td>1.21</td>
-<td>3.43</td>
-</tr>
-</tbody>
-</table>
-</div>
-</figure>
-</div>
-<ul>
-<li>Note that figures and tables (such as <a href="#tbl-one" class="quarto-xref">Table&nbsp;1</a>) should appear in the paper, not at the end or in separate files.</li>
-</ul>
 </section>
 <section id="sec-data" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="sec-data"><span class="header-section-number">2</span> Data</h2>
@@ -204,8 +163,8 @@ Table&nbsp;1: D-optimality values for design X under five different scenarios.
 <p>Some old reports (e.g.&nbsp;ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are sometimes at the country level and sometimes at the report level. For identifying the reports to parse and use for the model, we used ‘PyMuPDF’ and selected based on some characteristics from the file, like first page margins. The reports were then clustered using kNN, and the second cluster included the report types that could be parsed. There were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data mostly corresponds to post-2000 UN reports included in the PACT 2.0 data set, which coincides with the third and fourth generations of UN Peacekeeping Missions.</p>
 <section id="validity-checks" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="validity-checks"><span class="header-section-number">2.1</span> Validity checks</h3>
-<p>To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the reported paragraph, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
-<p>The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at ‘1.’ in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraphs number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures that the good data quality of parsed reports.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<p>To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the paragraph number, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at ‘1.’ in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraphs number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures good data quality for the parsed reports.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
 <div id="fig-parsing" class="quarto-layout-panel">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-parsing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -237,7 +196,7 @@ Table&nbsp;1: D-optimality values for design X under five different scenarios.
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-parsing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Examples of the parsing pipeline in action.
+Figure&nbsp;1: <span style="align: center">Examples of the parsing pipeline in action.</span>
 </figcaption>
 </figure>
 </div>
@@ -246,7 +205,7 @@ Figure&nbsp;1: Examples of the parsing pipeline in action.
 <div id="tbl-included" class="cell quarto-float anchored" data-caption="Included reports in PACT 2.0, after pre-selection and after parsing (also in %).">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-included-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2: Included reports in PACT 2.0, after pre-selection and after parsing (also in %).
+Table&nbsp;1: Included reports in PACT 2.0, after pre-selection and after parsing (also in %).
 </figcaption>
 <div aria-describedby="tbl-included-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -475,42 +434,216 @@ Table&nbsp;2: Included reports in PACT 2.0, after pre-selection and after parsin
 </figure>
 </div>
 </div>
-<p>Interestingly, we can see that some reports included after pre-selection do not appear in the PACT 2.0 dataset, meaning that there were no peackeeping activities carried out at the time of the report. This concerns three reports in UNIKOM, as well as one report in UNMIT. Most reports were filtered out for UNOMIG, which is again not surprising, as the mission lasted from 1993 until 2009, meaning that most early reports were in the typewritten and therefore discarded.</p>
-<p>For our models, this means that results are generalizable only to a certain extent.</p>
+<p>Interestingly, we can see that some reports included after pre-selection do not appear in the PACT 2.0 dataset, meaning that there were no peackeeping activities carried out at the time of the report. This concerns three reports in UNIKOM, as well as one report in UNMIT. Most reports were filtered out for UNOMIG, which is again not surprising, as the mission lasted from 1993 until 2009, meaning that most early reports were in the typewritten format and therefore disgarded. For our models, this means that results are generalizable only to a certain extent, which will be discussed in <a href="#sec-conc" class="quarto-xref">Section&nbsp;6</a>.</p>
 <p>In total, we were able to extract 6029, from which 1819 were matched to codings in PACT 2.0. There were multi-label paragraphs (paragraphs that reported more than one activity) in 256 cases. For 29 paragraphs out of the included reports, parsing failed on the paragraph level.</p>
 </section>
 <section id="uncertainty-quantification" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="uncertainty-quantification"><span class="header-section-number">2.2</span> Uncertainty quantification</h3>
-<p>Unlike the paragraph number, which we take as ground truth, the coding itself can not be considered to be ground truth. <span class="citation" data-cites="Bachl2024">Bachl and Scharkow (<a href="#ref-Bachl2024" role="doc-biblioref">forthcoming</a>)</span> discuss the importance of accurate and consistent human classification, particularly in the context of supervised computational text analysis (CTA) methods. This human input is analogous to the role of human coders in traditional content analysis, where intercoder reliability is a key concern.</p>
+<p>Unlike the paragraph number, which we take as ground truth, the coding itself can not be considered to be ground truth. <span class="citation" data-cites="Bachl2024">Bachl and Scharkow (<a href="#ref-Bachl2024" role="doc-biblioref">forthcoming</a>)</span> discuss the importance of accurate and consistent human classification, particularly in the context of supervised computational text analysis (CTA) methods. This human input is analogous to the role of human coders in traditional content analysis, where intercoder reliability is a key concern. Content analysis is particularly vulnerable to measurement error because it depends on the “consensual reading” (<span class="citation" data-cites="Krippendorff2018">Krippendorff (<a href="#ref-Krippendorff2018" role="doc-biblioref">2018</a>)</span>, p.&nbsp;212) of messages that are semantically or visually ambiguous, interpreted by different coders or at different times.</p>
 <p>Errors in this input (akin to having training data that is not “ground truth”, or low intercoder reliability for this case) can increase error rates:</p>
 <ol type="1">
 <li><p>Supervised CTA relies on human judgment: Supervised approaches to CTA require human intervention. Researchers must provide either pre-defined classification rules or example texts that have been classified by humans. These classified examples or rules serve as the training material from which computational algorithms learn to classify large amounts of text.</p></li>
 <li><p>Errors bias the analysis results: These errors can, in turn, bias the results of an analysis based on the classification. This means if the human-classified training data contains errors or inconsistencies (i.e., is not “ground truth”), the model trained on this data will learn these errors and inconsistencies, leading to biased or inaccurate classifications on new data and increasing the overall error rate of the CTA. Generally, the error rate grows exponentially if a bias is introduced at the first stage.</p></li>
 </ol>
-<p>Sadly, the intercoder reliability checks for the process of coding PACT 2.0 were not available to me, which is why the uncertainty estimates and error rates are not quantified further based on the reliability of the training sources. Without multiple codings for the same paragraph, and the decision that was made for the final data set, potential systematic bias can not be worked out. In general, the error rates reported in <a href="#sec-results" class="quarto-xref">Section&nbsp;5</a> are therefore likely to underestimate the true error rates of classification.</p>
+<p><span class="citation" data-cites="Bachl2017">Bachl and Scharkow (<a href="#ref-Bachl2017" role="doc-biblioref">2017</a>)</span> introduce a method to counter this using matrix back-calculation. Sadly, the intercoder reliability checks for the process of coding PACT 2.0 were not available to me, which is why the uncertainty estimates and error rates are not quantified further based on the reliability of the training sources. Without multiple codings for the same paragraph, and the decision that was made for the final data set, potential systematic bias can not be worked out. In general, the error rates reported in <a href="#sec-results" class="quarto-xref">Section&nbsp;5</a> are therefore likely to underestimate the true error rates of classification.</p>
 </section>
 </section>
 <section id="sec-eda" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="sec-eda"><span class="header-section-number">3</span> Exploratory Data Analysis</h2>
-<p>Text Corpus Analysis</p>
-<p>Basic Statistics</p>
-<p>Document counts (total paragraphs, documents per category) Text length distribution (words per paragraph, sentences per paragraph) Document distribution across reports/sources Visualization: Histogram of text lengths with mean/median markers</p>
-<p>Vocabulary Analysis</p>
-<p>Vocabulary size (unique words) Word frequency distribution (Zipf’s law plot) Top words overall (excluding stopwords) Token-to-type ratio (measure of lexical diversity)</p>
-<p>N-gram Analysis</p>
-<p>Most frequent bigrams and trigrams Category-specific phrases (distinctive collocations)</p>
-<p>Category-Specific Analysis</p>
+<section id="text-corpus-analysis" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="text-corpus-analysis"><span class="header-section-number">3.1</span> Text Corpus Analysis</h3>
+<p><a href="#fig-text-lengths" class="quarto-xref">Figure&nbsp;2</a> shows that paragraphs included in the models (i.e.&nbsp;that included peacekeeping activities) did only differ sligthly from all parsed paragraphs (mean 123 vs.&nbsp;117 tokens; median 112 vs.&nbsp;102 tokens), indicating that peacekeeping-relevant information is not strongly associated with paragraph length. This suggests that semantic content—rather than verbosity—drives relevance, and supports the feasibility of using NLP models that rely on textual meaning rather than surface-level features. However, it is important to note that parsing is more likely to fail for longer paragraphs, as they often include numbered lists or bullet points. Further, if a line starts with a number (e.g.&nbsp;“The second unit went on patrol and encountered with the local authorities of district *17.**“), the parsing shortened the paragraph, as everything after the number 17 would be recognized as a new paragraph, and removed during the check for consecutive numbering.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+<div id="fig-text-lengths" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-text-lengths-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-text-lengths" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-text-lengths-1" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-text-lengths-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-text-lengths-1.png" class="img-fluid figure-img" data-ref-parent="fig-text-lengths" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-text-lengths-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Included paragraphs
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-text-lengths" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-text-lengths-2" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-text-lengths-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-text-lengths-2.png" class="img-fluid figure-img" data-ref-parent="fig-text-lengths" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-text-lengths-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) All parsed paragraphs
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-text-lengths-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Distribution of Paragraph Lengths
+</figcaption>
+</figure>
+</div>
+<p>Looking more specific at the vocabulary, we identified the use of 7383 unique words (including stop-words). <a href="#tbl-voc" class="quarto-xref">Table&nbsp;2</a> shows the relation to the total number of words. The rather low value of for type-token ratio of 0.063 indicates repetition, formulaic writing, or specialized language, which we expect for the normed UN reporting (<span class="citation" data-cites="UN2019"><em>Integrated reporting from peacekeeping operations to UNHQ</em> (<a href="#ref-UN2019" role="doc-biblioref">2019</a>)</span>). Therefore, language seems to be rather standardized across reports. For our language model to be able to code the paragraphs into peacekeeping activities well, we need to look at differentiated language use across categories.</p>
+<div id="tbl-voc" class="quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-voc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Vocabulary size and Type-token ratio.
+</figcaption>
+<div aria-describedby="tbl-voc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">Total words</th>
+<th style="text-align: right;">Unique words</th>
+<th style="text-align: right;">Type-token ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">117704</td>
+<td style="text-align: right;">7383</td>
+<td style="text-align: right;">0.0627251</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>To analyze the text corpus further, we look at Zipf’s law of natural language. <span class="citation" data-cites="Zipf1949">Zipf (<a href="#ref-Zipf1949" role="doc-biblioref">1949</a>)</span> says:</p>
+<div class="blockquote">
+<p>If one ranks all the words occurring in a large corpus of natural language texts by their frequency of occurrence, the frequency of any word is inversely proportional to its rank.</p>
+</div>
+<p>The Zipf’s Law plot of the corpus shows a clear power-law distribution of word frequencies, confirming that the text follows the statistical patterns typical of natural language. A small number of words are extremely frequent, while the majority are rare—consistent with Zipfian behavior. However, this observation stands in contrast to the relatively low type-token ratio observed in the data, which suggests a more repetitive, possibly technical or formulaic language with limited lexical diversity. This apparent contradiction can be explained by the specialized nature of the corpus: although the overall distribution of word frequencies follows natural language norms, the specific context (i.e.&nbsp;peacekeeping reports) likely relies on a constrained vocabulary and frequent reuse of mission-specific terminology. This supports the use of contextual models (e.g., transformer-based embeddings) over token frequency-based approaches like TF-IDF, which may not adequately capture semantic distinctions in this type of structured and domain-specific text.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-zipf" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-zipf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-zipf-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-zipf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Zipf’s Law Plot: Word Frequency vs Rank (Log-Log Scale)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<section id="n-gram-analysis" class="level4" data-number="3.1.1">
+<h4 data-number="3.1.1" class="anchored" data-anchor-id="n-gram-analysis"><span class="header-section-number">3.1.1</span> N-Gram Analysis</h4>
+<p><a href="#fig-ngrams" class="quarto-xref">Figure&nbsp;4</a> displays the most frequent trigrams and bigrams in the text corpus of peacekeeping mission reports included in the models, and offer insight into the dominant themes and institutional actors mentioned. The top trigrams such as: - “haitian national police” - “port au prince” - “gender based violence” - “internally displaced persons” - “united nations country” and corresponding bigrams (not shown, but often subsumed in these trigrams), suggest a strong institutional framing. This language reflects the frequent reference to national institutions (e.g., “haitian national police”), geographic anchors (e.g., “port au prince”), and core thematic concerns of peacekeeping operations, such as gender-based violence, displacement, and human rights violations.</p>
+<p>While the references to national authorities, categories like ‘PoliceReform’ can be identified well, since the mentioning of the name for national authorities can link activities to specific common terms used to name these autorities. On the other hand, geographical anchors may bias the results. The importance of these features in combination with differentiated activity implementation across missions can lead the model to learn that the activity was carried out because of the location, not because of activity-specific language. This has potential implications for model generalization. We will discuss feature importance in <a href="#sec-results" class="quarto-xref">Section&nbsp;5</a>.</p>
+<div id="fig-ngrams" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ngrams-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-ngrams" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-ngrams-1" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-ngrams-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-ngrams-1.png" class="img-fluid figure-img" data-ref-parent="fig-ngrams" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-ngrams-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Top 20 Most Frequent Bigrams
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-ngrams" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-ngrams-2" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-ngrams-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-ngrams-2.png" class="img-fluid figure-img" data-ref-parent="fig-ngrams" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-ngrams-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Top 15 Most Frequent Trigrams
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ngrams-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: N-Gram Frequencies
+</figcaption>
+</figure>
+</div>
+<p>Below are the most relevant bigrams (cutoff for frequency higher than 50) and trigrams (frequencies higher than 25). These network graphs embed the most frequent bi- and trigrams into a larger context of appearance.</p>
+<div id="fig-ngram-network" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ngram-network-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-ngram-network" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-ngram-network-1" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-ngram-network-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-ngram-network-1.png" class="img-fluid figure-img" data-ref-parent="fig-ngram-network" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-ngram-network-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Bigrams (n &gt; 50)
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-ngram-network" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-ngram-network-2" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-ngram-network-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-ngram-network-2.png" class="img-fluid figure-img" data-ref-parent="fig-ngram-network" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-ngram-network-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Trigrams (n &gt; 25)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ngram-network-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: N-Gram Networks
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="category-specific-analysis" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="category-specific-analysis"><span class="header-section-number">3.2</span> Category-Specific Analysis</h3>
+<div class="cell" data-fig-caption="Lexical Diversity by Category">
+<div class="cell-output-display">
+<div id="fig-lex-diversity" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lex-diversity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-lex-diversity-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lex-diversity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Type-Token Ratio (higher values indicate greater diversity)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The differences in Type-Token Ratio (TTR) across categories have important implications for our modeling approaches. For Bag-of-Words (BoW) models, high TTR categories like ‘RefugeeAssistance’ may lead to sparser feature representations due to their richer vocabulary, which can affect model performance if not enough training data is available. Conversely, low TTR categories like ‘PoliceReform’ may produce denser, more repetitive word distributions, potentially making them easier to model with BoW but also more susceptible to overfitting on frequent terms. For BERT models, which capture contextual semantics, high lexical diversity can enhance learning if the model is exposed to varied contexts, but it may also challenge generalization if vocabulary usage is highly domain-specific.</p>
 <p>Label Distribution</p>
 <p>Class imbalance visualization (bar chart of your categories) Multi-label statistics (paragraphs with multiple categories) Co-occurrence matrix (which categories appear together)</p>
 <p>Category Characterization</p>
 <p>Word clouds for each category Most distinctive terms per category (TF-IDF analysis) Average paragraph length by category</p>
-<p>Semantic Analysis</p>
+</section>
+<section id="semantic-analysis" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="semantic-analysis"><span class="header-section-number">3.3</span> Semantic Analysis</h3>
 <p>Term Importance</p>
-<p>TF-IDF scores for important terms Create a visualization showing the most distinctive words per category</p>
+<p>TF-IDF scores for important terms: Create a visualization showing the most distinctive words per category</p>
 <p>Topic Modeling</p>
-<p>Latent Dirichlet Allocation (LDA) to identify underlying topics Topic distribution visualization Topic coherence across categories</p>
+<p>Latent Dirichlet Allocation (LDA) to identify underlying topics</p>
+<p>Topic distribution visualization</p>
+<p>Topic coherence across categories</p>
 <p>Word Embeddings Exploration</p>
-<p>t-SNE or UMAP visualization of word vectors Clustering of semantically similar terms Analogy relationships between key terms</p>
+<p>t-SNE or UMAP visualization of word vectors Clustering of semantically similar terms</p>
+<p>Analogy relationships between key terms</p>
+</section>
 </section>
 <section id="sec-meth" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="sec-meth"><span class="header-section-number">4</span> Modeling approach</h2>
@@ -596,6 +729,7 @@ Table&nbsp;3: Class distributions in training data.
 </section>
 <section id="sec-conc" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="sec-conc"><span class="header-section-number">6</span> Conclusion</h2>
+<p>Limitations: - geographic anchors - subset of missions</p>
 </section>
 <section id="annex" class="level2 annex" data-number="7">
 <h2 class="annex anchored" data-number="7" data-anchor-id="annex"><span class="header-section-number">7</span> Annex</h2>
@@ -862,8 +996,17 @@ Table&nbsp;4: Class distributions in full PACT 2.0 data.
 <div id="ref-Bachl2024" class="csl-entry" role="listitem">
 Bachl, M., and Scharkow, M. (forthcoming), <span>“Computational text analysis,”</span> in <em>Handbook of quantitative research methods in communication science</em>, ed. L. Shen, De Gruyter Mouton.
 </div>
+<div id="ref-Bachl2017" class="csl-entry" role="listitem">
+Bachl, M., and Scharkow, M. (2017), <span>“Correcting measurement error in content analysis,”</span> <em>Communication Methods and Measures</em>, Routledge, 11, 87–104. <a href="https://doi.org/10.1080/19312458.2017.1305103">https://doi.org/10.1080/19312458.2017.1305103</a>.
+</div>
 <div id="ref-Blair2022" class="csl-entry" role="listitem">
 Blair, R. A., Di Salvatore, J., and Smidt, H. M. (2022), <span>“When do <span>UN</span> peacekeeping operations implement their mandates?”</span> <em>American Journal of Political Science</em>, 66, 664–680. <a href="https://doi.org/10.1111/ajps.12650">https://doi.org/10.1111/ajps.12650</a>.
+</div>
+<div id="ref-UN2019" class="csl-entry" role="listitem">
+<em><a href="https://resourcehub01.blob.core.windows.net/%24web/Policy%20and%20Guidance/corepeacekeepingguidance/Mission%20Management%2C%20Planning%20and%20Oversight/Analysis%2C%20Reporting%20and%20Monitoring/2019.10%20Integrated%20Reporting%20from%20Peacekeeping%20Operations%20to%20UNHQ%20%28SOP%29.pdf">Integrated reporting from peacekeeping operations to UNHQ: Standard operating procedure</a></em> (2019), United Nations Department of Peace Operations.
+</div>
+<div id="ref-Krippendorff2018" class="csl-entry" role="listitem">
+Krippendorff, K. (2018), <em>Content analysis: An introduction to its methodology</em>, Sage publications.
 </div>
 <div id="ref-PACT2" class="csl-entry" role="listitem">
 Otto, S. (2024), <span>“<span>Peacekeeping Activity (PACT) Dataset 2.0</span>,”</span> Harvard Dataverse. <a href="https://doi.org/10.7910/DVN/TQ8ETA">https://doi.org/10.7910/DVN/TQ8ETA</a>.
@@ -877,12 +1020,16 @@ Otto, S., Kube, F., and Smidt, H. (2024), <span>“<span>UN</span> peacekeeping 
 <div id="ref-Salvatore2022" class="csl-entry" role="listitem">
 Salvatore, J. D., Lundgren, M., Oksamytna, K., and Smidt, H. M. (2022), <span>“Introducing the <span>Peacekeeping Mandates (PEMA)</span> dataset,”</span> <em>Journal of Conflict Resolution</em>, 66, 924–951. <a href="https://doi.org/10.1177/00220027211068897">https://doi.org/10.1177/00220027211068897</a>.
 </div>
+<div id="ref-Zipf1949" class="csl-entry" role="listitem">
+Zipf, G. K. (1949), <em>Human behavior and the principle of least effort: An introduction to human ecology</em>, Cambridge, MA: Addison-Wesley.
+</div>
 </div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
 <li id="fn1"><p>The UNPKOs included are: MINUGUA, MINUJUSTH, MINUSTAH, MIPONUH, ONUCA, ONUSAL, UNCPSG, UNCRO, UNMIBH, UNMIH, UNMIK, UNMISET, UNMIT, UNMOP, UNMOT, UNOMIG, UNPREDEP, UNPROFOR, UNSMIH, UNTAC, UNTAES, UNTAET and UNTMIH.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2"><p>On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. Therefore, pre-trained BERT-class models were used.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units like the others, the bounding box to extract text failed for these reports.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units, the bounding box to extract the main text failed to adjust for these reports.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>While this could theoretically be the case, we only encountered edge cases with years (e.g.&nbsp;2003), which the regex was adjusted for by only selecting r”“.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main>
 <!-- /main column -->
