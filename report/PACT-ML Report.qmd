@@ -37,21 +37,9 @@ This initiative also draws inspiration from related efforts such as the PEMA (Pe
 
 In sum, this study tests whether combining high-quality annotated data from the PACT project with modern NLP techniques can offer a scalable solution to peacekeeping data collection, thereby enabling continuous monitoring of peacekeeping behavior even in the absence of new manual coding efforts.
 
-| one  | two  | three | four | five |
-|------|------|-------|------|------|
-| 1.23 | 3.45 | 5.00  | 1.21 | 3.41 |
-| 1.23 | 3.45 | 5.00  | 1.21 | 3.42 |
-| 1.23 | 3.45 | 5.00  | 1.21 | 3.43 |
-
-: D-optimality values for design X under five different scenarios. {#tbl-one}
-
-- Note that figures and tables (such as @tbl-one) should appear in the paper, not at the end or in separate files.
-
-
-
 ## Data {#sec-data}
 
-- Describe PACT data, describe report formats, reference the PACT/PEMA codebooks with same coding categories for all reports since 1989
+-   Describe PACT data, describe report formats, reference the PACT/PEMA codebooks with same coding categories for all reports since 1989
 
 This is a sentence.[^1]
 
@@ -61,20 +49,20 @@ Some old reports (e.g. ONUCA) were left out due to issues in parsing, because th
 
 ### Validity checks
 
-To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the reported paragraph, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.[^2]
-
-The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at '1.' in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraphs number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures that the good data quality of parsed reports.[^3]
+To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the paragraph number, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.[^2]
 
 [^2]: On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. Therefore, pre-trained BERT-class models were used.
-[^3]: Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units like the others, the bounding box to extract text failed for these reports.
 
-::: {#fig-parsing layout-ncol=2}
+The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at '1.' in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraphs number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures good data quality for the parsed reports.[^3]
 
+[^3]: Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units, the bounding box to extract the main text failed to adjust for these reports.
+
+::: {#fig-parsing layout-ncol="2"}
 ![Removing annex paragraphs during parsing](_static/Annex_parsing.png){#fig-annex}
 
 ![Parsing fails due to 10% threshold](_static/Parsing_fails.png){#fig-fails}
 
-Examples of the parsing pipeline in action.
+[Examples of the parsing pipeline in action.]{style="align: center"}
 :::
 
 Table 2 shows the number of reports per UNPKO in PACT 2.0, as well as shares of the reports that made it through pre-selection and parsing. As can be seen, the PDF-formats that the parsing pipeline was able to process is heavily skewed towards a few missions. This is not surprising, as some missions took place only in the 1990s, while the included missions are mostly of the newer peacekeeping generations.
@@ -90,7 +78,6 @@ report_data <- read_csv2("../data/paragraphs.csv") %>%
 para_data <- read_csv("../data/PACT_paragraphs_training.csv")
 
 ```
-
 
 ```{r}
 #| label: tbl-included
@@ -161,164 +148,439 @@ report_summary %>%
 
 ```
 
-Interestingly, we can see that some reports included after pre-selection do not appear in the PACT 2.0 dataset, meaning that there were no peackeeping activities carried out at the time of the report. This concerns three reports in UNIKOM, as well as one report in UNMIT. Most reports were filtered out for UNOMIG, which is again not surprising, as the mission lasted from 1993 until 2009, meaning that most early reports were in the typewritten and therefore discarded.
-
-For our models, this means that results are generalizable only to a certain extent. 
+Interestingly, we can see that some reports included after pre-selection do not appear in the PACT 2.0 dataset, meaning that there were no peackeeping activities carried out at the time of the report. This concerns three reports in UNIKOM, as well as one report in UNMIT. Most reports were filtered out for UNOMIG, which is again not surprising, as the mission lasted from 1993 until 2009, meaning that most early reports were in the typewritten format and therefore disgarded. For our models, this means that results are generalizable only to a certain extent, which will be discussed in @sec-conc.
 
 In total, we were able to extract `{r} dim(para_data)[1]`, from which 1819 were matched to codings in PACT 2.0. There were multi-label paragraphs (paragraphs that reported more than one activity) in 256 cases. For 29 paragraphs out of the included reports, parsing failed on the paragraph level.
 
 ### Uncertainty quantification
 
-Unlike the paragraph number, which we take as ground truth, the coding itself can not be considered to be ground truth. @Bachl2024 discuss the importance of accurate and consistent human classification, particularly in the context of supervised computational text analysis (CTA) methods. This human input is analogous to the role of human coders in traditional content analysis, where intercoder reliability is a key concern.
+Unlike the paragraph number, which we take as ground truth, the coding itself can not be considered to be ground truth. @Bachl2024 discuss the importance of accurate and consistent human classification, particularly in the context of supervised computational text analysis (CTA) methods. This human input is analogous to the role of human coders in traditional content analysis, where intercoder reliability is a key concern. Content analysis is particularly vulnerable to measurement error because it depends on the “consensual reading” (@Krippendorff2018, p. 212) of messages that are semantically or visually ambiguous, interpreted by different coders or at different times.
 
 Errors in this input (akin to having training data that is not "ground truth", or low intercoder reliability for this case) can increase error rates:
 
-1. Supervised CTA relies on human judgment: Supervised approaches to CTA require human intervention. Researchers must provide either pre-defined classification rules or example texts that have been classified by humans. These classified examples or rules serve as the training material from which computational algorithms learn to classify large amounts of text.
+1.  Supervised CTA relies on human judgment: Supervised approaches to CTA require human intervention. Researchers must provide either pre-defined classification rules or example texts that have been classified by humans. These classified examples or rules serve as the training material from which computational algorithms learn to classify large amounts of text.
 
-2. Errors bias the analysis results: These errors can, in turn, bias the results of an analysis based on the classification. This means if the human-classified training data contains errors or inconsistencies (i.e., is not "ground truth"), the model trained on this data will learn these errors and inconsistencies, leading to biased or inaccurate classifications on new data and increasing the overall error rate of the CTA. Generally, the error rate grows exponentially if a bias is introduced at the first stage.
+2.  Errors bias the analysis results: These errors can, in turn, bias the results of an analysis based on the classification. This means if the human-classified training data contains errors or inconsistencies (i.e., is not "ground truth"), the model trained on this data will learn these errors and inconsistencies, leading to biased or inaccurate classifications on new data and increasing the overall error rate of the CTA. Generally, the error rate grows exponentially if a bias is introduced at the first stage.
 
-Sadly, the intercoder reliability checks for the process of coding PACT 2.0 were not available to me, which is why the uncertainty estimates and error rates are not quantified further based on the reliability of the training sources. Without multiple codings for the same paragraph, and the decision that was made for the final data set, potential systematic bias can not be worked out. In general, the error rates reported in @sec-results are therefore likely to underestimate the true error rates of classification.
+@Bachl2017 introduce a method to counter this using matrix back-calculation. Sadly, the intercoder reliability checks for the process of coding PACT 2.0 were not available to me, which is why the uncertainty estimates and error rates are not quantified further based on the reliability of the training sources. Without multiple codings for the same paragraph, and the decision that was made for the final data set, potential systematic bias can not be worked out. In general, the error rates reported in @sec-results are therefore likely to underestimate the true error rates of classification.
 
 ## Exploratory Data Analysis {#sec-eda}
 
-Text Corpus Analysis
+```{r}
+#| label: load-data
 
-Basic Statistics
+library(tidyverse)
 
-Document counts (total paragraphs, documents per category)
-Text length distribution (words per paragraph, sentences per paragraph)
-Document distribution across reports/sources
-Visualization: Histogram of text lengths with mean/median markers
+merged_data <- read_csv("../data/merged_data.csv")
+
+```
+
+### Text Corpus Analysis
+
+@fig-text-lengths shows that paragraphs included in the models (i.e. that included peacekeeping activities) did only differ sligthly from all parsed paragraphs (mean 123 vs. 117 tokens; median 112 vs. 102 tokens), indicating that peacekeeping-relevant information is not strongly associated with paragraph length. This suggests that semantic content—rather than verbosity—drives relevance, and supports the feasibility of using NLP models that rely on textual meaning rather than surface-level features. However, it is important to note that parsing is more likely to fail for longer paragraphs, as they often include numbered lists or bullet points. Further, if a line starts with a number (e.g. "The second unit went on patrol and encountered with the local authorities of district \n **17.**"), the parsing shortened the paragraph, as everything after the number 17 would be recognized as a new paragraph, and removed during the check for consecutive numbering.[^4]
+
+[^4]: While this could theoretically be the case, we only encountered edge cases with years (e.g. 2003), which the regex was adjusted for by only selecting r"\d{1,3}".
+
+```{r}
+#| label: fig-text-lengths
+#| fig-cap: "Distribution of Paragraph Lengths"
+#| fig-subcap:
+#|   - "Included paragraphs"
+#|   - "All parsed paragraphs"
+#| layout-ncol: 2
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(stringr)
+
+# Calculate text lengths
+text_lengths <- merged_data %>%
+  mutate(word_count = str_count(paragraph, "\\S+")) %>%
+  select(paragraph, word_count)
+
+# Calculate mean and median
+mean_length <- mean(text_lengths$word_count)
+median_length <- median(text_lengths$word_count)
+
+# Create histogram
+ggplot(text_lengths, aes(x = word_count)) +
+  geom_histogram(binwidth = 10, fill = "#4472C4", color = "white", alpha = 0.7) +
+  geom_vline(aes(xintercept = mean_length), color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = median_length), color = "darkgreen", linetype = "dashed", size = 1) +
+  annotate("text", x = mean_length + 50, y = max(table(text_lengths$word_count)) * 1, 
+           label = paste("Mean:", round(mean_length, 1)), color = "red") +
+  annotate("text", x = median_length - 50, y = max(table(text_lengths$word_count)) * 0.7, 
+           label = paste("Median:", median_length), color = "darkgreen") +
+  labs(x = "Number of Words per Paragraph",
+       y = "Count") +
+  theme_minimal() +
+  scale_x_continuous(limits = c(0,500)) +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+# Calculate text lengths
+text_lengths_all <- para_data %>%
+  mutate(word_count = str_count(paragraph, "\\S+")) %>%
+  select(paragraph, word_count)
+
+# Calculate mean and median
+mean_length_all <- mean(text_lengths_all$word_count)
+median_length_all <- median(text_lengths_all$word_count)
+
+# Create histogram
+ggplot(text_lengths_all, aes(x = word_count)) +
+  geom_histogram(binwidth = 10, fill = "#4472C4", color = "white", alpha = 0.7) +
+  geom_vline(aes(xintercept = mean_length_all), color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = median_length_all), color = "darkgreen", linetype = "dashed", size = 1) +
+  annotate("text", x = mean_length_all + 50, y = max(table(text_lengths_all$word_count)) * 1, 
+           label = paste("Mean:", round(mean_length_all, 1)), color = "red") +
+  annotate("text", x = median_length_all - 50, y = max(table(text_lengths_all$word_count)) * 0.7, 
+           label = paste("Median:", median_length_all), color = "darkgreen") +
+  labs(x = "Number of Words per Paragraph",
+       y = "Count") +
+  theme_minimal() +
+  scale_x_continuous(limits = c(0,500)) +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+```
+
+Looking more specific at the vocabulary, we identified the use of 7383 unique words (including stop-words). @tbl-voc shows the relation to the total number of words. The rather low value of for type-token ratio of 0.063 indicates repetition, formulaic writing, or specialized language, which we expect for the normed UN reporting (@UN2019). Therefore, language seems to be rather standardized across reports. For our language model to be able to code the paragraphs into peacekeeping activities well, we need to look at differentiated language use across categories.
+
+| Total words | Unique words | Type-token ratio |
+|------------:|-------------:|-----------------:|
+|      117704 |         7383 |        0.0627251 |
+
+: Vocabulary size and Type-token ratio. {#tbl-voc}
+
+To analyze the text corpus further, we look at Zipf's law of natural language. @Zipf1949 says:
+
+:::{.blockquote}
+
+If one ranks all the words occurring in a large corpus of natural language texts by their frequency of occurrence, the frequency of any word is inversely proportional to its rank.
+
+:::
+
+The Zipf’s Law plot of the corpus shows a clear power-law distribution of word frequencies, confirming that the text follows the statistical patterns typical of natural language. A small number of words are extremely frequent, while the majority are rare—consistent with Zipfian behavior. However, this observation stands in contrast to the relatively low type-token ratio observed in the data, which suggests a more repetitive, possibly technical or formulaic language with limited lexical diversity. This apparent contradiction can be explained by the specialized nature of the corpus: although the overall distribution of word frequencies follows natural language norms, the specific context (i.e. peacekeeping reports) likely relies on a constrained vocabulary and frequent reuse of mission-specific terminology. This supports the use of contextual models (e.g., transformer-based embeddings) over token frequency-based approaches like TF-IDF, which may not adequately capture semantic distinctions in this type of structured and domain-specific text.
+
+```{r}
+#| label: fig-zipf
+#| fig-cap: "Zipf's Law Plot: Word Frequency vs Rank (Log-Log Scale)"
+
+library(tidytext)
+
+tokens <- merged_data %>%
+  select(paragraph) %>%
+  unnest_tokens(word, paragraph) %>%
+  filter(!word %in% stop_words$word,
+         str_detect(word, "[a-z]"),
+         !str_detect(word, "\\d"))
+
+# Calculate word frequencies
+word_freqs <- tokens %>%
+  count(word, sort = TRUE) %>%
+  mutate(rank = row_number(),
+         frequency = n / sum(n))
+
+# Zipf's law plot (log-log)
+ggplot(word_freqs %>% head(500), aes(x = rank, y = frequency)) +
+  geom_point(color = "#4472C4", alpha = 0.7) +
+  geom_line(aes(x = rank, y = frequency[1] * (1/rank)), 
+            color = "red", linetype = "dashed") +
+  scale_x_log10() +
+  scale_y_log10() +
+  annotation_logticks() +
+  labs(x = "Rank (log scale)",
+       y = "Frequency (log scale)") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+```
+
+#### N-Gram Analysis
+
+@fig-ngrams displays the most frequent trigrams and bigrams in the text corpus of peacekeeping mission reports included in the models, and offer insight into the dominant themes and institutional actors mentioned. The top trigrams such as:
+- “haitian national police”
+- “port au prince”
+- “gender based violence”
+- “internally displaced persons”
+- “united nations country”
+and corresponding bigrams (not shown, but often subsumed in these trigrams), suggest a strong institutional framing. This language reflects the frequent reference to national institutions (e.g., “haitian national police”), geographic anchors (e.g., “port au prince”), and core thematic concerns of peacekeeping operations, such as gender-based violence, displacement, and human rights violations.
+
+While the references to national authorities, categories like 'PoliceReform' can be identified well, since the mentioning of the name for national authorities can link activities to specific common terms used to name these autorities. On the other hand, geographical anchors may bias the results. The importance of these features in combination with differentiated activity implementation across missions can lead the model to learn that the activity was carried out because of the location, not because of activity-specific language. This has potential implications for model generalization. We will discuss feature importance in @sec-results.
+
+```{r}
+#| label: fig-ngrams
+#| fig-cap: "N-Gram Frequencies"
+#| fig-subcap:
+#|   - "Top 20 Most Frequent Bigrams"
+#|   - "Top 15 Most Frequent Trigrams"
+#| layout-ncol: 2
+
+library(igraph)
+library(ggraph)
+library(widyr)
+
+# Extract bigrams
+bigrams <- merged_data %>%
+  select(paragraph) %>%
+  unnest_tokens(bigram, paragraph, token = "ngrams", n = 2) %>%
+  filter(!is.na(bigram))
+
+# Separate bigrams
+bigrams_separated <- bigrams %>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+
+# Filter stopwords
+bigrams_filtered <- bigrams_separated %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+  filter(str_detect(word1, "[a-z]")) %>%
+  filter(str_detect(word2, "[a-z]"))
+
+# Count and sort
+bigram_counts <- bigrams_filtered %>%
+  count(word1, word2, sort = TRUE)
+
+# Visualize top bigrams
+bigram_counts %>%
+  head(20) %>%
+  unite(bigram, word1, word2, sep = " ") %>%
+  mutate(bigram = factor(bigram, levels = rev(bigram))) %>%
+  ggplot(aes(x = bigram, y = n)) +
+  geom_col(fill = "#4472C4") +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "Frequency") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+# Extract trigrams
+trigrams <- merged_data %>%
+  select(paragraph) %>%
+  unnest_tokens(trigram, paragraph, token = "ngrams", n = 3) %>%
+  filter(!is.na(trigram))
+
+# Separate trigrams
+trigrams_separated <- trigrams %>%
+  separate(trigram, c("word1", "word2", "word3"), sep = " ")
+
+# Filter stopwords
+trigrams_filtered <- trigrams_separated %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+  filter(!word3 %in% stop_words$word) %>%
+  filter(str_detect(word1, "[a-z]")) %>%
+  filter(str_detect(word2, "[a-z]")) %>%
+  filter(str_detect(word3, "[a-z]"))
+
+# Count and sort
+trigram_counts <- trigrams_filtered %>%
+  count(word1, word2, word3, sort = TRUE)
+
+# Visualize top trigrams
+trigram_counts %>%
+  head(15) %>%
+  unite(trigram, word1, word2, word3, sep = " ") %>%
+  mutate(trigram = factor(trigram, levels = rev(trigram))) %>%
+  ggplot(aes(x = trigram, y = n)) +
+  geom_col(fill = "#4472C4") +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "Frequency") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+```
+
+Below are the most relevant bigrams (cutoff for frequency higher than 50) and trigrams (frequencies higher than 25). These network graphs embed the most frequent bi- and trigrams into a larger context of appearance.
+
+```{r}
+#| label: fig-ngram-network
+#| fig-cap: "N-Gram Networks"
+#| fig-subcap:
+#|   - "Bigrams (n > 50)"
+#|   - "Trigrams (n > 25)"
+#| layout-ncol: 2
 
 
-Vocabulary Analysis
+set.seed(161)
+bigram_graph <- bigram_counts %>%
+  filter(n > 50) %>%  # Adjust threshold as needed
+  graph_from_data_frame()
 
-Vocabulary size (unique words)
-Word frequency distribution (Zipf's law plot)
-Top words overall (excluding stopwords)
-Token-to-type ratio (measure of lexical diversity)
+ggraph(bigram_graph, layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n), show.legend = FALSE) +
+  geom_node_point(color = "#4472C4", size = 4) +
+  geom_node_text(aes(label = name), vjust = 1.5, repel = TRUE) +
+  theme_void() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 
+set.seed(161)
+trigram_graph <- trigram_counts %>%
+  filter(n > 20) %>%  # Adjust threshold as needed
+  graph_from_data_frame()
 
-N-gram Analysis
+ggraph(trigram_graph, layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n), show.legend = FALSE) +
+  geom_node_point(color = "#4472C4", size = 4) +
+  geom_node_text(aes(label = name), vjust = 1.5, repel = TRUE) +
+  theme_void() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+```
 
-Most frequent bigrams and trigrams
-Category-specific phrases (distinctive collocations)
+### Category-Specific Analysis
 
+```{r}
+#| label: fig-lex-diversity
+#| fig-caption: "Lexical Diversity by Category"
+#| fig-subcap: "Type-Token Ratio (higher values indicate greater diversity)"
 
+target_categories = c(
+    "PoliceReform",
+    "Operations_PatrolsInterventions",
+    "StateAdministration",
+    "RefugeeAssistance",
+    "ElectionAssistance",
+    "LegalReform",
+    "CivilSocietyAssistance"
+)
 
+# Calculate lexical diversity by category
+lexical_diversity <- merged_data %>%
+  pivot_longer(cols = all_of(target_categories), 
+               names_to = "category", 
+               values_to = "present") %>%
+  filter(present == TRUE) %>%
+  select(paragraph, category) %>%
+  group_by(category) %>%
+  mutate(text_combined = paste(paragraph, collapse = " ")) %>%
+  select(category, text_combined) %>%
+  distinct() %>%
+  mutate(total_tokens = str_count(text_combined, "\\S+"),
+         unique_tokens = sapply(text_combined, function(x) {
+           length(unique(unlist(str_split(x, "\\s+"))))
+         }),
+         type_token_ratio = unique_tokens / total_tokens)
 
-Category-Specific Analysis
+# Visualize TTR by category
+ggplot(lexical_diversity, aes(x = reorder(category, -type_token_ratio), y = type_token_ratio)) +
+  geom_col(fill = "#4472C4") +
+  geom_text(aes(label = sprintf("%.3f", type_token_ratio)), vjust = -0.5) +
+  labs(x = NULL,
+       y = "Type-Token Ratio") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+The differences in Type-Token Ratio (TTR) across categories have important implications for our modeling approaches. For Bag-of-Words (BoW) models, high TTR categories like 'RefugeeAssistance' may lead to sparser feature representations due to their richer vocabulary, which can affect model performance if not enough training data is available. Conversely, low TTR categories like 'PoliceReform' may produce denser, more repetitive word distributions, potentially making them easier to model with BoW but also more susceptible to overfitting on frequent terms. For BERT models, which capture contextual semantics, high lexical diversity can enhance learning if the model is exposed to varied contexts, but it may also challenge generalization if vocabulary usage is highly domain-specific.
 
 Label Distribution
 
-Class imbalance visualization (bar chart of your categories)
-Multi-label statistics (paragraphs with multiple categories)
-Co-occurrence matrix (which categories appear together)
-
+Class imbalance visualization (bar chart of your categories) Multi-label statistics (paragraphs with multiple categories) Co-occurrence matrix (which categories appear together)
 
 Category Characterization
 
-Word clouds for each category
-Most distinctive terms per category (TF-IDF analysis)
-Average paragraph length by category
+Word clouds for each category Most distinctive terms per category (TF-IDF analysis) Average paragraph length by category
 
-
-
-Semantic Analysis
+### Semantic Analysis
 
 Term Importance
 
-TF-IDF scores for important terms
-Create a visualization showing the most distinctive words per category
+TF-IDF scores for important terms: Create a visualization showing the most distinctive words per category
+
 
 
 Topic Modeling
 
 Latent Dirichlet Allocation (LDA) to identify underlying topics
-Topic distribution visualization
-Topic coherence across categories
+
+ Topic distribution visualization
+ 
+ Topic coherence across categories
 
 
 Word Embeddings Exploration
 
-t-SNE or UMAP visualization of word vectors
-Clustering of semantically similar terms
-Analogy relationships between key terms
+t-SNE or UMAP visualization of word vectors Clustering of semantically similar terms
+
+ Analogy relationships between key terms
 
 ## Modeling approach {#sec-meth}
 
-Don't take any of these section titles seriously.
-They're just for illustration.
+Don't take any of these section titles seriously. They're just for illustration.
 
 ### Cross-Validation strategy
 
-| Category | Count | Proportion | Percentage |
-|----------|-------|------------|------------|
-| PoliceReform | 525 | 0.2886 | 28.86% |
-| Operations_PatrolsInterventions | 151 | 0.0830 | 8.30% |
-| StateAdministration | 219 | 0.1204 | 12.04% |
-| RefugeeAssistance | 103 | 0.0566 | 5.66% |
-| ElectionAssistance | 112 | 0.0616 | 6.16% |
-| LegalReform | 129 | 0.0709 | 7.09% |
-| CivilSocietyAssistance | 161 | 0.0885 | 8.85% |
-| **Total** | 1819 | 1.0000 | 100.00% |
+| Category                        | Count | Proportion | Percentage |
+|---------------------------------|-------|------------|------------|
+| PoliceReform                    | 525   | 0.2886     | 28.86%     |
+| Operations_PatrolsInterventions | 151   | 0.0830     | 8.30%      |
+| StateAdministration             | 219   | 0.1204     | 12.04%     |
+| RefugeeAssistance               | 103   | 0.0566     | 5.66%      |
+| ElectionAssistance              | 112   | 0.0616     | 6.16%      |
+| LegalReform                     | 129   | 0.0709     | 7.09%      |
+| CivilSocietyAssistance          | 161   | 0.0885     | 8.85%      |
+| **Total**                       | 1819  | 1.0000     | 100.00%    |
 
 : Class distributions in training data. {#tbl-class-distribution}
 
 As can be seen in @tbl-class-distribution, the seven most coded categories selected for this feasibility test were still highly unbalanced. The imbalance ratio between the most frequent and least frequent was 5.1, compared to 5.31 for our target categories among the whole PACT 2.0 data set. The class distribution table for the full PACT 2.0 data set can be found in @tbl-class-distribution-full in the Annex.
 
-To ensure robust model evaluation, we employed Stratified K-Fold Cross-Validation. Specifically, we used Stratified K-Fold Cross-Validation using the 'IterativeStratification' strategy from the 'skmultilearn' library, which is tailored for multilabel classification. This strategy splits the data into _K_ folds while preserving the label distribution across each fold, which is critical given the imbalanced and multilabel nature of the dataset. Unlike standard K-Fold, stratification helps prevent biased performance estimates that can occur if rare labels are unevenly distributed. By training and testing across multiple stratified splits, we obtain a more reliable estimate of model performance and ensure that each model is evaluated on diverse subsets of the data while still maintaining representative label proportions. This makes the approach well-suited for our multi-class, multi-label classification task.
+To ensure robust model evaluation, we employed Stratified K-Fold Cross-Validation. Specifically, we used Stratified K-Fold Cross-Validation using the 'IterativeStratification' strategy from the 'skmultilearn' library, which is tailored for multilabel classification. This strategy splits the data into *K* folds while preserving the label distribution across each fold, which is critical given the imbalanced and multilabel nature of the dataset. Unlike standard K-Fold, stratification helps prevent biased performance estimates that can occur if rare labels are unevenly distributed. By training and testing across multiple stratified splits, we obtain a more reliable estimate of model performance and ensure that each model is evaluated on diverse subsets of the data while still maintaining representative label proportions. This makes the approach well-suited for our multi-class, multi-label classification task.
 
 The typical StratifiedKFold in 'scikit-learn' has a random state parameter to shuffle the data before splitting, which is useful to ensure reproducibility. However, 'IterativeStratification' from 'skmultilearn.model_selection' does not support a random state parameter, because it uses a deterministic algorithm to ensure that label distributions are balanced in each fold. Shuffling or adding randomness would disrupt the iterative label-balancing process, which is the entire point of using this strategy. Since the same cross-validation was used across all models, results are still comparable.
 
 ## Results {#sec-results}
 
-
 ## Conclusion {#sec-conc}
 
+Limitations:
+- geographic anchors
+- subset of missions
 
 ## Annex {.annex}
 
-| Category | Count | Proportion | Percentage |
-|----------|-------|------------|------------|
-| PoliceReform | 1232 | 0.2532 | 25.32% |
-| Operations_PatrolsInterventions | 587 | 0.1207 | 12.07% |
-| StateAdministration | 581 | 0.1194 | 11.94% |
-| HumanRights | 450 | 0.0925 | 9.25% |
-| JusticeSectorReform | 435 | 0.0894 | 8.94% |
-| Demilitarization | 350 | 0.0719 | 7.19% |
-| RefugeeAssistance | 312 | 0.0641 | 6.41% |
-| ElectionAssistance | 265 | 0.0545 | 5.45% |
-| BorderControl | 251 | 0.0516 | 5.16% |
-| MilitaryReform | 247 | 0.0508 | 5.08% |
-| LegalReform | 235 | 0.0483 | 4.83% |
-| CivilSocietyAssistance | 232 | 0.0477 | 4.77% |
-| PrisonReform | 228 | 0.0469 | 4.69% |
-| HumanitarianRelief | 222 | 0.0456 | 4.56% |
-| Gender | 209 | 0.0430 | 4.30% |
-| PartyAssistance | 178 | 0.0366 | 3.66% |
-| DemocraticInstitutions | 144 | 0.0296 | 2.96% |
-| SexualViolence | 142 | 0.0292 | 2.92% |
-| ControlSALW | 133 | 0.0273 | 2.73% |
-| Operations_UseOfForce | 132 | 0.0271 | 2.71% |
-| TransitionalJustice | 123 | 0.0253 | 2.53% |
-| PublicHealth | 109 | 0.0224 | 2.24% |
-| LocalReconciliation | 102 | 0.0210 | 2.10% |
-| ElectoralSecurity | 99 | 0.0203 | 2.03% |
-| EconomicDevelopment | 98 | 0.0201 | 2.01% |
-| ChildRights | 96 | 0.0197 | 1.97% |
-| DisarmamentDemobilization | 95 | 0.0195 | 1.95% |
-| Media | 80 | 0.0164 | 1.64% |
-| Demining | 79 | 0.0162 | 1.62% |
-| National_Reconciliation | 77 | 0.0158 | 1.58% |
-| CivilianProtection | 61 | 0.0125 | 1.25% |
-| Reintegration | 54 | 0.0111 | 1.11% |
-| Resources | 38 | 0.0078 | 0.78% |
-| VoterEducation | 30 | 0.0062 | 0.62% |
-| StateAuthority | 23 | 0.0047 | 0.47% |
-| PowerSharing | 9 | 0.0018 | 0.18% |
-| ArmsEmbargo | 0 | 0.0000 | 0.00% |
-| **Total Documents** | 4865 | - | - |
+| Category                        | Count | Proportion | Percentage |
+|---------------------------------|-------|------------|------------|
+| PoliceReform                    | 1232  | 0.2532     | 25.32%     |
+| Operations_PatrolsInterventions | 587   | 0.1207     | 12.07%     |
+| StateAdministration             | 581   | 0.1194     | 11.94%     |
+| HumanRights                     | 450   | 0.0925     | 9.25%      |
+| JusticeSectorReform             | 435   | 0.0894     | 8.94%      |
+| Demilitarization                | 350   | 0.0719     | 7.19%      |
+| RefugeeAssistance               | 312   | 0.0641     | 6.41%      |
+| ElectionAssistance              | 265   | 0.0545     | 5.45%      |
+| BorderControl                   | 251   | 0.0516     | 5.16%      |
+| MilitaryReform                  | 247   | 0.0508     | 5.08%      |
+| LegalReform                     | 235   | 0.0483     | 4.83%      |
+| CivilSocietyAssistance          | 232   | 0.0477     | 4.77%      |
+| PrisonReform                    | 228   | 0.0469     | 4.69%      |
+| HumanitarianRelief              | 222   | 0.0456     | 4.56%      |
+| Gender                          | 209   | 0.0430     | 4.30%      |
+| PartyAssistance                 | 178   | 0.0366     | 3.66%      |
+| DemocraticInstitutions          | 144   | 0.0296     | 2.96%      |
+| SexualViolence                  | 142   | 0.0292     | 2.92%      |
+| ControlSALW                     | 133   | 0.0273     | 2.73%      |
+| Operations_UseOfForce           | 132   | 0.0271     | 2.71%      |
+| TransitionalJustice             | 123   | 0.0253     | 2.53%      |
+| PublicHealth                    | 109   | 0.0224     | 2.24%      |
+| LocalReconciliation             | 102   | 0.0210     | 2.10%      |
+| ElectoralSecurity               | 99    | 0.0203     | 2.03%      |
+| EconomicDevelopment             | 98    | 0.0201     | 2.01%      |
+| ChildRights                     | 96    | 0.0197     | 1.97%      |
+| DisarmamentDemobilization       | 95    | 0.0195     | 1.95%      |
+| Media                           | 80    | 0.0164     | 1.64%      |
+| Demining                        | 79    | 0.0162     | 1.62%      |
+| National_Reconciliation         | 77    | 0.0158     | 1.58%      |
+| CivilianProtection              | 61    | 0.0125     | 1.25%      |
+| Reintegration                   | 54    | 0.0111     | 1.11%      |
+| Resources                       | 38    | 0.0078     | 0.78%      |
+| VoterEducation                  | 30    | 0.0062     | 0.62%      |
+| StateAuthority                  | 23    | 0.0047     | 0.47%      |
+| PowerSharing                    | 9     | 0.0018     | 0.18%      |
+| ArmsEmbargo                     | 0     | 0.0000     | 0.00%      |
+| **Total Documents**             | 4865  | \-         | \-         |
 
 : Class distributions in full PACT 2.0 data. {#tbl-class-distribution-full}
 
