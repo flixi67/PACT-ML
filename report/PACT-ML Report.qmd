@@ -803,7 +803,12 @@ t-SNE or UMAP visualization of word vectors Clustering of semantically similar t
 
 ## Modeling approach {#sec-meth}
 
-In classification tasks with imbalanced class distributions, standard machine learning models often become biased toward the majority class, resulting in poor performance on minority classes. This imbalance can lead to misleading accuracy scores, as the model may learn to predict the dominant class at the expense of others. To address this, we use class weighting strategies such as class_weight='balanced' in logistic regression. This approach adjusts the contribution of each class to the loss function by assigning higher weights to underrepresented classes and lower weights to overrepresented ones, thereby mitigating the imbalance. By penalizing misclassifications of minority classes more heavily, balanced class weighting encourages the model to learn a more equitable decision boundary, improving metrics like recall and F1-score for all classes. This is particularly important in multi-label classification, where each label may exhibit different levels of frequency and relevance.
+In classification tasks with imbalanced class distributions, standard machine learning models often become biased toward the majority class, resulting in poor performance on minority classes. This imbalance can lead to misleading accuracy scores, as the model may learn to predict the dominant class at the expense of others. To address this, we use class weighting strategies such as class_weight='balanced' in logistic regression. This approach adjusts the contribution of each class to the loss function by assigning higher weights (see @eq-balanced-weight) to underrepresented classes and lower weights to overrepresented ones, thereby mitigating the imbalance. By penalizing misclassifications of minority classes more heavily, balanced class weighting encourages the model to learn a more equitable decision boundary, improving metrics like recall and F1-score for all classes. This is particularly important in multi-label classification, where each label may exhibit different levels of frequency and relevance.
+
+$$
+w_i = \frac{n_{\text{samples}}}{n_{\text{classes}} \times n_i}
+$$ {#eq-balanced-weight}
+
 
 We therefore opt for a tri-fold modeling approach. First, the baseline models using 'CountVectorizer' for tokenizations are calculated, using Logistic Regression, Balanced Logistic Regression as explained above and a Random Forest Tree Classifier for subsequent classifications. We included a Random Forest model because of its strong performance and high computational efficiency for classification tasks in general. Second, the same models are employed using TF-IDF to tokenize documents. Thirdly, a pre-trained BERT model is fitted to the data. The exploratory data analysis in @sec-eda points in various bits, for example the analysis of word frequency according to Zipf's law, the analysis of most common and distinctive terms as well as the contextual knowledge of UN reporting schemes, that this class of models fits well for the task. 
 
@@ -850,9 +855,30 @@ The typical StratifiedKFold in 'scikit-learn' has a random state parameter to sh
 
 ## Results {#sec-results}
 
+F1 Score Variants:
+
+Micro-F1: Calculates F1 globally by counting total true positives, false negatives, and false positives
+Macro-F1: Calculates F1 for each label and averages them... explain why this is generally higher because of label imbalance
+
+### Feature importance
+
+When comparing the results across models, it is important to look at 
+
+### Multi-label codings
+
+- table showing how many codings were made on the new paragraphs, label distribution and multi-label results
+
 ### Parameter optimization
 
-All BoW models reported in the results section are parameter optimized using 'GridSearchCV'. 
+All BoW models reported in the results section are parameter optimized using 'GridSearchCV'. For the logistic regression models, this included the regularization strength (candidates: 0.1, 1, 10) and the type of regularization (lasso or ridge).
+
+For the Random Forest model, a grid search was performed for the following model parameters and candidates:
+
+- 'estimator__n_estimators': [50, 75, 100, 125, 150, 175, 200],
+- 'estimator__max_depth': [None, 10, 20, 30, 40, 50],
+- 'estimator__min_samples_split': [2, 5, 10]
+
+The full specification of parameters for each model can be found in the Annex, @sec-annex.
 
 ## Conclusion {#sec-conc}
 
@@ -860,9 +886,13 @@ Limitations:
 - geographic anchors
 - subset of missions
 
+Not done yet:
+- Use ROC curves, precision-recall curves, or Youden’s J statistic to pick the optimal cutoff.
+- expected improvements from this: 5-15% in F1 score and 3-10% in missclassification rate.
+
 Combining word frequency tokenization with TF-IDF plus penalty term logistic regression for the balance between important key terms for detecting an activity and distinctive terms (TF-IDF scores) for fine-grained categorization for 
 
-## Annex {.annex}
+## Annex {#sec-annex}
 
 | Category                        | Count | Proportion | Percentage |
 |---------------------------------|-------|------------|------------|
