@@ -1,5 +1,5 @@
 ---
-title: "PACT-ML: Coding United Nation Peacekeeping Data from reports to the Secretary-General"
+title: "PACT-ML: Coding United Nation Peacekeeping ACtivities from reports to the Secretary-General"
 subtitle: "Using Bag-of-Words approaches and BERT models"
 format:
   jasa-html: default
@@ -53,7 +53,7 @@ To be able to use our models on the data, we need to identify which paragraph te
 
 [^2]: On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. Therefore, pre-trained BERT-class models were used.
 
-The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at '1.' in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraphs number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures good data quality for the parsed reports.[^3]
+The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at '1.' in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraph's number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures good data quality for the parsed reports.[^3]
 
 [^3]: Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units, the bounding box to extract the main text failed to adjust for these reports.
 
@@ -62,7 +62,7 @@ The reports were then parsed. Since the Annexes were not as expected in a separa
 
 ![Parsing fails due to 10% threshold](_static/Parsing_fails.png){#fig-fails}
 
-[Examples of the parsing pipeline in action.]{style="align: center"}
+Examples of the parsing pipeline in action.
 :::
 
 Table 2 shows the number of reports per UNPKO in PACT 2.0, as well as shares of the reports that made it through pre-selection and parsing. As can be seen, the PDF-formats that the parsing pipeline was able to process is heavily skewed towards a few missions. This is not surprising, as some missions took place only in the 1990s, while the included missions are mostly of the newer peacekeeping generations.
@@ -150,7 +150,7 @@ report_summary %>%
 
 Interestingly, we can see that some reports included after pre-selection do not appear in the PACT 2.0 dataset, meaning that there were no peackeeping activities carried out at the time of the report. This concerns three reports in UNIKOM, as well as one report in UNMIT. Most reports were filtered out for UNOMIG, which is again not surprising, as the mission lasted from 1993 until 2009, meaning that most early reports were in the typewritten format and therefore disgarded. For our models, this means that results are generalizable only to a certain extent, which will be discussed in @sec-conc.
 
-In total, we were able to extract `{r} dim(para_data)[1]`, from which 1819 were matched to codings in PACT 2.0. There were multi-label paragraphs (paragraphs that reported more than one activity) in 256 cases. For 29 paragraphs out of the included reports, parsing failed on the paragraph level.
+In total, we were able to extract `{r} dim(para_data)[1]` paragraphs, from which 1819 were matched to codings in PACT 2.0. There were multi-label paragraphs (paragraphs that reported more than one activity) in 256 cases. For 29 paragraphs out of the included reports, parsing failed on the paragraph level.
 
 ### Uncertainty quantification
 
@@ -177,7 +177,7 @@ merged_data <- read_csv("../data/merged_data.csv")
 
 ### Text Corpus Analysis
 
-@fig-text-lengths shows that paragraphs included in the models (i.e. that included peacekeeping activities) did only differ sligthly from all parsed paragraphs (mean 123 vs. 117 tokens; median 112 vs. 102 tokens), indicating that peacekeeping-relevant information is not strongly associated with paragraph length. This suggests that semantic content—rather than verbosity—drives relevance, and supports the feasibility of using NLP models that rely on textual meaning rather than surface-level features. However, it is important to note that parsing is more likely to fail for longer paragraphs, as they often include numbered lists or bullet points. Further, if a line starts with a number (e.g. "The second unit went on patrol and encountered with the local authorities of district \n **17.**"), the parsing shortened the paragraph, as everything after the number 17 would be recognized as a new paragraph, and removed during the check for consecutive numbering.[^4]
+@fig-text-lengths shows that paragraphs included in the models (i.e. that included peacekeeping activities) did only differ sligthly from all parsed paragraphs (mean 123 vs. 117 tokens; median 112 vs. 102 tokens), indicating that peacekeeping-relevant information is not strongly associated with paragraph length. This suggests that semantic content—rather than verbosity—drives relevance, and supports the feasibility of using NLP models that rely on textual meaning rather than surface-level features. However, it is important to note that parsing is more likely to fail for longer paragraphs, as they often include numbered lists or bullet points. Further, if a line starts with a number (e.g. "The second unit went on patrol and encountered with the local authorities of district _linebreak_ **17.**"), the parsing shortened the paragraph, as everything after the number 17 would be recognized as a new paragraph, and removed during the check for consecutive numbering.[^4]
 
 [^4]: While this could theoretically be the case, we only encountered edge cases with years (e.g. 2003), which the regex was adjusted for by only selecting r"\d{1,3}".
 
@@ -299,14 +299,16 @@ ggplot(word_freqs %>% head(500), aes(x = rank, y = frequency)) +
 #### N-Gram Analysis
 
 @fig-ngrams displays the most frequent trigrams and bigrams in the text corpus of peacekeeping mission reports included in the models, and offer insight into the dominant themes and institutional actors mentioned. The top trigrams such as:
+
 - “haitian national police”
 - “port au prince”
 - “gender based violence”
 - “internally displaced persons”
 - “united nations country”
+
 and corresponding bigrams (not shown, but often subsumed in these trigrams), suggest a strong institutional framing. This language reflects the frequent reference to national institutions (e.g., “haitian national police”), geographic anchors (e.g., “port au prince”), and core thematic concerns of peacekeeping operations, such as gender-based violence, displacement, and human rights violations.
 
-While the references to national authorities, categories like 'PoliceReform' can be identified well, since the mentioning of the name for national authorities can link activities to specific common terms used to name these autorities. On the other hand, geographical anchors may bias the results. The importance of these features in combination with differentiated activity implementation across missions can lead the model to learn that the activity was carried out because of the location, not because of activity-specific language. This has potential implications for model generalization. We will discuss feature importance in @sec-results.
+With the references to national authorities, categories like 'PoliceReform' can be identified well, since the mentioning of the name for national authorities can link activities to specific common terms used to name these autorities. On the other hand, geographical anchors may bias the results. The importance of these features in combination with differentiated activity implementation across missions can lead the model to learn that the activity was carried out because of the location, not because of activity-specific language. This has potential implications for model generalization. We will discuss feature importance in @sec-results.
 
 ```{r}
 #| label: fig-ngrams
@@ -590,7 +592,7 @@ create_comparison_plot(report_data_corr, merged_data)
 
 ```
 
-@fig-label-distr shows that the overall label distributions stays comparable between the full PACT data set and the subset parsed for analysis. Notably, 'CivilSocietyAssistance' is carried out heavier in the selected mission reports, while there was less use of force. This finding makes sense, as the use of force is only mandated for very specific third and fourth generation UNPKOs, also referred to as "robust" peacekeeping missions. These missions were mostly deployed in armed conflicts in Africa. Since data of PACT 1.0, which covers Africa, was not available, the reported activities in our subset rely heavily on the UNOMIG mission (@fig-label-per-mission). This potentially leads to results that rely on mission-specific wording in our models.
+@fig-label-distr shows that the overall label distributions stays comparable between the full PACT 2.0 data set and the subset parsed for analysis. Notably, 'CivilSocietyAssistance' is carried out heavier in the selected mission reports, while there was less use of force. This finding makes sense, as the use of force is only mandated for very specific third and fourth generation UNPKOs, also referred to as "robust" peacekeeping missions. These missions were mostly deployed in armed conflicts in Africa. Since the data of PACT 1.0, which covers Africa, was not available, the reported activities in our subset rely heavily on the UNOMIG mission (@fig-label-per-mission). This potentially leads to results that rely on mission-specific wording or geographic anchors in our models.
 
 ```{r}
 #| label: fig-label-per-mission
@@ -642,10 +644,20 @@ ggplot(mission_labels, aes(x = Mission, y = Percentage, fill = Category)) +
 
 For the other missions, most labels are present in varying proportions. Especially for the feature importance of geographical anchors, the multiplicity of missions per label should lead to better results and less importance of these geographical tokens, as they differ for different missions. Expanding the included paragraphs beyond the scope possible here should therefore lead to even less dependance on these features.
 
-Category Characterization
+Looking at the word clouds for the complete text data by categories (@fig-category-analysis-1), we can see that some words are heavily replicated in different categories. The term "police" on its own for example is present in three different categories as a central term. These duplications point to the semantic structure and usage of the term as an important distinction for extracting the correct labels from the paragraph data.
 
-Word clouds for each category Most distinctive terms per category (CountVectorizer from scikit-learn)
-Average paragraph length by category
+@fig-category-analysis-2 shows the distinctive terms by their TF-IDF score, which reflects the importance of each term within a given category relative to its distribution across the entire corpus. TF-IDF, or Term Frequency–Inverse Document Frequency, is computed using the following formula:
+
+$$
+\text{TF-IDF}(t, d, D) = \text{TF}(t, d) \times \text{IDF}(t, D) = \frac{f_{t,d}}{\sum_{t' \in d} f_{t',d}} \times \log\left(\frac{N}{1 + \left| \{ d' \in D : t \in d' \} \right|}\right)
+$$
+
+This version uses log-scaled inverse document frequency with term frequency normalized by document length, which is a common implementation (e.g. in 'scikit-learn').
+
+The distinctive terms are guaranteed to be different in a multi-label setup, but missing key terminology like "police" may still lead to a higher missclassification rate, especially regarding false positives.
+
+For both approaches, traditional word counts and TF-IDF scores, geographical anchors like "kosovo" or "georgian" appear in the features, which is not surprising for the imbalanced label distributions within and across different UNPKOs. UNMIK, which was active in Kosovo, implemented the highest share of 'CivilSocietyAssistance'. UNOMIG on the other hand, which was active in Georgia, had the relatively highest codings for 'Operations'.
+
 
 ```{r}
 #| label: fig-category-analysis
@@ -737,13 +749,11 @@ calculate_distinctive_terms <- function(data, target_categories) {
 # 1. Create Word Clouds for each category
 # Only show if we have paragraph text data
 if ("paragraph" %in% colnames(merged_data)) {
-  par(mfrow = c(2, 3))  # Adjust grid layout based on number of categories
+  par(mfrow = c(3, 3))  # Adjust grid layout based on number of categories
   for (category in target_categories) {
     create_category_wordcloud(merged_data, category)
   }
   par(mfrow = c(1, 1))  # Reset layout
-} else {
-  cat("Paragraph text not available for word clouds.\n")
 }
 
 # 2. Find distinctive terms
@@ -761,7 +771,6 @@ if ("paragraph" %in% colnames(merged_data)) {
     scale_x_reordered() +
     scale_fill_brewer(palette = "Dark2") +
     labs(
-      title = "Most Distinctive Terms by Category",
       x = NULL,
       y = "TF-IDF Score"
     ) +
@@ -770,20 +779,12 @@ if ("paragraph" %in% colnames(merged_data)) {
       plot.title = element_text(hjust = 0.5, face = "bold"),
       strip.text = element_text(face = "bold")
     )
-} else {
-  cat("Paragraph text not available for distinctive terms analysis.\n")
 }
 
 
 ```
 
 ### Semantic Analysis
-
-Term Importance
-
-TF-IDF scores for important terms: Create a visualization showing the most distinctive words per category
-
-
 
 Topic Modeling
 
@@ -802,7 +803,9 @@ t-SNE or UMAP visualization of word vectors Clustering of semantically similar t
 
 ## Modeling approach {#sec-meth}
 
-We opt for a tri-fold modeling approach. First, the baseline models using 'CountVectorizer' for tokenizations are calculated, using Logistic Regression, Balanced Logistic Regression and a Random Forest Tree Classifier for subsequent classifications. Second, the same models are employed using TF-IDF to tokenize documents. Thirdly, a pre-trained BERT model is fitted to the data.
+In classification tasks with imbalanced class distributions, standard machine learning models often become biased toward the majority class, resulting in poor performance on minority classes. This imbalance can lead to misleading accuracy scores, as the model may learn to predict the dominant class at the expense of others. To address this, we use class weighting strategies such as class_weight='balanced' in logistic regression. This approach adjusts the contribution of each class to the loss function by assigning higher weights to underrepresented classes and lower weights to overrepresented ones, thereby mitigating the imbalance. By penalizing misclassifications of minority classes more heavily, balanced class weighting encourages the model to learn a more equitable decision boundary, improving metrics like recall and F1-score for all classes. This is particularly important in multi-label classification, where each label may exhibit different levels of frequency and relevance.
+
+We therefore opt for a tri-fold modeling approach. First, the baseline models using 'CountVectorizer' for tokenizations are calculated, using Logistic Regression, Balanced Logistic Regression as explained above and a Random Forest Tree Classifier for subsequent classifications. We included a Random Forest model because of its strong performance and high computational efficiency for classification tasks in general. Second, the same models are employed using TF-IDF to tokenize documents. Thirdly, a pre-trained BERT model is fitted to the data. The exploratory data analysis in @sec-eda points in various bits, for example the analysis of word frequency according to Zipf's law, the analysis of most common and distinctive terms as well as the contextual knowledge of UN reporting schemes, that this class of models fits well for the task. 
 
 ### Term Frequency–Inverse Document Frequency (TF-IDF)
 
@@ -841,17 +844,23 @@ Since the training of a BERT model is computationally expensive, ...
 
 As can be seen in @tbl-class-distribution, the seven most coded categories selected for this feasibility test were still highly unbalanced. The imbalance ratio between the most frequent and least frequent was 5.1, compared to 5.31 for our target categories among the whole PACT 2.0 data set. The class distribution table for the full PACT 2.0 data set can be found in @tbl-class-distribution-full in the Annex.
 
-To ensure robust model evaluation, we employed Stratified K-Fold Cross-Validation. Specifically, we used Stratified K-Fold Cross-Validation using the 'IterativeStratification' strategy from the 'skmultilearn' library, which is tailored for multilabel classification. This strategy splits the data into *K* folds while preserving the label distribution across each fold, which is critical given the imbalanced and multilabel nature of the dataset. Unlike standard K-Fold, stratification helps prevent biased performance estimates that can occur if rare labels are unevenly distributed. By training and testing across multiple stratified splits, we obtain a more reliable estimate of model performance and ensure that each model is evaluated on diverse subsets of the data while still maintaining representative label proportions. This makes the approach well-suited for our multi-class, multi-label classification task.
+To ensure robust model evaluation, we employed Stratified K-Fold Cross-Validation. Specifically, we used the 'IterativeStratification' function from the 'skmultilearn' library, which is tailored for multilabel classification. This strategy splits the data into *K* folds while preserving the label distribution across each fold, which is critical given the imbalanced and multi-label nature of the dataset. Unlike standard K-Fold, stratification helps prevent biased performance estimates that can occur if rare labels are unevenly distributed. By training and testing across multiple stratified splits, we obtain a more reliable estimate of model performance and ensure that each model is evaluated on diverse subsets of the data while still maintaining representative label proportions. This makes the approach well-suited for our multi-class, multi-label classification task.
 
 The typical StratifiedKFold in 'scikit-learn' has a random state parameter to shuffle the data before splitting, which is useful to ensure reproducibility. However, 'IterativeStratification' from 'skmultilearn.model_selection' does not support a random state parameter, because it uses a deterministic algorithm to ensure that label distributions are balanced in each fold. Shuffling or adding randomness would disrupt the iterative label-balancing process, which is the entire point of using this strategy. Since the same cross-validation was used across all models, results are still comparable.
 
 ## Results {#sec-results}
+
+### Parameter optimization
+
+All BoW models reported in the results section are parameter optimized using 'GridSearchCV'. 
 
 ## Conclusion {#sec-conc}
 
 Limitations:
 - geographic anchors
 - subset of missions
+
+Combining word frequency tokenization with TF-IDF plus penalty term logistic regression for the balance between important key terms for detecting an activity and distinctive terms (TF-IDF scores) for fine-grained categorization for 
 
 ## Annex {.annex}
 
