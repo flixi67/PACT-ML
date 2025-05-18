@@ -86,7 +86,9 @@ div.csl-indent {
   </ul></li>
   <li><a href="#sec-meth" id="toc-sec-meth" class="nav-link" data-scroll-target="#sec-meth"><span class="header-section-number">4</span> Modeling approach</a>
   <ul class="collapse">
-  <li><a href="#cross-validation-strategy" id="toc-cross-validation-strategy" class="nav-link" data-scroll-target="#cross-validation-strategy"><span class="header-section-number">4.1</span> Cross-Validation strategy</a></li>
+  <li><a href="#term-frequencyinverse-document-frequency-tf-idf" id="toc-term-frequencyinverse-document-frequency-tf-idf" class="nav-link" data-scroll-target="#term-frequencyinverse-document-frequency-tf-idf"><span class="header-section-number">4.1</span> Term Frequency–Inverse Document Frequency (TF-IDF)</a></li>
+  <li><a href="#bidirectional-encoder-representations-from-transformers-bert" id="toc-bidirectional-encoder-representations-from-transformers-bert" class="nav-link" data-scroll-target="#bidirectional-encoder-representations-from-transformers-bert"><span class="header-section-number">4.2</span> Bidirectional Encoder Representations from Transformers (BERT)</a></li>
+  <li><a href="#cross-validation-strategy" id="toc-cross-validation-strategy" class="nav-link" data-scroll-target="#cross-validation-strategy"><span class="header-section-number">4.3</span> Cross-Validation strategy</a></li>
   </ul></li>
   <li><a href="#sec-results" id="toc-sec-results" class="nav-link" data-scroll-target="#sec-results"><span class="header-section-number">5</span> Results</a></li>
   <li><a href="#sec-conc" id="toc-sec-conc" class="nav-link" data-scroll-target="#sec-conc"><span class="header-section-number">6</span> Conclusion</a></li>
@@ -572,7 +574,7 @@ Figure&nbsp;4: N-Gram Frequencies
 </figcaption>
 </figure>
 </div>
-<p>Below are the most relevant bigrams (cutoff for frequency higher than 50) and trigrams (frequencies higher than 25). These network graphs embed the most frequent bi- and trigrams into a larger context of appearance.</p>
+<p>Below are the most relevant bigrams (cutoff for frequency higher than 50, <a href="#fig-ngram-network-1" class="quarto-xref">Figure&nbsp;5 (a)</a>) and trigrams (frequencies higher than 25, <a href="#fig-ngram-network-2" class="quarto-xref">Figure&nbsp;5 (b)</a>). These network graphs embed the most frequent bi- and trigrams into a larger context of appearance.</p>
 <div id="fig-ngram-network" class="quarto-layout-panel">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-ngram-network-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -627,10 +629,123 @@ Figure&nbsp;6: Type-Token Ratio (higher values indicate greater diversity)
 </div>
 </div>
 <p>The differences in Type-Token Ratio (TTR) across categories have important implications for our modeling approaches. For Bag-of-Words (BoW) models, high TTR categories like ‘RefugeeAssistance’ may lead to sparser feature representations due to their richer vocabulary, which can affect model performance if not enough training data is available. Conversely, low TTR categories like ‘PoliceReform’ may produce denser, more repetitive word distributions, potentially making them easier to model with BoW but also more susceptible to overfitting on frequent terms. For BERT models, which capture contextual semantics, high lexical diversity can enhance learning if the model is exposed to varied contexts, but it may also challenge generalization if vocabulary usage is highly domain-specific.</p>
-<p>Label Distribution</p>
-<p>Class imbalance visualization (bar chart of your categories) Multi-label statistics (paragraphs with multiple categories) Co-occurrence matrix (which categories appear together)</p>
+<div id="fig-co-occurence" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-co-occurence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-co-occurence" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-co-occurence-1" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-co-occurence-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-co-occurence-1.png" class="img-fluid figure-img" data-ref-parent="fig-co-occurence" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-co-occurence-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) PACT 2.0
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-co-occurence" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-co-occurence-2" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-co-occurence-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-co-occurence-2.png" class="img-fluid figure-img" data-ref-parent="fig-co-occurence" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-co-occurence-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Included Paragraphs
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-co-occurence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Category Co-Occurence for Target Categories
+</figcaption>
+</figure>
+</div>
+<p>The co-occurence matrices in <a href="#fig-co-occurence" class="quarto-xref">Figure&nbsp;7</a> indicate very similar co-occurences in the subset of data compared to the full PACT 2.0, with slightly higher co-occurence of the labels ‘PoliceReform’ with ‘LegalReform’ and ‘CivilSocietyAssistance’. To our advantage, the co-occurence of textually related categories of ‘PoliceReform’ and ‘Operations’, which both may use police or military language, is smaller in our subset.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-label-distr" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-label-distr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-label-distr-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-label-distr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Comparison of Label Distributions
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-label-distr" class="quarto-xref">Figure&nbsp;8</a> shows that the overall label distributions stays comparable between the full PACT data set and the subset parsed for analysis. Notably, ‘CivilSocietyAssistance’ is carried out heavier in the selected mission reports, while there was less use of force. This finding makes sense, as the use of force is only mandated for very specific third and fourth generation UNPKOs, also referred to as “robust” peacekeeping missions. These missions were mostly deployed in armed conflicts in Africa. Since data of PACT 1.0, which covers Africa, was not available, the reported activities in our subset rely heavily on the UNOMIG mission (<a href="#fig-label-per-mission" class="quarto-xref">Figure&nbsp;9</a>). This potentially leads to results that rely on mission-specific wording in our models.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-label-per-mission" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-label-per-mission-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-label-per-mission-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-label-per-mission-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Proportional Label Distribution by Mission for Included Paragraphs
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>For the other missions, most labels are present in varying proportions. Especially for the feature importance of geographical anchors, the multiplicity of missions per label should lead to better results and less importance of these geographical tokens, as they differ for different missions. Expanding the included paragraphs beyond the scope possible here should therefore lead to even less dependance on these features.</p>
 <p>Category Characterization</p>
-<p>Word clouds for each category Most distinctive terms per category (TF-IDF analysis) Average paragraph length by category</p>
+<p>Word clouds for each category Most distinctive terms per category (CountVectorizer from scikit-learn) Average paragraph length by category</p>
+<div id="fig-category-analysis" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-category-analysis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-category-analysis" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-category-analysis-1" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-category-analysis-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-category-analysis-1.png" class="img-fluid figure-img" data-ref-parent="fig-category-analysis" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-category-analysis-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Word Clouds by Category
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-category-analysis" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-category-analysis-2" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-category-analysis-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-category-analysis-2.png" class="img-fluid figure-img" data-ref-parent="fig-category-analysis" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-category-analysis-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Distinctive Terms by Category
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-category-analysis" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-category-analysis-3" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-category-analysis-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-category-analysis-3.png" class="img-fluid figure-img" data-ref-parent="fig-category-analysis" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-category-analysis-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c) Word Clouds by Category
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-category-analysis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Category-Specific Text Analysis
+</figcaption>
+</figure>
+</div>
 </section>
 <section id="semantic-analysis" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="semantic-analysis"><span class="header-section-number">3.3</span> Semantic Analysis</h3>
@@ -647,9 +762,23 @@ Figure&nbsp;6: Type-Token Ratio (higher values indicate greater diversity)
 </section>
 <section id="sec-meth" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="sec-meth"><span class="header-section-number">4</span> Modeling approach</h2>
-<p>Don’t take any of these section titles seriously. They’re just for illustration.</p>
-<section id="cross-validation-strategy" class="level3" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="cross-validation-strategy"><span class="header-section-number">4.1</span> Cross-Validation strategy</h3>
+<p>We opt for a tri-fold modeling approach. First, the baseline models using ‘CountVectorizer’ for tokenizations are calculated, using Logistic Regression, Balanced Logistic Regression and a Random Forest Tree Classifier for subsequent classifications. Second, the same models are employed using TF-IDF to tokenize documents. Thirdly, a pre-trained BERT model is fitted to the data.</p>
+<section id="term-frequencyinverse-document-frequency-tf-idf" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="term-frequencyinverse-document-frequency-tf-idf"><span class="header-section-number">4.1</span> Term Frequency–Inverse Document Frequency (TF-IDF)</h3>
+<p>As shown in <a href="#sec-eda" class="quarto-xref">Section&nbsp;3</a>, the formalized United nations language in reporting activities combined with the technical and relevant terms for each category lead to restrictions in using simple word count vectors. Replacing raw word counts with Term Frequency–Inverse Document Frequency (TF-IDF) representations can significantly enhance the effectiveness of machine learning models in text analysis, even when stopwords have already been removed. While count-based vectorization (as implemented in ‘CountVectorizer’ from ‘scikit-learn’) simply encodes the frequency of terms in each document, it treats all terms as equally informative. This approach can obscure the underlying semantic structure of the text, particularly when terms appear frequently across many documents but do not meaningfully contribute to document differentiation.</p>
+<p>In contrast, TF-IDF weighting provides a more discriminative representation by scaling term frequencies by the inverse document frequency, thereby down-weighting terms that are common across the corpus and up-weighting those that are more unique to specific documents. This is especially useful in corpora where certain terms recur regularly but do not carry thematic significance. Although removing stopwords mitigates some of this issue, many domain-specific high-frequency terms (e.g., “government”, “peace”, “operation” in peacekeeping corpora) may still dominate the feature space in a count-based model without necessarily improving predictive performance. This is also shown in <a href="#fig-ngrams-1" class="quarto-xref">Figure&nbsp;4 (a)</a>, where many of the most frequent bigrams showed cross-cutting terminology like “human rights”, “reporting period”, “united nations”, “special representative” or “capacity building” (which is to some degree a term for a subgroup of peacekeeping activities, namely peacebuilding activities).</p>
+<p>Moreover, TF-IDF has been shown to improve performance in a range of supervised learning tasks, particularly with linear classifiers such as logistic regression. By emphasizing the relative importance of terms, TF-IDF can enhance the signal-to-noise ratio in the input representation, leading to better generalization and interpretability. This is especially relevant when dealing with large vocabularies or class-imbalanced datasets like in our case, where raw frequency counts may skew model attention toward overly generic patterns.</p>
+</section>
+<section id="bidirectional-encoder-representations-from-transformers-bert" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="bidirectional-encoder-representations-from-transformers-bert"><span class="header-section-number">4.2</span> Bidirectional Encoder Representations from Transformers (BERT)</h3>
+<p>Bidirectional Encoder Representations from Transformers (BERT) represents a paradigm shift in natural language processing by replacing surface-level feature engineering with deep contextual language understanding. Unlike traditional vectorization methods such as CountVectorizer used in the base models and TF-IDF, which generate fixed, sparse representations based on term-level statistics, BERT constructs dense, context-sensitive embeddings for each token, derived from its position within a sentence and the surrounding linguistic context. This approach allows BERT to model not only word meaning but also subtle syntactic and semantic relationships that are entirely invisible to TF-IDF and other bag-of-words representations.</p>
+<p>The advantages of BERT are particularly salient in tasks that require understanding word sense disambiguation, idiomatic expressions, or syntactic dependencies — areas where frequency-based approaches struggle due to their inherent assumption of word independence. For example, TF-IDF treats the word “bank” identically in “river bank” and “investment bank,” whereas BERT dynamically adjusts the representation of “bank” depending on its context. This context-aware modeling enables BERT to capture nuanced meanings and improve downstream performance in classification, sentiment analysis and other text-based tasks.</p>
+<p>Importantly, BERT eliminates the need for many traditional preprocessing steps such as stopword removal, stemming, or lemmatization. Because its transformer architecture learns language patterns directly from raw text, BERT can internally determine the informativeness of frequent function words and adjust their impact accordingly. This further distinguishes it from TF-IDF, which relies on external heuristics to mitigate the influence of high-frequency but low-information terms.</p>
+<p>Moreover, BERT’s capacity to encode both local and long-range dependencies through self-attention mechanisms enhances its ability to generalize across domains and tasks, even with relatively limited annotated data. Fine-tuning BERT on a task-specific corpus allows the model to adapt to domain-specific language use while retaining its general-purpose linguistic knowledge, acquired during pretraining on large-scale corpora such as Wikipedia and BookCorpus.</p>
+<p>Since the training of a BERT model is computationally expensive, …</p>
+</section>
+<section id="cross-validation-strategy" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="cross-validation-strategy"><span class="header-section-number">4.3</span> Cross-Validation strategy</h3>
 <div id="tbl-class-distribution" class="quarto-float anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-class-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
