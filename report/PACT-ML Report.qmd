@@ -392,7 +392,7 @@ trigram_counts %>%
 
 ```
 
-Below are the most relevant bigrams (cutoff for frequency higher than 50) and trigrams (frequencies higher than 25). These network graphs embed the most frequent bi- and trigrams into a larger context of appearance.
+Below are the most relevant bigrams (cutoff for frequency higher than 50, @fig-ngram-network-1) and trigrams (frequencies higher than 25, @fig-ngram-network-2). These network graphs embed the most frequent bi- and trigrams into a larger context of appearance.
 
 ```{r}
 #| label: fig-ngram-network
@@ -475,13 +475,307 @@ ggplot(lexical_diversity, aes(x = reorder(category, -type_token_ratio), y = type
 
 The differences in Type-Token Ratio (TTR) across categories have important implications for our modeling approaches. For Bag-of-Words (BoW) models, high TTR categories like 'RefugeeAssistance' may lead to sparser feature representations due to their richer vocabulary, which can affect model performance if not enough training data is available. Conversely, low TTR categories like 'PoliceReform' may produce denser, more repetitive word distributions, potentially making them easier to model with BoW but also more susceptible to overfitting on frequent terms. For BERT models, which capture contextual semantics, high lexical diversity can enhance learning if the model is exposed to varied contexts, but it may also challenge generalization if vocabulary usage is highly domain-specific.
 
-Label Distribution
+```{r}
+#| label: fig-co-occurence
+#| fig-cap: "Category Co-Occurence for Target Categories"
+#| fig-subcap:
+#|   - "PACT 2.0"
+#|   - "Included Paragraphs"
+#| layout-ncol: 2
 
-Class imbalance visualization (bar chart of your categories) Multi-label statistics (paragraphs with multiple categories) Co-occurrence matrix (which categories appear together)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(RColorBrewer)
+
+# Ensure categories are logical
+for (category in target_categories) {
+  if (category %in% colnames(report_data)) {
+    report_data[[category]] <- report_data[[category]] != ""
+  }
+}
+
+report_data_corr <- report_data %>%
+  select(paragraphNumber, all_of(target_categories)) %>%
+  mutate_at(all_of(target_categories), ~replace(., is.na(.), FALSE))
+
+# Create co-occurrence matrices
+create_cooccurrence_plot <- function(data, title) {
+  if (nrow(data) == 0 || ncol(data) == 0) {
+    warning("Empty data provided to create_cooccurrence_plot")
+    # Return empty plot if data is invalid
+    return(ggplot() + 
+             annotate("text", x = 0, y = 0, label = "No data available") + 
+             theme_void())
+  }
+
+  # Calculate co-occurrence matrix
+  label_matrix <- as.matrix(data[, target_categories])
+  cooccurrence_matrix <- t(label_matrix) %*% label_matrix
+  
+  # Convert to data frame for ggplot
+  cooc_df <- as.data.frame(as.table(cooccurrence_matrix))
+  names(cooc_df) <- c("Category1", "Category2", "Frequency")
+  
+  # Create heatmap
+  ggplot(cooc_df, aes(x = Category1, y = Category2, fill = Frequency)) +
+    geom_tile(color = "white") +
+    geom_text(aes(label = Frequency), color = "black", size = 3) +
+    scale_fill_gradient(low = "white", high = "steelblue") +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      plot.title = element_text(hjust = 0.5, face = "bold")
+    ) +
+    labs(
+      x = NULL, 
+      y = NULL,
+      fill = "Frequency"
+    ) +
+    coord_fixed()
+}
+
+# Plot 1: Co-occurrence matrix for full dataset
+create_cooccurrence_plot(report_data_corr, "Label Co-occurrence for PACT 2.0")
+
+# Plot 2: Co-occurrence matrix for merged dataset
+create_cooccurrence_plot(merged_data, "Label Co-occurrence in Included Paragraphs")
+
+```
+
+The co-occurence matrices in @fig-co-occurence indicate very similar co-occurences in the subset of data compared to the full PACT 2.0, with slightly higher co-occurence of the labels 'PoliceReform' with 'LegalReform' and 'CivilSocietyAssistance'. To our advantage, the co-occurence of textually related categories of 'PoliceReform' and 'Operations', which both may use police or military language, is smaller in our subset. 
+
+```{r}
+#| label: fig-label-distr
+#| fig-cap: "Comparison of Label Distributions"
+
+# Create category proportion comparison
+create_comparison_plot <- function(data1, data2) {
+  # Calculate proportions for both datasets
+  props1 <- sapply(data1[, target_categories], sum) / nrow(data1)
+  props2 <- sapply(data2[, target_categories], sum) / nrow(data2)
+  
+  # Combine into a data frame
+  comparison <- data.frame(
+    Category = names(props1),
+    Full_Dataset = props1,
+    Merged_Dataset = props2
+  )
+  
+  # Convert to long format
+  comparison_long <- comparison %>%
+    pivot_longer(cols = c(Full_Dataset, Merged_Dataset),
+                 names_to = "Dataset",
+                 values_to = "Proportion")
+  
+  # Create bar chart
+  ggplot(comparison_long, aes(x = Category, y = Proportion, fill = Dataset)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    scale_fill_manual(
+      values = c("#4472C4", "#ED7D31"),
+      labels = c("PACT 2.0", "Included Paragraphs")
+    ) +
+    labs(
+      x = NULL,
+      y = "Proportion"
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold"),
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    )
+}
+
+create_comparison_plot(report_data_corr, merged_data)
+
+```
+
+@fig-label-distr shows that the overall label distributions stays comparable between the full PACT data set and the subset parsed for analysis. Notably, 'CivilSocietyAssistance' is carried out heavier in the selected mission reports, while there was less use of force. This finding makes sense, as the use of force is only mandated for very specific third and fourth generation UNPKOs, also referred to as "robust" peacekeeping missions. These missions were mostly deployed in armed conflicts in Africa. Since data of PACT 1.0, which covers Africa, was not available, the reported activities in our subset rely heavily on the UNOMIG mission (@fig-label-per-mission). This potentially leads to results that rely on mission-specific wording in our models.
+
+```{r}
+#| label: fig-label-per-mission
+#| fig-cap: "Proportional Label Distribution by Mission for Included Paragraphs"
+
+# Create a barplot of label distribution across missions
+mission_labels <- merged_data %>%
+  # Extract mission name from matchingKey
+  mutate(
+    # Extract mission name (everything before first underscore)
+    Mission = sub("_.*", "", matchingKey)
+  ) %>%
+  # Convert to long format for plotting
+  pivot_longer(
+    cols = all_of(target_categories),
+    names_to = "Category",
+    values_to = "Has_Label"
+  ) %>%
+  # Filter to only include TRUE values
+  filter(Has_Label == TRUE) %>%
+  # Count occurrences by mission and category
+  count(Mission, Category) %>%
+  # Get mission totals to calculate percentages
+  group_by(Mission) %>%
+  mutate(
+    # Calculate total labels for this mission
+    Mission_Total = sum(n),
+    # Calculate percentage within mission
+    Percentage = n / Mission_Total * 100
+  ) %>%
+  ungroup()
+
+# Optional: Create a percentage-based stacked barplot
+# This is useful to see proportional distribution within each mission
+ggplot(mission_labels, aes(x = Mission, y = Percentage, fill = Category)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Mission",
+    y = "Percentage of Labels (%)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+```
+
+For the other missions, most labels are present in varying proportions. Especially for the feature importance of geographical anchors, the multiplicity of missions per label should lead to better results and less importance of these geographical tokens, as they differ for different missions. Expanding the included paragraphs beyond the scope possible here should therefore lead to even less dependance on these features.
 
 Category Characterization
 
-Word clouds for each category Most distinctive terms per category (TF-IDF analysis) Average paragraph length by category
+Word clouds for each category Most distinctive terms per category (CountVectorizer from scikit-learn)
+Average paragraph length by category
+
+```{r}
+#| label: fig-category-analysis
+#| fig-cap: "Category-Specific Text Analysis"
+#| fig-subcap:
+#|   - "Word Clouds by Category"
+#|   - "Distinctive Terms by Category"
+#| layout-ncol: 2
+
+library(dplyr)
+library(ggplot2)
+library(tidytext)
+library(wordcloud)
+library(RColorBrewer)
+library(stringr)
+
+# Function to create word cloud for a specific category
+create_category_wordcloud <- function(data, category_name, min_freq = 3) {
+  # Filter data for the specific category
+  category_docs <- data %>%
+    filter(!!sym(category_name) == TRUE)
+  
+  # Extract and tokenize text
+  category_words <- category_docs %>%
+    unnest_tokens(word, paragraph) %>%
+    anti_join(stop_words, by = "word") %>%
+    filter(str_detect(word, "^[a-z]+$"),  # Remove non-alphabetic words
+           nchar(word) > 2) %>%           # Remove short words
+    count(word, sort = TRUE)
+  
+  # Create a wordcloud
+  if (nrow(category_words) > 0) {
+    par(mar = c(0, 0, 2, 0))
+    wordcloud(words = category_words$word, 
+              freq = category_words$n, 
+              min.freq = min_freq,
+              max.words = 50, 
+              random.order = FALSE, 
+              rot.per = 0.35, 
+              colors = brewer.pal(8, "Dark2"),
+              main = category_name)
+    title(category_name, line = -1)
+  } else {
+    plot.new()
+    text(0.5, 0.5, paste("No sufficient data for", category_name))
+  }
+}
+
+# Function to find distinctive terms using TF-IDF (similar to CountVectorizer)
+calculate_distinctive_terms <- function(data, target_categories) {
+  # Create a dataset with category and text
+  all_category_texts <- data.frame()
+  
+  for (category in target_categories) {
+    category_docs <- data %>%
+      filter(!!sym(category) == TRUE) %>%
+      select(paragraph)
+    
+    if (nrow(category_docs) > 0) {
+      category_tokens <- category_docs %>%
+        unnest_tokens(word, paragraph) %>%
+        anti_join(stop_words, by = "word") %>%
+        filter(str_detect(word, "^[a-z]+$"),
+               nchar(word) > 2) %>%
+        count(word) %>%
+        mutate(category = category)
+      
+      all_category_texts <- bind_rows(all_category_texts, category_tokens)
+    }
+  }
+  
+  # Calculate TF-IDF
+  category_tf_idf <- all_category_texts %>%
+    group_by(category) %>%
+    mutate(total = sum(n)) %>%
+    ungroup() %>%
+    bind_tf_idf(word, category, n)
+  
+  # Get top terms by TF-IDF for each category
+  top_terms <- category_tf_idf %>%
+    group_by(category) %>%
+    top_n(10, tf_idf) %>%
+    ungroup() %>%
+    arrange(category, desc(tf_idf))
+  
+  return(top_terms)
+}
+
+# 1. Create Word Clouds for each category
+# Only show if we have paragraph text data
+if ("paragraph" %in% colnames(merged_data)) {
+  par(mfrow = c(2, 3))  # Adjust grid layout based on number of categories
+  for (category in target_categories) {
+    create_category_wordcloud(merged_data, category)
+  }
+  par(mfrow = c(1, 1))  # Reset layout
+} else {
+  cat("Paragraph text not available for word clouds.\n")
+}
+
+# 2. Find distinctive terms
+if ("paragraph" %in% colnames(merged_data)) {
+  # Get distinctive terms
+  distinctive_terms <- calculate_distinctive_terms(merged_data, target_categories)
+  
+  # Plot distinctive terms
+  ggplot(distinctive_terms, aes(x = reorder_within(word, tf_idf, category), 
+                                y = tf_idf, 
+                                fill = category)) +
+    geom_col(show.legend = FALSE) +
+    facet_wrap(~ category, scales = "free_y") +
+    coord_flip() +
+    scale_x_reordered() +
+    scale_fill_brewer(palette = "Dark2") +
+    labs(
+      title = "Most Distinctive Terms by Category",
+      x = NULL,
+      y = "TF-IDF Score"
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold"),
+      strip.text = element_text(face = "bold")
+    )
+} else {
+  cat("Paragraph text not available for distinctive terms analysis.\n")
+}
+
+
+```
 
 ### Semantic Analysis
 
@@ -508,7 +802,27 @@ t-SNE or UMAP visualization of word vectors Clustering of semantically similar t
 
 ## Modeling approach {#sec-meth}
 
-Don't take any of these section titles seriously. They're just for illustration.
+We opt for a tri-fold modeling approach. First, the baseline models using 'CountVectorizer' for tokenizations are calculated, using Logistic Regression, Balanced Logistic Regression and a Random Forest Tree Classifier for subsequent classifications. Second, the same models are employed using TF-IDF to tokenize documents. Thirdly, a pre-trained BERT model is fitted to the data.
+
+### Term Frequency–Inverse Document Frequency (TF-IDF)
+
+As shown in @sec-eda, the formalized United nations language in reporting activities combined with the technical and relevant terms for each category lead to restrictions in using simple word count vectors. Replacing raw word counts with Term Frequency–Inverse Document Frequency (TF-IDF) representations can significantly enhance the effectiveness of machine learning models in text analysis, even when stopwords have already been removed. While count-based vectorization (as implemented in 'CountVectorizer' from 'scikit-learn') simply encodes the frequency of terms in each document, it treats all terms as equally informative. This approach can obscure the underlying semantic structure of the text, particularly when terms appear frequently across many documents but do not meaningfully contribute to document differentiation.
+
+In contrast, TF-IDF weighting provides a more discriminative representation by scaling term frequencies by the inverse document frequency, thereby down-weighting terms that are common across the corpus and up-weighting those that are more unique to specific documents. This is especially useful in corpora where certain terms recur regularly but do not carry thematic significance. Although removing stopwords mitigates some of this issue, many domain-specific high-frequency terms (e.g., "government", "peace", "operation" in peacekeeping corpora) may still dominate the feature space in a count-based model without necessarily improving predictive performance. This is also shown in @fig-ngrams-1, where many of the most frequent bigrams showed cross-cutting terminology like "human rights", "reporting period", "united nations", "special representative" or "capacity building" (which is to some degree a term for a subgroup of peacekeeping activities, namely peacebuilding activities).
+
+Moreover, TF-IDF has been shown to improve performance in a range of supervised learning tasks, particularly with linear classifiers such as logistic regression. By emphasizing the relative importance of terms, TF-IDF can enhance the signal-to-noise ratio in the input representation, leading to better generalization and interpretability. This is especially relevant when dealing with large vocabularies or class-imbalanced datasets like in our case, where raw frequency counts may skew model attention toward overly generic patterns.
+
+### Bidirectional Encoder Representations from Transformers (BERT)
+
+Bidirectional Encoder Representations from Transformers (BERT) represents a paradigm shift in natural language processing by replacing surface-level feature engineering with deep contextual language understanding. Unlike traditional vectorization methods such as CountVectorizer used in the base models and TF-IDF, which generate fixed, sparse representations based on term-level statistics, BERT constructs dense, context-sensitive embeddings for each token, derived from its position within a sentence and the surrounding linguistic context. This approach allows BERT to model not only word meaning but also subtle syntactic and semantic relationships that are entirely invisible to TF-IDF and other bag-of-words representations.
+
+The advantages of BERT are particularly salient in tasks that require understanding word sense disambiguation, idiomatic expressions, or syntactic dependencies — areas where frequency-based approaches struggle due to their inherent assumption of word independence. For example, TF-IDF treats the word "bank" identically in “river bank” and “investment bank,” whereas BERT dynamically adjusts the representation of "bank" depending on its context. This context-aware modeling enables BERT to capture nuanced meanings and improve downstream performance in classification, sentiment analysis and other text-based tasks.
+
+Importantly, BERT eliminates the need for many traditional preprocessing steps such as stopword removal, stemming, or lemmatization. Because its transformer architecture learns language patterns directly from raw text, BERT can internally determine the informativeness of frequent function words and adjust their impact accordingly. This further distinguishes it from TF-IDF, which relies on external heuristics to mitigate the influence of high-frequency but low-information terms.
+
+Moreover, BERT's capacity to encode both local and long-range dependencies through self-attention mechanisms enhances its ability to generalize across domains and tasks, even with relatively limited annotated data. Fine-tuning BERT on a task-specific corpus allows the model to adapt to domain-specific language use while retaining its general-purpose linguistic knowledge, acquired during pretraining on large-scale corpora such as Wikipedia and BookCorpus.
+
+Since the training of a BERT model is computationally expensive, ...
 
 ### Cross-Validation strategy
 
