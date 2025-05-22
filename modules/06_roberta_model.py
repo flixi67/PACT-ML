@@ -34,6 +34,12 @@ tokenizer = XLMRobertaTokenizer.from_pretrained("xlm-roberta-base")
 
 all_folds = []
 
+class DebugTrainer(Trainer):
+    def compute_loss(self, model, inputs, return_outputs=False):
+        labels = inputs.get("labels")
+        print("🔍 Label tensor dtype:", labels.dtype)
+        return super().compute_loss(model, inputs, return_outputs)
+
 for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
     print(f"\n📂 FOLD {fold + 1}")
 
@@ -78,7 +84,7 @@ for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
         save_strategy="no"
     )
 
-    trainer = Trainer(
+    trainer = DebugTrainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
