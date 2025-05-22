@@ -10,7 +10,7 @@ stratifier = IterativeStratification(n_splits=n_splits, order=1)
 import torch
 import pandas as pd
 import numpy as np
-from datasets import Dataset
+from datasets import Dataset, Sequence, Value
 from transformers import XLMRobertaTokenizer, XLMRobertaForSequenceClassification, Trainer, TrainingArguments
 from sklearn.metrics import f1_score, multilabel_confusion_matrix, classification_report, precision_score, recall_score, accuracy_score
 
@@ -40,8 +40,13 @@ for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
     X_train, X_val = X[train_idx], X[val_idx]
     y_train, y_val = Y[train_idx], Y[val_idx]
 
-    train_dataset = Dataset.from_dict({"text": X_train.tolist(), "labels": y_train.tolist()})
-    val_dataset = Dataset.from_dict({"text": X_val.tolist(), "labels": y_val.tolist()})
+    features = {
+        "text": Value("string"),
+        "labels": Sequence(Value("float32"))
+    }
+
+    train_dataset = Dataset.from_dict({"text": X_train.tolist(), "labels": y_train.tolist()}).cast(features)
+    val_dataset = Dataset.from_dict({"text": X_val.tolist(), "labels": y_val.tolist()}).cast(features)
 
     def tokenize(example):
         tokenized = tokenizer(
@@ -50,8 +55,6 @@ for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
             padding="max_length",
             max_length=256
         )
-        # Cast labels to float32 for BCEWithLogitsLoss
-        tokenized["labels"] = [float(x) for x in example["labels"]]
         return tokenized
     
     train_dataset = train_dataset.map(tokenize)
