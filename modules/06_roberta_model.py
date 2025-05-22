@@ -10,7 +10,7 @@ stratifier = IterativeStratification(n_splits=n_splits, order=1)
 import torch
 import pandas as pd
 import numpy as np
-from datasets import Dataset, Sequence, Value
+from datasets import Dataset, Features, Sequence, Value
 from transformers import XLMRobertaTokenizer, XLMRobertaForSequenceClassification, Trainer, TrainingArguments
 from sklearn.metrics import f1_score, multilabel_confusion_matrix, classification_report, precision_score, recall_score, accuracy_score
 
@@ -27,7 +27,7 @@ target_categories = [
 ]
 
 X = np.array(df["paragraph"].tolist())
-Y = np.array(df[target_categories].fillna(False).astype(int).values)
+Y = np.array(df[target_categories].fillna(False).astype(float).values)
 
 # Tokenizer & Encoding
 tokenizer = XLMRobertaTokenizer.from_pretrained("xlm-roberta-base")
@@ -40,7 +40,7 @@ for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
     X_train, X_val = X[train_idx], X[val_idx]
     y_train, y_val = Y[train_idx], Y[val_idx]
 
-    features = {
+    features = Features{
         "text": Value("string"),
         "labels": Sequence(Value("float32"))
     }
