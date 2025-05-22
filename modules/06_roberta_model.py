@@ -58,7 +58,7 @@ for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
 
     training_args = TrainingArguments(
         output_dir=f"./results/fold_{fold+1}",
-        evaluation_strategy="epoch",
+        eval_strategy="epoch",
         learning_rate=2e-5,
         per_device_train_batch_size=16,
         per_device_eval_batch_size=16,
