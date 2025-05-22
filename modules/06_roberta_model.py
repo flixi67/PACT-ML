@@ -101,7 +101,7 @@ for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
     cm = multilabel_confusion_matrix(Y_true, Y_pred)
 
     rows = []
-    for i, label in enumerate(label_names):
+    for i, label in enumerate(target_categories):
         tn, fp, fn, tp = cm[i].ravel()
         fpr = fp / (fp + tn) if (fp + tn) > 0 else 0
         fnr = fn / (fn + tp) if (fn + tp) > 0 else 0
@@ -124,7 +124,7 @@ for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
             'TN': tn
         })
 
-    print(classification_report(Y_true, Y_pred, target_names=label_names, zero_division=0))
+    print(classification_report(Y_true, Y_pred, target_names=target_categories, zero_division=0))
     
     fold_df = pd.DataFrame(rows)
     all_folds.append(fold_df)
