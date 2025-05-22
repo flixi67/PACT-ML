@@ -44,7 +44,15 @@ for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
     val_dataset = Dataset.from_dict({"text": X_val.tolist(), "labels": y_val.tolist()})
 
     def tokenize(example):
-        return tokenizer(example["text"], truncation=True, padding="max_length", max_length=256)
+        tokenized = tokenizer(
+            example["text"],
+            truncation=True,
+            padding="max_length",
+            max_length=256
+        )
+        # Cast labels to float32 for BCEWithLogitsLoss
+        tokenized["labels"] = [float(x) for x in example["labels"]]
+        return tokenized
     
     train_dataset = train_dataset.map(tokenize)
     val_dataset = val_dataset.map(tokenize)
