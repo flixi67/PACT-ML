@@ -826,11 +826,11 @@ Bidirectional Encoder Representations from Transformers (BERT) represents a para
 
 The advantages of BERT are particularly salient in tasks that require understanding word sense disambiguation, idiomatic expressions, or syntactic dependencies — areas where frequency-based approaches struggle due to their inherent assumption of word independence. For example, TF-IDF treats the word "bank" identically in “river bank” and “investment bank,” whereas BERT dynamically adjusts the representation of "bank" depending on its context. This context-aware modeling enables BERT to capture nuanced meanings and improve downstream performance in classification, sentiment analysis and other text-based tasks.
 
-Importantly, BERT eliminates the need for many traditional preprocessing steps such as stopword removal, stemming, or lemmatization. Because its transformer architecture learns language patterns directly from raw text, BERT can internally determine the informativeness of frequent function words and adjust their impact accordingly. This further distinguishes it from TF-IDF, which relies on external heuristics to mitigate the influence of high-frequency but low-information terms.
+Importantly, BERT-class models eliminate the need for many traditional preprocessing steps such as stopword removal, stemming, or lemmatization. Because its transformer architecture learns language patterns directly from raw text, BERT can internally determine the informativeness of frequent function words and adjust their impact accordingly. This further distinguishes it from TF-IDF, which relies on external heuristics to mitigate the influence of high-frequency but low-information terms.
 
 Moreover, BERT's capacity to encode both local and long-range dependencies through self-attention mechanisms enhances its ability to generalize across domains and tasks, even with relatively limited annotated data. Fine-tuning BERT on a task-specific corpus allows the model to adapt to domain-specific language use while retaining its general-purpose linguistic knowledge, acquired during pretraining on large-scale corpora such as Wikipedia and BookCorpus.
 
-Since the training of a BERT model is computationally expensive, ...
+Since the training of a BERT model is computationally expensive, we decided for the approach of using a pre-trained model and fine-tune it. For this use case, the XML roBERTa base model ('xlm-roberta-base') available in the 'transformers' library seems to be a good fit. It is trained by Facebook AI on a multitude of languages, allowing the model to use the translated reports (up to the six official UN languages) as a method of validity for classification in the future, as it has great cross-lingual capabilities, which the standard roBERTa model does not. The model was trained on up to 295GB  compared to ~100GB of roBERTa base abd ~16GB of the original BERT model. Further advantages include that it is trained on more report-style "real-world" data (compared to mostly Wikipedia for the original BERT), while the disadvantages are a higher computational effort.
 
 ### Cross-Validation strategy
 
@@ -860,9 +860,13 @@ F1 Score Variants:
 Micro-F1: Calculates F1 globally by counting total true positives, false negatives, and false positives
 Macro-F1: Calculates F1 for each label and averages them... explain why this is generally higher because of label imbalance
 
+Random Forest models perform poorly on both TF-IDF and count vectorized text data primarily due to the high-dimensional, sparse nature of these representations. Text vectorization typically creates feature spaces with thousands or tens of thousands of dimensions (in this case 6144), where each paragraph consisting of only around 110 words has non-zero values for only a small fraction of features. Random Forest struggles with this sparsity because its tree-based splitting mechanism becomes inefficient when most features are zero for most samples, making it difficult to find meaningful decision boundaries. Additionally, the algorithm's random feature sampling at each split becomes less effective in such high-dimensional spaces, and the correlation between text features (related words, overlapping n-grams) violates Random Forest's assumption of feature independence. The ensemble method works best with dense, lower-dimensional data where individual trees can make clear distinctions, but text data's extreme sparsity leads to weak individual trees that don't combine well into a strong ensemble classifier.
+
+Contrary to popular ML course opinion (ironically: "main takeaway from the class is that Random Trees always win"), for text data, Random Forest models are not a suitable class. We included them in the reporting because a) the model already ran and b) it is important to rank the base models performance.
+
 ### Feature importance
 
-When comparing the results across models, it is important to look at 
+When comparing the results across models, it is important to look at the feature importance. In general, the interpretability of a model is important to understand and assert that the model is doing what it is intended to do. For working with text data however,  cross-mission and cross-label comparisons can be helpful in assessing the model too, as the validity
 
 ### Multi-label codings
 
