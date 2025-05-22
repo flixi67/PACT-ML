@@ -1,5 +1,5 @@
 # just for Google Colab Notebook
-!pip install transformers datasets evaluate scikit-learn scikit-multilearn --quiet
+# !pip install transformers datasets evaluate scikit-learn scikit-multilearn --quiet
 
 from skmultilearn.model_selection import IterativeStratification
 
