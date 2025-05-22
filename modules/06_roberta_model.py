@@ -38,7 +38,7 @@ class DebugTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):
         labels = inputs.get("labels")
         print("🔍 Label tensor dtype:", labels.dtype)
-        return super().compute_loss(model, inputs, return_outputs)
+        return super().compute_loss(model, inputs, return_outputs, **kwargs)
 
 for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
     print(f"\n📂 FOLD {fold + 1}")
