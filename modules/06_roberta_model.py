@@ -40,10 +40,10 @@ for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
     X_train, X_val = X[train_idx], X[val_idx]
     y_train, y_val = Y[train_idx], Y[val_idx]
 
-    features = Features{
+    features = Features({
         "text": Value("string"),
         "labels": Sequence(Value("float32"))
-    }
+    })
 
     train_dataset = Dataset.from_dict({"text": X_train.tolist(), "labels": y_train.tolist()}).cast(features)
     val_dataset = Dataset.from_dict({"text": X_val.tolist(), "labels": y_val.tolist()}).cast(features)
