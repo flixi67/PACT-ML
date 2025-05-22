@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Felix Kube">
-<meta name="dcterms.date" content="2025-05-18">
+<meta name="dcterms.date" content="2025-05-22">
 <meta name="keywords" content="Machine Learning, Natural Language Processing, United Nations Peacekeeping, BERT, roBERTa">
 
 <title>PACT-ML: Coding United Nation Peacekeeping ACtivities from reports to the Secretary-General</title>
@@ -121,10 +121,12 @@ window.Quarto = {
   </ul></li>
   <li><a href="#sec-results" id="toc-sec-results" class="nav-link" data-scroll-target="#sec-results"><span class="header-section-number">5</span> Results</a>
   <ul class="collapse">
-  <li><a href="#parameter-optimization" id="toc-parameter-optimization" class="nav-link" data-scroll-target="#parameter-optimization"><span class="header-section-number">5.1</span> Parameter optimization</a></li>
+  <li><a href="#feature-importance" id="toc-feature-importance" class="nav-link" data-scroll-target="#feature-importance"><span class="header-section-number">5.1</span> Feature importance</a></li>
+  <li><a href="#multi-label-codings" id="toc-multi-label-codings" class="nav-link" data-scroll-target="#multi-label-codings"><span class="header-section-number">5.2</span> Multi-label codings</a></li>
+  <li><a href="#parameter-optimization" id="toc-parameter-optimization" class="nav-link" data-scroll-target="#parameter-optimization"><span class="header-section-number">5.3</span> Parameter optimization</a></li>
   </ul></li>
   <li><a href="#sec-conc" id="toc-sec-conc" class="nav-link" data-scroll-target="#sec-conc"><span class="header-section-number">6</span> Conclusion</a></li>
-  <li><a href="#annex" id="toc-annex" class="nav-link" data-scroll-target="#annex"><span class="header-section-number">7</span> Annex</a></li>
+  <li><a href="#sec-annex" id="toc-sec-annex" class="nav-link" data-scroll-target="#sec-annex"><span class="header-section-number">7</span> Annex</a></li>
   </ul>
 </nav>
 </div>
@@ -157,7 +159,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 18, 2025</p>
+      <p class="date">May 22, 2025</p>
     </div>
   </div>
   
@@ -807,9 +809,9 @@ w_i = \frac{n_{\text{samples}}}{n_{\text{classes}} \times n_i}
 <h3 data-number="4.2" class="anchored" data-anchor-id="bidirectional-encoder-representations-from-transformers-bert"><span class="header-section-number">4.2</span> Bidirectional Encoder Representations from Transformers (BERT)</h3>
 <p>Bidirectional Encoder Representations from Transformers (BERT) represents a paradigm shift in natural language processing by replacing surface-level feature engineering with deep contextual language understanding. Unlike traditional vectorization methods such as CountVectorizer used in the base models and TF-IDF, which generate fixed, sparse representations based on term-level statistics, BERT constructs dense, context-sensitive embeddings for each token, derived from its position within a sentence and the surrounding linguistic context. This approach allows BERT to model not only word meaning but also subtle syntactic and semantic relationships that are entirely invisible to TF-IDF and other bag-of-words representations.</p>
 <p>The advantages of BERT are particularly salient in tasks that require understanding word sense disambiguation, idiomatic expressions, or syntactic dependencies — areas where frequency-based approaches struggle due to their inherent assumption of word independence. For example, TF-IDF treats the word “bank” identically in “river bank” and “investment bank,” whereas BERT dynamically adjusts the representation of “bank” depending on its context. This context-aware modeling enables BERT to capture nuanced meanings and improve downstream performance in classification, sentiment analysis and other text-based tasks.</p>
-<p>Importantly, BERT eliminates the need for many traditional preprocessing steps such as stopword removal, stemming, or lemmatization. Because its transformer architecture learns language patterns directly from raw text, BERT can internally determine the informativeness of frequent function words and adjust their impact accordingly. This further distinguishes it from TF-IDF, which relies on external heuristics to mitigate the influence of high-frequency but low-information terms.</p>
+<p>Importantly, BERT-class models eliminate the need for many traditional preprocessing steps such as stopword removal, stemming, or lemmatization. Because its transformer architecture learns language patterns directly from raw text, BERT can internally determine the informativeness of frequent function words and adjust their impact accordingly. This further distinguishes it from TF-IDF, which relies on external heuristics to mitigate the influence of high-frequency but low-information terms.</p>
 <p>Moreover, BERT’s capacity to encode both local and long-range dependencies through self-attention mechanisms enhances its ability to generalize across domains and tasks, even with relatively limited annotated data. Fine-tuning BERT on a task-specific corpus allows the model to adapt to domain-specific language use while retaining its general-purpose linguistic knowledge, acquired during pretraining on large-scale corpora such as Wikipedia and BookCorpus.</p>
-<p>Since the training of a BERT model is computationally expensive, …</p>
+<p>Since the training of a BERT model is computationally expensive, we decided for the approach of using a pre-trained model and fine-tune it. For this use case, the XML roBERTa base model (‘xlm-roberta-base’) available in the ‘transformers’ library seems to be a good fit. It is trained by Facebook AI on a multitude of languages, allowing the model to use the translated reports (up to the six official UN languages) as a method of validity for classification in the future, as it has great cross-lingual capabilities, which the standard roBERTa model does not. The model was trained on up to 295GB compared to ~100GB of roBERTa base abd ~16GB of the original BERT model. Further advantages include that it is trained on more report-style “real-world” data (compared to mostly Wikipedia for the original BERT), while the disadvantages are a higher computational effort.</p>
 </section>
 <section id="cross-validation-strategy" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="cross-validation-strategy"><span class="header-section-number">4.3</span> Cross-Validation strategy</h3>
@@ -889,18 +891,41 @@ Table&nbsp;3: Class distributions in training data.
 </section>
 <section id="sec-results" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="sec-results"><span class="header-section-number">5</span> Results</h2>
-<section id="parameter-optimization" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="parameter-optimization"><span class="header-section-number">5.1</span> Parameter optimization</h3>
-<p>All BoW models reported in the results section are parameter optimized using ‘GridSearchCV’.</p>
+<p>F1 Score Variants:</p>
+<p>Micro-F1: Calculates F1 globally by counting total true positives, false negatives, and false positives Macro-F1: Calculates F1 for each label and averages them… explain why this is generally higher because of label imbalance</p>
+<p>Random Forest models perform poorly on both TF-IDF and count vectorized text data primarily due to the high-dimensional, sparse nature of these representations. Text vectorization typically creates feature spaces with thousands or tens of thousands of dimensions (in this case 6144), where each paragraph consisting of only around 110 words has non-zero values for only a small fraction of features. Random Forest struggles with this sparsity because its tree-based splitting mechanism becomes inefficient when most features are zero for most samples, making it difficult to find meaningful decision boundaries. Additionally, the algorithm’s random feature sampling at each split becomes less effective in such high-dimensional spaces, and the correlation between text features (related words, overlapping n-grams) violates Random Forest’s assumption of feature independence. The ensemble method works best with dense, lower-dimensional data where individual trees can make clear distinctions, but text data’s extreme sparsity leads to weak individual trees that don’t combine well into a strong ensemble classifier.</p>
+<p>Contrary to popular ML course opinion (ironically in our WhatsApp group: “main takeaway from the class is that Random Forests always win”), for text data, Random Forest models are not a suitable class. We included them in the reporting because a) the model already ran and b) it is important to better rank the base models performance, which is quite good regarding the simplicity of the modeling approach and tokkenization progress.</p>
+<section id="feature-importance" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="feature-importance"><span class="header-section-number">5.1</span> Feature importance</h3>
+<p>When comparing the results across models, it is important to look at the feature importance to better determine differences between models. In general, the interpretability of a model is important to understand and assert that the model is doing what it is intended to do. For working with text data however, cross-mission and cross-label comparisons can be helpful in assessing the model too, as the validity…</p>
+</section>
+<section id="multi-label-codings" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="multi-label-codings"><span class="header-section-number">5.2</span> Multi-label codings</h3>
+<ul>
+<li>table showing how many codings were made on the new paragraphs, label distribution and multi-label results</li>
+</ul>
+</section>
+<section id="parameter-optimization" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="parameter-optimization"><span class="header-section-number">5.3</span> Parameter optimization</h3>
+<p>All BoW models reported in the results section are parameter optimized using ‘GridSearchCV’. For the logistic regression models, this included the regularization strength (candidates: 0.1, 1, 10) and the type of regularization (lasso or ridge).</p>
+<p>For the Random Forest model, a grid search was performed for the following model parameters and candidates:</p>
+<ul>
+<li>’estimator__n_estimators’: [50, 75, 100, 125, 150, 175, 200],</li>
+<li>’estimator__max_depth’: [None, 10, 20, 30, 40, 50],</li>
+<li>’estimator__min_samples_split’: [2, 5, 10]</li>
+</ul>
+<p>The full specification of parameters for each model can be found in the Annex, <a href="#sec-annex" class="quarto-xref">Section&nbsp;7</a>.</p>
 </section>
 </section>
 <section id="sec-conc" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="sec-conc"><span class="header-section-number">6</span> Conclusion</h2>
 <p>Limitations: - geographic anchors - subset of missions</p>
-<p>Combining word frequency tokenization with TF-IDF plus penalty term logistic regression for the balance between important key terms for detecting an activity and distinctive terms (TF-IDF scores) for fine-grained categorization for</p>
+<p>Not done yet: - Use ROC curves, precision-recall curves, or Youden’s J statistic to pick the optimal cutoff. - expected improvements from this for the BoW and TF-IDF (balanced) logistic models: 5-15% in F1 score and 3-10% in missclassification rate.</p>
+<p>Combining word frequency tokenization with TF-IDF plus penalty term logistic regression for the balance between important key terms for detecting an activity and distinctive terms (TF-IDF scores) for fine-grained categorization, capturing the importance and repetition of key activity terminology with the exclusive (distinct) words that allow for a more fine-grained categorization, maybe even to the engagement level.</p>
+<p>SUCESS</p>
 </section>
-<section id="annex" class="level2 annex" data-number="7">
-<h2 class="annex anchored" data-number="7" data-anchor-id="annex"><span class="header-section-number">7</span> Annex</h2>
+<section id="sec-annex" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="sec-annex"><span class="header-section-number">7</span> Annex</h2>
 <div id="tbl-class-distribution-full" class="quarto-float anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-class-distribution-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">

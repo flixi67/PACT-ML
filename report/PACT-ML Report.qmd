@@ -1,6 +1,6 @@
 ---
-title: "PACT-ML: Coding United Nation Peacekeeping ACtivities from reports to the Secretary-General"
-subtitle: "Using Bag-of-Words approaches and BERT models"
+title: "PACT-ML: Coding United Nation Peacekeeping ACtivities from status reports to the Secretary-General"
+subtitle: "Using Bag-of-Words approaches and BERT-class models"
 format:
   jasa-html: default
 execute:
@@ -862,11 +862,11 @@ Macro-F1: Calculates F1 for each label and averages them... explain why this is 
 
 Random Forest models perform poorly on both TF-IDF and count vectorized text data primarily due to the high-dimensional, sparse nature of these representations. Text vectorization typically creates feature spaces with thousands or tens of thousands of dimensions (in this case 6144), where each paragraph consisting of only around 110 words has non-zero values for only a small fraction of features. Random Forest struggles with this sparsity because its tree-based splitting mechanism becomes inefficient when most features are zero for most samples, making it difficult to find meaningful decision boundaries. Additionally, the algorithm's random feature sampling at each split becomes less effective in such high-dimensional spaces, and the correlation between text features (related words, overlapping n-grams) violates Random Forest's assumption of feature independence. The ensemble method works best with dense, lower-dimensional data where individual trees can make clear distinctions, but text data's extreme sparsity leads to weak individual trees that don't combine well into a strong ensemble classifier.
 
-Contrary to popular ML course opinion (ironically: "main takeaway from the class is that Random Trees always win"), for text data, Random Forest models are not a suitable class. We included them in the reporting because a) the model already ran and b) it is important to rank the base models performance.
+Contrary to popular ML course opinion (ironically in our WhatsApp group: "main takeaway from the class is that Random Forests always win"), for text data, Random Forest models are not a suitable class. We included them in the reporting because a) the model already ran and b) it is important to better rank the base models performance, which is quite good regarding the simplicity of the modeling approach and tokkenization progress.
 
 ### Feature importance
 
-When comparing the results across models, it is important to look at the feature importance. In general, the interpretability of a model is important to understand and assert that the model is doing what it is intended to do. For working with text data however,  cross-mission and cross-label comparisons can be helpful in assessing the model too, as the validity
+When comparing the results across models, it is important to look at the feature importance to better determine differences between models. In general, the interpretability of a model is important to understand and assert that the model is doing what it is intended to do. For working with text data however,  cross-mission and cross-label comparisons can be helpful in assessing the model too, as the validity...
 
 ### Multi-label codings
 
@@ -892,9 +892,11 @@ Limitations:
 
 Not done yet:
 - Use ROC curves, precision-recall curves, or Youden’s J statistic to pick the optimal cutoff.
-- expected improvements from this: 5-15% in F1 score and 3-10% in missclassification rate.
+- expected improvements from this for the BoW and TF-IDF (balanced) logistic models: 5-15% in F1 score and 3-10% in missclassification rate.
 
-Combining word frequency tokenization with TF-IDF plus penalty term logistic regression for the balance between important key terms for detecting an activity and distinctive terms (TF-IDF scores) for fine-grained categorization for 
+Combining word frequency tokenization with TF-IDF plus penalty term logistic regression for the balance between important key terms for detecting an activity and distinctive terms (TF-IDF scores) for fine-grained categorization, capturing the importance and repetition of key activity terminology with the exclusive (distinct) words that allow for a more fine-grained categorization, maybe even to the engagement level.
+
+SUCCESS
 
 ## Annex {#sec-annex}
 
