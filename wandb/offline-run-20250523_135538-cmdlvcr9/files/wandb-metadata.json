@@ -1,0 +1,41 @@
+{
+  "os": "Linux-6.1.123+-x86_64-with-glibc2.35",
+  "python": "CPython 3.11.12",
+  "startedAt": "2025-05-23T13:55:38.155804Z",
+  "program": "/content/PACT-ML/modules/06_roberta_model.py",
+  "codePath": "modules/06_roberta_model.py",
+  "git": {
+    "remote": "https://github.com/flixi67/PACT-ML.git",
+    "commit": "3cb0acf2afd83edda9439f1c4d9647602577ecaa"
+  },
+  "root": "/content/PACT-ML",
+  "host": "96384ecbff33",
+  "executable": "/usr/bin/python3",
+  "codePathLocal": "modules/06_roberta_model.py",
+  "cpu_count": 1,
+  "cpu_count_logical": 2,
+  "gpu": "Tesla T4",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "120942624768",
+      "used": "41866555392"
+    }
+  },
+  "memory": {
+    "total": "13608361984"
+  },
+  "cpu": {
+    "count": 1,
+    "countLogical": 2
+  },
+  "gpu_nvidia": [
+    {
+      "name": "Tesla T4",
+      "memoryTotal": "16106127360",
+      "cudaCores": 2560,
+      "architecture": "Turing"
+    }
+  ],
+  "cudaVersion": "12.4"
+}
