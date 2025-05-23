@@ -122,7 +122,12 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#parameter-optimization" id="toc-parameter-optimization" class="nav-link" data-scroll-target="#parameter-optimization"><span class="header-section-number">5.1</span> Parameter optimization</a></li>
   </ul></li>
-  <li><a href="#sec-conc" id="toc-sec-conc" class="nav-link" data-scroll-target="#sec-conc"><span class="header-section-number">6</span> Conclusion</a></li>
+  <li><a href="#sec-conc" id="toc-sec-conc" class="nav-link" data-scroll-target="#sec-conc"><span class="header-section-number">6</span> Conclusion</a>
+  <ul class="collapse">
+  <li><a href="#key-findings-and-model-performance" id="toc-key-findings-and-model-performance" class="nav-link" data-scroll-target="#key-findings-and-model-performance"><span class="header-section-number">6.1</span> Key findings and model performance</a></li>
+  <li><a href="#limitations-and-generalizability-concerns" id="toc-limitations-and-generalizability-concerns" class="nav-link" data-scroll-target="#limitations-and-generalizability-concerns"><span class="header-section-number">6.2</span> Limitations and generalizability concerns</a></li>
+  <li><a href="#prospects-for-improvement-and-implementation" id="toc-prospects-for-improvement-and-implementation" class="nav-link" data-scroll-target="#prospects-for-improvement-and-implementation"><span class="header-section-number">6.3</span> Prospects for improvement and implementation</a></li>
+  </ul></li>
   <li><a href="#sec-annex" id="toc-sec-annex" class="nav-link" data-scroll-target="#sec-annex"><span class="header-section-number">7</span> Annex</a>
   <ul class="collapse">
   <li><a href="#model-results-ext." id="toc-model-results-ext." class="nav-link" data-scroll-target="#model-results-ext."><span class="header-section-number">7.1</span> Model results (ext.)</a></li>
@@ -1022,10 +1027,27 @@ Figure&nbsp;11: Cross-Validation Performance Metrics Plot
 </section>
 <section id="sec-conc" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="sec-conc"><span class="header-section-number">6</span> Conclusion</h2>
-<p>Limitations: - geographic anchors - subset of missions</p>
-<p>Not done yet: - Use ROC curves, precision-recall curves, or Youden’s J statistic to pick the optimal cutoff. - expected improvements from this for the BoW and TF-IDF (balanced) logistic models: 5-15% in F1 score and 3-10% in missclassification rate.</p>
+<p>This study examined the feasibility of using natural language processing and machine learning techniques to automatically code United Nations peacekeeping activities from Secretary-General progress reports, building on the manually coded PACT 2.0 dataset. The results demonstrate both the promise and limitations of automated approaches for this specialized domain.</p>
+<section id="key-findings-and-model-performance" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="key-findings-and-model-performance"><span class="header-section-number">6.1</span> Key findings and model performance</h3>
+<p>The analysis reveals that traditional machine learning approaches significantly outperform modern deep learning methods for this classification task. Balanced Logistic Regression with TF-IDF features emerged as the optimal solution, achieving an F1-Macro score of 0.506 and F1-Micro score of 0.528. This success underscores the critical importance of addressing class imbalance in multi-label classification problems, where the balanced approach achieved a recall of 0.715 compared to 0.382 for standard logistic regression.</p>
+<p>Surprisingly, the sophisticated XLM-RoBERTa BERT model performed poorly, ranking fifth with an F1-Macro score of only 0.179. More concerning was the model’s high variance across cross-validation folds, indicating unstable and unreliable performance. This instability stems from the fundamental mismatch between the model’s complexity (110M+ parameters) and the available training data size (1,819 labeled paragraphs), causing the model to overfit to specific fold characteristics rather than learning generalizable patterns. The combination of poor average performance and high uncertainty makes BERT unsuitable for production deployment in this context.</p>
+<p>Random Forest models performed disappointingly across both feature representations, achieving high precision (0.61-0.66) but extremely low recall (~0.07). This conservative behavior, missing the vast majority of positive cases, reflects the algorithm’s struggle with the high-dimensional, sparse nature of text representations where most features are zero for most samples.</p>
+</section>
+<section id="limitations-and-generalizability-concerns" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="limitations-and-generalizability-concerns"><span class="header-section-number">6.2</span> Limitations and generalizability concerns</h3>
+<p>Several limitations constrain the generalizability of these findings. First, the presence of geographical anchors in the feature space poses a significant concern. Terms like “kosovo” and “georgian” appeared prominently in the TF-IDF analysis, suggesting that models may learn location-based patterns rather than activity-specific language. This geographic bias stems from the skewed distribution of missions in the parsed dataset, with UNMIK (Kosovo) and UNOMIG (Georgia) contributing disproportionately to certain activity categories.</p>
+<p>Second, the subset of missions successfully parsed represents a narrow slice of peacekeeping operations, heavily skewed toward post-2000 missions from the third and fourth generations of UN peacekeeping. This temporal and operational bias limits the applicability of findings to earlier missions or different operational contexts. The exclusion of many reports due to parsing difficulties (typewritten documents, two-column layouts, cross-country missions) further constrains the representativeness of the training data.</p>
+<p>Third, the uncertainty regarding intercoder reliability in the original PACT 2.0 coding process means that reported error rates likely underestimate true classification errors. Without access to reliability assessments, the models may have learned from inconsistent human judgments, propagating and amplifying coding errors.</p>
+</section>
+<section id="prospects-for-improvement-and-implementation" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="prospects-for-improvement-and-implementation"><span class="header-section-number">6.3</span> Prospects for improvement and implementation</h3>
+<p>Despite these limitations, several pathways could enhance performance and broaden applicability. The use of ROC curves, precision-recall curves, or Youden’s J statistic to optimize classification thresholds could improve F1 scores by 5-15% and reduce misclassification rates by 3-10% for the logistic regression models. This threshold optimization represents low-hanging fruit for immediate performance gains.</p>
+<p>Expanding the parsing pipeline to include more reports would address the geographical bias concern by diversifying the missions and time periods represented in the training data. The combination of TF-IDF’s ability to identify important key terms with its emphasis on distinctive vocabulary creates a robust foundation for capturing both the repetitive institutional language and the fine-grained categorization signals necessary for this task.</p>
+<p>For practical implementation, the stable performance and interpretability of the Balanced Logistic Regression with TF-IDF approach, including a easy implementable feature importance analysis skipped here, make it well-suited for operational deployment. Unlike BERT’s black-box predictions, the linear model provides transparent feature weights that domain experts can evaluate and validate, crucial for institutional adoption.</p>
 <p>Combining word frequency tokenization with TF-IDF plus penalty term logistic regression for the balance between important key terms for detecting an activity and distinctive terms (TF-IDF scores) for fine-grained categorization, capturing the importance and repetition of key activity terminology with the exclusive (distinct) words that allow for a more fine-grained categorization, maybe even to the engagement level.</p>
-<p>SUCCESS</p>
+<p>Overall, the feasability test condludes that data quality on the level of a manual research project seems to be impossible yet. Especially regarding the multiplicity of categories to code and fine-grade decisions to take, the models seem unsuitable for the task, especially in regard to statements about individual peacekeeping missions.</p>
+</section>
 </section>
 <section id="sec-annex" class="level2" data-number="7">
 <h2 data-number="7" class="anchored" data-anchor-id="sec-annex"><span class="header-section-number">7</span> Annex</h2>
@@ -1671,12 +1693,7 @@ Table&nbsp;6: Model Performance Summary (Mean Across Folds)
 <section id="codebase" class="level3" data-number="7.2">
 <h3 data-number="7.2" class="anchored" data-anchor-id="codebase"><span class="header-section-number">7.2</span> Codebase</h3>
 <p><a href="https://github.com/flixi67/PACT-ML">GitHub repository</a></p>
-<dl>
-<dt><a href="https://colab.research.google.com/drive/1EwnhTa3FQxFqi8Wddjk6z9PKBsDN4JEj#scrollTo=nJeU4Pt2mkMr">Google Colab: PACT-ML runtime</a></dt>
-<dd>
-<p>Codebase on GitHub and Google Colab. (I will grant access to the Google Colab after request and removal of my secrets.)</p>
-</dd>
-</dl>
+<p><a href="https://colab.research.google.com/drive/1EwnhTa3FQxFqi8Wddjk6z9PKBsDN4JEj#scrollTo=nJeU4Pt2mkMr">Google Colab: PACT-ML runtime</a> (I will grant access to the Google Colab after request and removal of my secrets.)</p>
 </section>
 <section id="model-parameter-specifications" class="level3" data-number="7.3">
 <h3 data-number="7.3" class="anchored" data-anchor-id="model-parameter-specifications"><span class="header-section-number">7.3</span> Model Parameter Specifications</h3>
