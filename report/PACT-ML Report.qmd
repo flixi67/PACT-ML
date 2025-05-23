@@ -1,5 +1,5 @@
 ---
-title: "PACT-ML: Coding United Nation Peacekeeping ACtivities from status reports to the Secretary-General"
+title: "PACT-ML: Coding United Nation Peacekeeping ACtivities from progress reports to the Secretary-General"
 subtitle: "Using Bag-of-Words approaches and BERT-class models"
 format:
   jasa-html: default
@@ -39,17 +39,17 @@ In sum, this study tests whether combining high-quality annotated data from the 
 
 ## Data {#sec-data}
 
--   Describe PACT data, describe report formats, reference the PACT/PEMA codebooks with same coding categories for all reports since 1989
+PACT 2.0 expands the Peacekeeping Activity Dataset 1.0—originally compiled by Hannah Smidt and Rob Blair—beyond Africa. It includes all UN peacekeeping operations (UNPKOs) associated with civil war contexts (excluding those addressing interstate conflicts) that were mandated after 1988. The dataset encompasses 23 UNPKOs in Europe, the Americas, and Asia, each with a minimum duration of six months. The data and associated reports in PDF-format (in English) were made available to me via our old research group, which I kindly thank for the support in being able to work with real research data for this term paper, and which saved me from writing a scraping module as well.
 
-This is a sentence.[^1]
+The dataset draws on UN Secretary-General progress reports, which describe the UNPKOs’ undertakings in typical reporting intervals of 3–6 months. If a report mentions an activity, it is assumed to be implemented throughout each month in the reporting period. While PACT 2.0 is the most comprehensive dataset on implemented peacekeeping activities in Asia, Europe and Latin America[^1], it has its limitations. The reports, intended to brief the Security Council on field developments, are more political than operational, focusing on describing the general situations in the UNPKO host country and detailing how the UNPKO fulfills its mandate. However, we believe misreporting of activities is unlikely for two reasons: First, UNPKOs have strong incentives for being seen as fulfilling their mandates, reducing their incentive to under-report activities. Second, over-reporting is also improbable given the scrutiny of public UNSG reports by various “watchdog” groups, for example, international and domestic media, and civil society groups, who would likely flag unimplemented but reported activities (see also for data quality discussions: @Blair2022).
 
 [^1]: The UNPKOs included are: MINUGUA, MINUJUSTH, MINUSTAH, MIPONUH, ONUCA, ONUSAL, UNCPSG, UNCRO, UNMIBH, UNMIH, UNMIK, UNMISET, UNMIT, UNMOP, UNMOT, UNOMIG, UNPREDEP, UNPROFOR, UNSMIH, UNTAC, UNTAES, UNTAET and UNTMIH.
 
-Some old reports (e.g. ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are sometimes at the country level and sometimes at the report level. For identifying the reports to parse and use for the model, we used 'PyMuPDF' and selected based on some characteristics from the file, like first page margins. The reports were then clustered using kNN, and the second cluster included the report types that could be parsed. There were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data mostly corresponds to post-2000 UN reports included in the PACT 2.0 data set, which coincides with the third and fourth generations of UN Peacekeeping Missions.
+The reports are generally structured equivalently, with the UN imposing reporting standards on the staff and offering training. Each paragrpah is numbered consecutively. Some old reports (e.g. ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are sometimes at the country level and sometimes at the report level. For identifying the reports to parse and use for the model, we used 'PyMuPDF' and selected based on some characteristics from the file, like first page margins. The reports were then clustered using kNN, and the second cluster included the report types that could be parsed. There were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data mostly corresponds to post-2000 UN reports included in the PACT 2.0 data set, which coincides with the third and fourth generations of UN Peacekeeping Missions.
 
 ### Validity checks
 
-To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the paragraph number, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.[^2]
+To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the paragraph number reported in PACT 2.0, from which the manual coders at the Department of Peace and Conflict Research at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.[^2]
 
 [^2]: On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. Therefore, pre-trained BERT-class models were used.
 
@@ -855,10 +855,23 @@ The typical StratifiedKFold in 'scikit-learn' has a random state parameter to sh
 
 ## Results {#sec-results}
 
-F1 Score Variants:
+The results of the models are depicted below in ###TABLE. We decided to report both Micro-F1 and Macro-F1 scores as well as the full confusion matrix for better analysis of where wrong classifications happen. This is important to better assess the data quality of codings and thus make a judgement if NLP tecniques are feasible to implement in a automatic coding pipeline. For research and analysis purposes, the decision makers might have preference for rather conservative false positive classification while giving lesser value to false negatives, to not overreport activity implementation. Regarding the two types of F1 scores, the micro variant counts all missclassifications globally, while the macro variant first calculates the missclassifications for each label and then averages, meaning that despite the prevalence, each target category has the same impact.
 
-Micro-F1: Calculates F1 globally by counting total true positives, false negatives, and false positives
-Macro-F1: Calculates F1 for each label and averages them... explain why this is generally higher because of label imbalance
+Additionally, the variance across K-fold splits for the F1 macro score (main indicator) is calculated. Reporting variance across K-fold cross-validation splits is essential for robust evaluation of multi-label classification models, particularly when using IterativeStratification to maintain label distribution balance. The variance provides critical insights into model stability and reliability—low variance indicates consistent performance regardless of the specific training-test split, while high variance suggests the model's effectiveness is heavily dependent on the particular data subset used for training. In multi-label scenarios, this stability assessment becomes even more important because IterativeStratification, despite its sophisticated approach to maintaining proportional label distributions, cannot always achieve perfect stratification due to the complexity of label co-occurrence patterns.
+
+```{r}
+#| label: tbl-results
+#| caption: "Model performance metrics and uncertainty"
+
+# import all .csv from out
+
+# calculate means for everything and variance for F1 macro
+
+print("placeholder (TBD)")
+
+```
+
+Elaborate on False Positives vs False Negatives, pick best model for each preference case. Pick overall best model and write summary of models. Highlight best model in text ###
 
 Random Forest models perform poorly on both TF-IDF and count vectorized text data primarily due to the high-dimensional, sparse nature of these representations. Text vectorization typically creates feature spaces with thousands or tens of thousands of dimensions (in this case 6144), where each paragraph consisting of only around 110 words has non-zero values for only a small fraction of features. Random Forest struggles with this sparsity because its tree-based splitting mechanism becomes inefficient when most features are zero for most samples, making it difficult to find meaningful decision boundaries. Additionally, the algorithm's random feature sampling at each split becomes less effective in such high-dimensional spaces, and the correlation between text features (related words, overlapping n-grams) violates Random Forest's assumption of feature independence. The ensemble method works best with dense, lower-dimensional data where individual trees can make clear distinctions, but text data's extreme sparsity leads to weak individual trees that don't combine well into a strong ensemble classifier.
 

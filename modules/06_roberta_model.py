@@ -32,7 +32,7 @@ Y = np.array(df[target_categories].fillna(False).astype(float).values)
 # Tokenizer & Encoding
 tokenizer = XLMRobertaTokenizer.from_pretrained("xlm-roberta-base")
 
-all_folds = []
+all_results = []
 
 for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
     print(f"\n📂 FOLD {fold + 1}")
@@ -97,23 +97,34 @@ for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
     Y_pred = (probs > 0.5).astype(int)
     Y_true = preds.label_ids
 
+    f1_micro = f1_score(Y_true, Y_pred, average='micro')
+    f1_macro = f1_score(Y_true, Y_pred, average='macro')
+
     # Confusion Metrics
     cm = multilabel_confusion_matrix(Y_true, Y_pred)
-
-    rows = []
+    precision_per_label = precision_score(Y_true, Y_pred, average=None, zero_division=0)
+    recall_per_label = recall_score(Y_true, Y_pred, average=None, zero_division=0)
+    
     for i, label in enumerate(target_categories):
         tn, fp, fn, tp = cm[i].ravel()
+
+        # Use sklearn's calculated metrics
+        precision = precision_per_label[i]
+        recall = recall_per_label[i]
+
         fpr = fp / (fp + tn) if (fp + tn) > 0 else 0
         fnr = fn / (fn + tp) if (fn + tp) > 0 else 0
         tpr = tp / (tp + fn) if (tp + fn) > 0 else 0
         tnr = tn / (tn + fp) if (tn + fp) > 0 else 0
 
-        rows.append({
+        all_results.append({
             'Model': 'XLM-RoBERTa',
             'Fold': fold + 1,
             'Label': label,
-            'F1_micro': f1_score(Y_true, Y_pred, average='micro'),
-            'F1_macro': f1_score(Y_true, Y_pred, average='macro'),
+            'F1_micro': f1_micro,
+            'F1_macro': f1_macro,
+            'Precision': precision,
+            'Recall': recall,
             'FPR': fpr,
             'FNR': fnr,
             'TPR': tpr,
@@ -126,22 +137,10 @@ for fold, (train_idx, val_idx) in enumerate(stratifier.split(X, Y)):
 
     print(classification_report(Y_true, Y_pred, target_names=target_categories, zero_division=0))
     
-    fold_df = pd.DataFrame(rows)
-    all_folds.append(fold_df)
+    results_df = pd.DataFrame(all_results)
 
-final_results_df = pd.concat(all_folds, ignore_index=True)
 
-# Summary per label
-summary_df = final_results_df.groupby(['Model', 'Label']).agg({
-    'F1_micro': 'mean',
-    'F1_macro': 'mean',
-    'FPR': 'mean',
-    'FNR': 'mean',
-    'TPR': 'mean',
-    'TNR': 'mean',
-}).reset_index()
-
-summary_df.to_csv("model_performance_summary_bert.csv", index=False)
+results_df.to_csv("model_performance_summary_bert.csv", index=False)
 print("📁 Results saved as model_performance_summary_bert.csv")
 
 
