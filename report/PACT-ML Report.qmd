@@ -1,5 +1,5 @@
 ---
-title: "PACT-ML: Coding United Nation Peacekeeping ACtivities from progress reports to the Secretary-General"
+title: "PACT-ML: Coding United Nation Peacekeeping Activities from progress reports to the Secretary-General"
 subtitle: "Using Bag-of-Words approaches and BERT-class models"
 format:
   jasa-html: default
@@ -98,7 +98,7 @@ report_counts <- report_data %>%
   count(PKO, name = "n_report_data")
 
 # 2. Reports in data/pdfs
-pdf_counts <- dir("data/pdfs", full.names = FALSE) %>%
+pdf_counts <- dir("../data/pdfs", full.names = FALSE) %>%
   enframe(name = NULL, value = "filename") %>%
   mutate(
     split = str_split_fixed(filename, "_", n = 2),
@@ -489,6 +489,9 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(RColorBrewer)
+library(tidyverse)
+
+merged_data <- read_csv("../data/merged_data.csv")
 
 # Ensure categories are logical
 for (category in target_categories) {
@@ -500,6 +503,11 @@ for (category in target_categories) {
 report_data_corr <- report_data %>%
   select(paragraphNumber, all_of(target_categories)) %>%
   mutate_at(all_of(target_categories), ~replace(., is.na(.), FALSE))
+
+merged_data_corr <- merged_data %>%
+  select(paragraphNumber, all_of(target_categories)) %>%
+  mutate(across(all_of(target_categories), ~ifelse(is.na(.), FALSE, .)))
+
 
 # Create co-occurrence matrices
 create_cooccurrence_plot <- function(data, title) {
@@ -541,7 +549,7 @@ create_cooccurrence_plot <- function(data, title) {
 create_cooccurrence_plot(report_data_corr, "Label Co-occurrence for PACT 2.0")
 
 # Plot 2: Co-occurrence matrix for merged dataset
-create_cooccurrence_plot(merged_data, "Label Co-occurrence in Included Paragraphs")
+create_cooccurrence_plot(merged_data_corr, "Label Co-occurrence in Included Paragraphs")
 
 ```
 
@@ -588,7 +596,7 @@ create_comparison_plot <- function(data1, data2) {
     )
 }
 
-create_comparison_plot(report_data_corr, merged_data)
+create_comparison_plot(report_data_corr, merged_data_corr)
 
 ```
 
@@ -784,22 +792,6 @@ if ("paragraph" %in% colnames(merged_data)) {
 
 ```
 
-### Semantic Analysis
-
-Topic Modeling
-
-Latent Dirichlet Allocation (LDA) to identify underlying topics
-
- Topic distribution visualization
- 
- Topic coherence across categories
-
-
-Word Embeddings Exploration
-
-t-SNE or UMAP visualization of word vectors Clustering of semantically similar terms
-
- Analogy relationships between key terms
 
 ## Modeling approach {#sec-meth}
 
@@ -814,7 +806,7 @@ We therefore opt for a tri-fold modeling approach. First, the baseline models us
 
 ### Term Frequency–Inverse Document Frequency (TF-IDF)
 
-As shown in @sec-eda, the formalized United nations language in reporting activities combined with the technical and relevant terms for each category lead to restrictions in using simple word count vectors. Replacing raw word counts with Term Frequency–Inverse Document Frequency (TF-IDF) representations can significantly enhance the effectiveness of machine learning models in text analysis, even when stopwords have already been removed. While count-based vectorization (as implemented in 'CountVectorizer' from 'scikit-learn') simply encodes the frequency of terms in each document, it treats all terms as equally informative. This approach can obscure the underlying semantic structure of the text, particularly when terms appear frequently across many documents but do not meaningfully contribute to document differentiation.
+As shown in @sec-eda, the formalized United Nations language in reporting activities combined with the technical and relevant terms for each category lead to restrictions in using simple word count vectors. Replacing raw word counts with Term Frequency–Inverse Document Frequency (TF-IDF) representations can significantly enhance the effectiveness of machine learning models in text analysis, even when stopwords have already been removed. While count-based vectorization (as implemented in 'CountVectorizer' from 'scikit-learn') simply encodes the frequency of terms in each document, it treats all terms as equally informative. This approach can obscure the underlying semantic structure of the text, particularly when terms appear frequently across many documents but do not meaningfully contribute to document differentiation.
 
 In contrast, TF-IDF weighting provides a more discriminative representation by scaling term frequencies by the inverse document frequency, thereby down-weighting terms that are common across the corpus and up-weighting those that are more unique to specific documents. This is especially useful in corpora where certain terms recur regularly but do not carry thematic significance. Although removing stopwords mitigates some of this issue, many domain-specific high-frequency terms (e.g., "government", "peace", "operation" in peacekeeping corpora) may still dominate the feature space in a count-based model without necessarily improving predictive performance. This is also shown in @fig-ngrams-1, where many of the most frequent bigrams showed cross-cutting terminology like "human rights", "reporting period", "united nations", "special representative" or "capacity building" (which is to some degree a term for a subgroup of peacekeeping activities, namely peacebuilding activities).
 
@@ -845,7 +837,7 @@ Since the training of a BERT model is computationally expensive, we decided for 
 | CivilSocietyAssistance          | 161   | 0.0885     | 8.85%      |
 | **Total**                       | 1819  | 1.0000     | 100.00%    |
 
-: Class distributions in training data. {#tbl-class-distribution}
+: Class Distributions in Training Data. {#tbl-class-distribution}
 
 As can be seen in @tbl-class-distribution, the seven most coded categories selected for this feasibility test were still highly unbalanced. The imbalance ratio between the most frequent and least frequent was 5.1, compared to 5.31 for our target categories among the whole PACT 2.0 data set. The class distribution table for the full PACT 2.0 data set can be found in @tbl-class-distribution-full in the Annex.
 
@@ -863,31 +855,245 @@ Additionally, the variance across K-fold splits for the F1 macro score (main ind
 #| label: tbl-results
 #| caption: "Results of the Models"
 
-# import all .csv from out
+library(dplyr)
+library(readr)
+library(knitr)
+library(kableExtra)
+library(tidyr)
 
-# calculate means for everything and variance for F1 macro
+# Read the CSV files
+bert_data <- read_csv("../out/model_performance_summary_bert.csv") %>% distinct()
+tfidf_data <- read_csv("../out/model_performance_summary_tf_idf.csv") %>% distinct()
+general_data <- read_csv("../out/model_performance_summary.csv") %>% distinct()
 
-print("placeholder (TBD)")
+# Function to calculate mean performance metrics across folds
+calculate_mean_metrics <- function(data) {
+  data %>%
+    group_by(Model, Label) %>%
+    summarise(
+      F1_micro_mean = mean(F1_micro, na.rm = TRUE),
+      F1_macro_mean = mean(F1_macro, na.rm = TRUE),
+      Precision_mean = mean(Precision, na.rm = TRUE),
+      Recall_mean = mean(Recall, na.rm = TRUE),
+      .groups = 'drop'
+    ) %>%
+    mutate(
+      F1_micro_mean = round(F1_micro_mean, 3),
+      F1_macro_mean = round(F1_macro_mean, 3),
+      Precision_mean = round(Precision_mean, 3),
+      Recall_mean = round(Recall_mean, 3)
+    )
+}
+
+# Calculate mean metrics for each dataset
+bert_summary <- calculate_mean_metrics(bert_data)
+tfidf_summary <- calculate_mean_metrics(tfidf_data)
+general_summary <- calculate_mean_metrics(general_data)
+
+# Combine all data and add source information
+all_data <- bind_rows(
+  bert_summary %>% mutate(Source = "BERT"),
+  tfidf_summary %>% mutate(Source = "TF-IDF"),
+  general_summary %>% mutate(Source = "Base model (BoW)")
+)
+
+# Create overall model ranking
+model_ranking <- all_data %>%
+  group_by(Model, Source) %>%
+  summarise(
+    Mean_F1_Macro = mean(F1_macro_mean, na.rm = TRUE),
+    Mean_F1_Micro = mean(F1_micro_mean, na.rm = TRUE),
+    Mean_Precision = mean(Precision_mean, na.rm = TRUE),
+    Mean_Recall = mean(Recall_mean, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(Mean_F1_Macro)) %>%
+  mutate(
+    Rank = row_number(),
+    across(where(is.numeric), ~ round(.x, 3))
+  )
+
+model_ranking %>%
+  select(Rank, Model, Source, Mean_F1_Macro, Mean_F1_Micro, Mean_Precision, Mean_Recall) %>%
+  kable(
+    col.names = c("Rank", "Model", "Source", "F1-Macro", "F1-Micro", "Precision", "Recall"),
+    caption = "Overall Model Performance Ranking (Averaged Across All Labels)",
+    booktabs = TRUE,
+    align = c("c", "l", "l", "c", "c", "c", "c")
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  ) %>%
+  column_spec(1, bold = TRUE, color = "white", background = "#34495e") %>%
+  column_spec(2, bold = TRUE) %>%
+  column_spec(4, bold = TRUE, color = "#27ae60") %>%
+  row_spec(0, bold = TRUE, color = "white", background = "#2c3e50") %>%
+  row_spec(1, bold = TRUE, background = "#ecf0f1")
 
 ```
+
+The model performance analysis reveals that traditional machine learning approaches significantly outperform modern deep learning methods for this classification task. Balanced Logistic Regression with TF-IDF features emerged as the top performer (F1-Macro: 0.506, F1-Micro: 0.528), demonstrating the critical importance of addressing class imbalance in multi-class problems. Surprisingly, the sophisticated 'XLM-RoBERTa-base' BERT model ranked poorly at fifth place with an F1-Macro score of only 0.179, suggesting that the dataset may be too small to leverage the benefits of pre-trained language models or that the task doesn't require the complex linguistic understanding that BERT provides. The stark contrast between balanced and standard logistic regression models highlights how class imbalance handling can dramatically improve recall (0.715 vs ~0.38) at the cost of some precision. Random Forest models performed disappointingly as we expected, achieving high precision but extremely low recall (~0.07), indicating overly conservative predictions that miss many positive cases. These results suggest that for this particular classification problem, simpler approaches with proper class balancing and appropriate feature engineering (TF-IDF over basic bag-of-words) are more effective than complex deep learning architectures, likely due to limited training data or the nature of the classification task itself.
+
+Notably, the BERT model performed best on the larger categories 'Operations' and 'PoliceReform' (see @tbl-comprehensive-results in the @sec-annex), giving support to our hypopthesis that the model underperformed because of limited training data.
 
 ```{r}
 #| label: fig-results-var
 #| fig-cap: "Cross-Validation Performance Metrics Plot"
 
-print("Here comes a nice ")
+library(dplyr)
+library(readr)
+library(knitr)
+library(kableExtra)
+library(tidyr)
+library(ggplot2)
+library(patchwork)
+library(stringr)
+
+# Function to calculate mean and standard error for performance metrics
+calculate_stats <- function(data) {
+  data %>%
+    group_by(Model, Label) %>%
+    summarise(
+      F1_micro_mean = mean(F1_micro, na.rm = TRUE),
+      F1_micro_se = sd(F1_micro, na.rm = TRUE) / sqrt(n()),
+      F1_macro_mean = mean(F1_macro, na.rm = TRUE),
+      F1_macro_se = sd(F1_macro, na.rm = TRUE) / sqrt(n()),
+      Precision_mean = mean(Precision, na.rm = TRUE),
+      Precision_se = sd(Precision, na.rm = TRUE) / sqrt(n()),
+      Recall_mean = mean(Recall, na.rm = TRUE),
+      Recall_se = sd(Recall, na.rm = TRUE) / sqrt(n()),
+      .groups = 'drop'
+    )
+}
+
+# Calculate stats for each dataset
+bert_stats <- calculate_stats(bert_data) %>% mutate(Source = "BERT")
+tfidf_stats <- calculate_stats(tfidf_data) %>% mutate(Source = "TF-IDF")
+general_stats <- calculate_stats(general_data) %>% mutate(Source = "Base model")
+
+# Combine all data
+all_stats <- bind_rows(bert_stats, tfidf_stats, general_stats)
+
+# Get the top 4 best models overall plus RoBERTa
+best_models_by_class <- all_stats %>%
+  group_by(Model, Source) %>%
+  summarise(
+    Overall_F1_Macro = mean(F1_macro_mean, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  # Filter out Random Forest models
+  filter(!str_detect(Model, "Random Forest")) %>%
+  # Force include RoBERTa and get top 4 others
+  {
+    roberta <- filter(., Model == "XLM-RoBERTa")
+    others <- filter(., Model != "XLM-RoBERTa") %>%
+      slice_max(Overall_F1_Macro, n = 4)
+    bind_rows(roberta, others)
+  } %>%
+  # Define model classes for plotting
+  mutate(
+    Model_Class = case_when(
+      Model == "XLM-RoBERTa" ~ "BERT",
+      str_detect(Model, "Balanced") ~ "Balanced Logistic Regression",
+      str_detect(Model, "Logistic") ~ "Logistic Regression",
+      TRUE ~ "Other"
+    )
+  )
+
+# Filter stats for best models only
+best_model_stats <- all_stats %>%
+  inner_join(best_models_by_class %>% select(Model, Source), by = c("Model", "Source")) %>%
+  # Add model class for plotting
+  mutate(
+    Model_Class = case_when(
+      Model == "XLM-RoBERTa" ~ "BERT",
+      str_detect(Model, "Balanced") ~ "Balanced Logistic Regression",
+      str_detect(Model, "Logistic") ~ "Logistic Regression",
+      TRUE ~ "Other"
+    ),
+    Model_Label = paste(Model, paste0("(", Source, ")"))
+  )
+
+# Prepare data for plotting - convert to long format
+plot_data <- best_model_stats %>%
+  pivot_longer(
+    cols = c(F1_micro_mean, F1_macro_mean, Precision_mean, Recall_mean),
+    names_to = "Metric",
+    values_to = "Value"
+  ) %>%
+  mutate(
+    # Get corresponding standard errors
+    SE = case_when(
+      Metric == "F1_micro_mean" ~ F1_micro_se,
+      Metric == "F1_macro_mean" ~ F1_macro_se,
+      Metric == "Precision_mean" ~ Precision_se,
+      Metric == "Recall_mean" ~ Recall_se
+    ),
+    # Clean metric names
+    Metric = case_when(
+      Metric == "F1_micro_mean" ~ "F1-Micro",
+      Metric == "F1_macro_mean" ~ "F1-Macro",
+      Metric == "Precision_mean" ~ "Precision",
+      Metric == "Recall_mean" ~ "Recall"
+    ),
+    # Factor for consistent ordering
+    Metric = factor(Metric, levels = c("F1-Macro", "F1-Micro", "Precision", "Recall"))
+  ) %>%
+  # Calculate overall means for each model-metric combination
+  group_by(Model_Label, Model_Class, Metric) %>%
+  summarise(
+    Mean_Value = mean(Value, na.rm = TRUE),
+    Mean_SE = sqrt(mean(SE^2, na.rm = TRUE)), # Combined SE
+    .groups = 'drop'
+  )
+
+# Create the coefficient plot
+coef_plot <- ggplot(plot_data, aes(x = Mean_Value, y = reorder(Model_Label, Mean_Value), 
+                                   color = Model_Class)) +
+  geom_point(size = 3, alpha = 0.8) +
+  geom_errorbarh(aes(xmin = Mean_Value - 1.96 * Mean_SE, 
+                     xmax = Mean_Value + 1.96 * Mean_SE),
+                 height = 0.2, alpha = 0.7) +
+  facet_wrap(~ Metric, scales = "free_x", ncol = 2) +
+  scale_color_manual(
+    values = c("BERT" = "#e74c3c", 
+               "Balanced Logistic Regression" = "#3498db", 
+               "Logistic Regression" = "#9b59b6"),
+    name = "Model Class"
+  ) +
+  labs(
+    x = "Performance Score",
+    y = "Model",
+    caption = "Error bars represent 95% confidence intervals based on cross-validation folds"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5, color = "gray40"),
+    strip.text = element_text(size = 11, face = "bold"),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    panel.grid.major.y = element_line(color = "gray90", size = 0.3),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(size = 9, color = "gray50", hjust = 0)
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 4)))
+
+print(coef_plot)
 
 ```
 
-Elaborate on False Positives vs False Negatives, pick best model for each preference case. Pick overall best model and write summary of models. Highlight best model in text ###
+Looking at the metric uncertainty across the folds of cross-validation, we can see that the BERT model has comparably very high values. This instability typically stems from the fundamental mismatch between the model's complexity (110M+ parameters) and the available training data size, causing the model to overfit to specific fold characteristics rather than learning generalizable patterns. In stark contrast, the traditional machine learning approaches—particularly the Logistic Regression variants—demonstrate tight, consistent error bars, indicating reliable and predictable performance across all data splits. While BERT's average F1-macro score of 0.179 is already concerning, the wide confidence intervals suggest that in real-world deployment, performance could vary dramatically depending on the specific input data encountered. This combination of poor average performance and high variance makes BERT unsuitable for production use in this context, reinforcing why the stable and consistently performing Balanced Logistic Regression with TF-IDF features represents the optimal choice for this classification task, offering both superior average performance and the reliability necessary for practical deployment.
+
+Thinking of the more general task of categorizing 39 activities across six engagement categories, including all reports in the parsing pipeline and using hyperparameter optimization[^5], the model could still yield valuable results. It can also not be ruled out that 'IterativeStratification' and the training did not go well together or were implemented wrongly.
+
+[^5]: Which in my case was impossible, since the model trained for around 2 hours using a T4 GPU on Google Colab.
 
 Random Forest models perform poorly on both TF-IDF and count vectorized text data primarily due to the high-dimensional, sparse nature of these representations. Text vectorization typically creates feature spaces with thousands or tens of thousands of dimensions (in this case 6144), where each paragraph consisting of only around 110 words has non-zero values for only a small fraction of features. Random Forest struggles with this sparsity because its tree-based splitting mechanism becomes inefficient when most features are zero for most samples, making it difficult to find meaningful decision boundaries. Additionally, the algorithm's random feature sampling at each split becomes less effective in such high-dimensional spaces, and the correlation between text features (related words, overlapping n-grams) violates Random Forest's assumption of feature independence. The ensemble method works best with dense, lower-dimensional data where individual trees can make clear distinctions, but text data's extreme sparsity leads to weak individual trees that don't combine well into a strong ensemble classifier.
 
 Contrary to popular ML course opinion (ironically in our WhatsApp group: "main takeaway from the class is that Random Forests always win"), for text data, Random Forest models are not a suitable class. We included them in the reporting because a) the model already ran and b) it is important to better rank the base models performance, which is quite good regarding the simplicity of the modeling approach and tokenization progress.
-
-### Feature importance
-
-When comparing the results across models, it is important to look at the feature importance to better determine differences between models. In general, the interpretability of a model is important to understand and assert that the model is doing what it is intended to do. For working with text data however,  cross-mission and cross-label comparisons can be helpful in assessing the model too, as the validity...
 
 ### Parameter optimization
 
@@ -958,17 +1164,73 @@ SUCCESS
 | ArmsEmbargo                     | 0     | 0.0000     | 0.00%      |
 | **Total Documents**             | 4865  | \-         | \-         |
 
-: Class distributions in full PACT 2.0 data. {#tbl-class-distribution-full}
+: Class Distributions in full PACT 2.0 data. {#tbl-class-distribution-full}
 
-## Codebase
+### Model results (ext.)
+
+```{r}
+#| label: tbl-comprehensive-results
+#| caption: "Comprehensive Model Results by Label"
+
+library(dplyr)
+library(readr)
+library(knitr)
+library(kableExtra)
+library(tidyr)
+
+# Create a comprehensive table
+comprehensive_table <- all_data %>%
+  select(Source, Model, Label, F1_micro_mean, F1_macro_mean, Precision_mean, Recall_mean) %>%
+  arrange(Source, Model, Label)
+
+# Display the table with kableExtra formatting
+comprehensive_table %>%
+  kable(
+    col.names = c("Source", "Model", "Label", "F1 Micro", "F1 Macro", "Precision", "Recall"),
+    caption = "Model Performance Summary (Mean Across Folds)",
+    booktabs = TRUE,
+    align = c("l", "l", "l", "c", "c", "c", "c")
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  ) %>%
+  column_spec(1, bold = TRUE, color = "black", background = "#f7f7f7") %>%
+  column_spec(2, bold = TRUE) %>%
+  collapse_rows(columns = 1:2, valign = "top") %>%
+  row_spec(0, bold = TRUE, color = "white", background = "#2c3e50")
+```
+
+### Codebase
 
 [GitHub repository](https://github.com/flixi67/PACT-ML)
 
 [Google Colab: PACT-ML runtime](https://colab.research.google.com/drive/1EwnhTa3FQxFqi8Wddjk6z9PKBsDN4JEj#scrollTo=nJeU4Pt2mkMr)
+(I will grant access to the Google Colab after request and removal of my secrets.)
 
-:   Codebase on GitHub and Google Colab. (I will grant access to the Google Colab after request and removal of my secrets.)
+### Model Parameter Specifications
 
-## Full parameter specification for the models
+**Base Model (CountVectorizer/BoW)**
 
+| Model | Algorithm | Wrapper | C | Penalty | Class Weight | Other Parameters |
+|-------|-----------|---------|---|---------|--------------|------------------|
+| Logistic Regression | LogisticRegression | OneVsRestClassifier | 1.0 | l1 | None | max_iter=1000, solver=liblinear |
+| Balanced Logistic Regression | LogisticRegression | OneVsRestClassifier | 0.1 | l1 | balanced | max_iter=1000, solver=liblinear |
+| Random Forest | RandomForestClassifier | None | - | - | - | n_estimators=75, max_depth=None, min_samples_split=2 |
+
+**TF-IDF Model**
+
+| Model | Algorithm | Wrapper | C | Penalty | Class Weight | Other Parameters |
+|-------|-----------|---------|---|---------|--------------|------------------|
+| Logistic Regression | LogisticRegression | OneVsRestClassifier | 10.0 | l1 | None | max_iter=1000, solver=liblinear |
+| Balanced Logistic Regression | LogisticRegression | OneVsRestClassifier | 1.0 | l2 | balanced | max_iter=1000, solver=liblinear |
+| Random Forest | RandomForestClassifier | None | - | - | - | n_estimators=75, max_depth=None, min_samples_split=2 |
+
+**BERT Model**
+
+| Model | Learning Rate | Epochs | Weight Decay | Batch Size | Other Parameters |
+|-------|---------------|--------|--------------|------------|------------------|
+| XLM-RoBERTa | 2e-5 | 4 | 0.01 | 16 | eval_strategy=epoch, logging_steps=50, save_strategy=no |
 
 :   Found using 'GridSearchCV'.

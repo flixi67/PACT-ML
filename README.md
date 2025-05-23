@@ -1,12 +1,8 @@
 # PACT-ML
 Code for the ML (Group) Project @Hertie.
 
-## Installation
+## Disclaimer
 
-You can directly clone a virtual environment from the 'environment.yml' file. Please note that 'dolcing' is currently not available in the conda environment manager and needs to be installed manually to be used in editable dev mode, i.e. training a custom document parsing pipeline.
+The roBERTa model was around ~1GB, and even with LFS, I could not find a way to upload it. I have it saved as .zip, in case you need to take a look.
 
-'''
-git clone https://github.com/docling-project/docling.git
-cd docling
-pip install -e .
-'''
+I used claude.ai and OpenAI effectively for coding, writing helpers, plotting, writing frameworks, research, and bug fixing. I checked all results. However, all errors are my own.

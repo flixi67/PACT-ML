@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Felix Kube">
-<meta name="dcterms.date" content="2025-05-22">
+<meta name="dcterms.date" content="2025-05-23">
 <meta name="keywords" content="Machine Learning, Natural Language Processing, United Nations Peacekeeping, BERT, roBERTa">
 
-<title>PACT-ML: Coding United Nation Peacekeeping ACtivities from reports to the Secretary-General</title>
+<title>PACT-ML: Coding United Nation Peacekeeping Activities from progress reports to the Secretary-General</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -111,7 +111,6 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#text-corpus-analysis" id="toc-text-corpus-analysis" class="nav-link" data-scroll-target="#text-corpus-analysis"><span class="header-section-number">3.1</span> Text Corpus Analysis</a></li>
   <li><a href="#category-specific-analysis" id="toc-category-specific-analysis" class="nav-link" data-scroll-target="#category-specific-analysis"><span class="header-section-number">3.2</span> Category-Specific Analysis</a></li>
-  <li><a href="#semantic-analysis" id="toc-semantic-analysis" class="nav-link" data-scroll-target="#semantic-analysis"><span class="header-section-number">3.3</span> Semantic Analysis</a></li>
   </ul></li>
   <li><a href="#sec-meth" id="toc-sec-meth" class="nav-link" data-scroll-target="#sec-meth"><span class="header-section-number">4</span> Modeling approach</a>
   <ul class="collapse">
@@ -121,12 +120,15 @@ window.Quarto = {
   </ul></li>
   <li><a href="#sec-results" id="toc-sec-results" class="nav-link" data-scroll-target="#sec-results"><span class="header-section-number">5</span> Results</a>
   <ul class="collapse">
-  <li><a href="#feature-importance" id="toc-feature-importance" class="nav-link" data-scroll-target="#feature-importance"><span class="header-section-number">5.1</span> Feature importance</a></li>
-  <li><a href="#multi-label-codings" id="toc-multi-label-codings" class="nav-link" data-scroll-target="#multi-label-codings"><span class="header-section-number">5.2</span> Multi-label codings</a></li>
-  <li><a href="#parameter-optimization" id="toc-parameter-optimization" class="nav-link" data-scroll-target="#parameter-optimization"><span class="header-section-number">5.3</span> Parameter optimization</a></li>
+  <li><a href="#parameter-optimization" id="toc-parameter-optimization" class="nav-link" data-scroll-target="#parameter-optimization"><span class="header-section-number">5.1</span> Parameter optimization</a></li>
   </ul></li>
   <li><a href="#sec-conc" id="toc-sec-conc" class="nav-link" data-scroll-target="#sec-conc"><span class="header-section-number">6</span> Conclusion</a></li>
-  <li><a href="#sec-annex" id="toc-sec-annex" class="nav-link" data-scroll-target="#sec-annex"><span class="header-section-number">7</span> Annex</a></li>
+  <li><a href="#sec-annex" id="toc-sec-annex" class="nav-link" data-scroll-target="#sec-annex"><span class="header-section-number">7</span> Annex</a>
+  <ul class="collapse">
+  <li><a href="#model-results-ext." id="toc-model-results-ext." class="nav-link" data-scroll-target="#model-results-ext."><span class="header-section-number">7.1</span> Model results (ext.)</a></li>
+  <li><a href="#codebase" id="toc-codebase" class="nav-link" data-scroll-target="#codebase"><span class="header-section-number">7.2</span> Codebase</a></li>
+  <li><a href="#model-parameter-specifications" id="toc-model-parameter-specifications" class="nav-link" data-scroll-target="#model-parameter-specifications"><span class="header-section-number">7.3</span> Model Parameter Specifications</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -134,8 +136,8 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">PACT-ML: Coding United Nation Peacekeeping ACtivities from reports to the Secretary-General</h1>
-<p class="subtitle lead">Using Bag-of-Words approaches and BERT models</p>
+<h1 class="title">PACT-ML: Coding United Nation Peacekeeping Activities from progress reports to the Secretary-General</h1>
+<p class="subtitle lead">Using Bag-of-Words approaches and BERT-class models</p>
 </div>
 
 
@@ -159,7 +161,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 22, 2025</p>
+      <p class="date">May 23, 2025</p>
     </div>
   </div>
   
@@ -192,14 +194,12 @@ window.Quarto = {
 </section>
 <section id="sec-data" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="sec-data"><span class="header-section-number">2</span> Data</h2>
-<ul>
-<li>Describe PACT data, describe report formats, reference the PACT/PEMA codebooks with same coding categories for all reports since 1989</li>
-</ul>
-<p>This is a sentence.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<p>Some old reports (e.g.&nbsp;ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are sometimes at the country level and sometimes at the report level. For identifying the reports to parse and use for the model, we used ‘PyMuPDF’ and selected based on some characteristics from the file, like first page margins. The reports were then clustered using kNN, and the second cluster included the report types that could be parsed. There were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data mostly corresponds to post-2000 UN reports included in the PACT 2.0 data set, which coincides with the third and fourth generations of UN Peacekeeping Missions.</p>
+<p>PACT 2.0 expands the Peacekeeping Activity Dataset 1.0—originally compiled by Hannah Smidt and Rob Blair—beyond Africa. It includes all UN peacekeeping operations (UNPKOs) associated with civil war contexts (excluding those addressing interstate conflicts) that were mandated after 1988. The dataset encompasses 23 UNPKOs in Europe, the Americas, and Asia, each with a minimum duration of six months. The data and associated reports in PDF-format (in English) were made available to me via our old research group, which I kindly thank for the support in being able to work with real research data for this term paper, and which saved me from writing a scraping module as well.</p>
+<p>The dataset draws on UN Secretary-General progress reports, which describe the UNPKOs’ undertakings in typical reporting intervals of 3–6 months. If a report mentions an activity, it is assumed to be implemented throughout each month in the reporting period. While PACT 2.0 is the most comprehensive dataset on implemented peacekeeping activities in Asia, Europe and Latin America<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, it has its limitations. The reports, intended to brief the Security Council on field developments, are more political than operational, focusing on describing the general situations in the UNPKO host country and detailing how the UNPKO fulfills its mandate. However, we believe misreporting of activities is unlikely for two reasons: First, UNPKOs have strong incentives for being seen as fulfilling their mandates, reducing their incentive to under-report activities. Second, over-reporting is also improbable given the scrutiny of public UNSG reports by various “watchdog” groups, for example, international and domestic media, and civil society groups, who would likely flag unimplemented but reported activities (see also for data quality discussions: <span class="citation" data-cites="Blair2022">Blair et al. (<a href="#ref-Blair2022" role="doc-biblioref">2022</a>)</span>).</p>
+<p>The reports are generally structured equivalently, with the UN imposing reporting standards on the staff and offering training. Each paragrpah is numbered consecutively. Some old reports (e.g.&nbsp;ONUCA) were left out due to issues in parsing, because the official UN documents are just a bad scan of typewritten reports. UNMIBH and UNTAET reports were left out due to their two-column layout. We also decided for the exclusion of cross-country reports (missions active in more than one country) due to issues with the systematic difference in language to describe activities and the adjacent codings, which are sometimes at the country level and sometimes at the report level. For identifying the reports to parse and use for the model, we used ‘PyMuPDF’ and selected based on some characteristics from the file, like first page margins. The reports were then clustered using kNN, and the second cluster included the report types that could be parsed. There were 133 reports identified, which was deemed sufficient for the scope of this term paper. If we assume that the content of the reports and the features of the layout used for clustering do not coincide, the subsetting should not interfere with our results systematically. In summary, the data mostly corresponds to post-2000 UN reports included in the PACT 2.0 data set, which coincides with the third and fourth generations of UN Peacekeeping Missions.</p>
 <section id="validity-checks" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="validity-checks"><span class="header-section-number">2.1</span> Validity checks</h3>
-<p>To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the paragraph number, from which the manual coders at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>To be able to use our models on the data, we need to identify which paragraph text belongs to the specific coding in the PACT 2.0 data set. We take the paragraph number reported in PACT 2.0, from which the manual coders at the Department of Peace and Conflict Research at the University of Uppsala made their judgement, as ground truth. We do this because it is highly unlikely that mistakes happened, as each paragraph as per the UN reporting scheme carries its paragraph number at the beginning, and coders had to mark the relevant sentences within the PDFs before adding them to the database.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 <p>The reports were then parsed. Since the Annexes were not as expected in a separate file, but included in the main report, the numbering at times was not consecutive, but started again at ‘1.’ in the middle of the parsed paragraphs. To sucessfully eliminate the paragraphs that were extracted from the Annexes, the paragraph’s number at the beginning of each paragraph needed to increase strictly monotonically. Reports failed the parsing pipeline and were not added to the training data if the extracted paragraphs were 10% more or less than the expected paragraphs according to the PACT data. This ensures good data quality for the parsed reports.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
 <div id="fig-parsing" class="quarto-layout-panel">
 <figure class="quarto-float quarto-float-fig figure">
@@ -270,17 +270,17 @@ Table&nbsp;1: Included reports in PACT 2.0, after pre-selection and after parsin
 <tr class="even">
 <td style="text-align: center;">MINUJUSTH</td>
 <td style="text-align: center;">7</td>
-<td style="text-align: center;">NA</td>
 <td style="text-align: center;">7</td>
-<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">100.0%</td>
 <td style="text-align: center;">100.0%</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">MINUSTAH</td>
 <td style="text-align: center;">38</td>
-<td style="text-align: center;">NA</td>
+<td style="text-align: center;">33</td>
 <td style="text-align: center;">30</td>
-<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">86.8%</td>
 <td style="text-align: center;">78.9%</td>
 </tr>
 <tr class="even">
@@ -342,17 +342,17 @@ Table&nbsp;1: Included reports in PACT 2.0, after pre-selection and after parsin
 <tr class="odd">
 <td style="text-align: center;">UNMIK</td>
 <td style="text-align: center;">74</td>
-<td style="text-align: center;">NA</td>
+<td style="text-align: center;">53</td>
 <td style="text-align: center;">38</td>
-<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">71.6%</td>
 <td style="text-align: center;">51.4%</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">UNMISET</td>
 <td style="text-align: center;">10</td>
-<td style="text-align: center;">NA</td>
 <td style="text-align: center;">4</td>
-<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">40.0%</td>
 <td style="text-align: center;">40.0%</td>
 </tr>
 <tr class="odd">
@@ -366,9 +366,9 @@ Table&nbsp;1: Included reports in PACT 2.0, after pre-selection and after parsin
 <tr class="even">
 <td style="text-align: center;">UNMIT</td>
 <td style="text-align: center;">12</td>
-<td style="text-align: center;">NA</td>
+<td style="text-align: center;">13</td>
 <td style="text-align: center;">12</td>
-<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">108.3%</td>
 <td style="text-align: center;">100.0%</td>
 </tr>
 <tr class="odd">
@@ -390,9 +390,9 @@ Table&nbsp;1: Included reports in PACT 2.0, after pre-selection and after parsin
 <tr class="odd">
 <td style="text-align: center;">UNOMIG</td>
 <td style="text-align: center;">63</td>
-<td style="text-align: center;">NA</td>
+<td style="text-align: center;">18</td>
 <td style="text-align: center;">7</td>
-<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">28.6%</td>
 <td style="text-align: center;">11.1%</td>
 </tr>
 <tr class="even">
@@ -455,6 +455,14 @@ Table&nbsp;1: Included reports in PACT 2.0, after pre-selection and after parsin
 <td style="text-align: center;">UNTMIH</td>
 <td style="text-align: center;">1</td>
 <td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA%</td>
+<td style="text-align: center;">NA%</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UNIKOM</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">3</td>
 <td style="text-align: center;">NA</td>
 <td style="text-align: center;">NA%</td>
 <td style="text-align: center;">NA%</td>
@@ -781,16 +789,6 @@ Figure&nbsp;10: Category-Specific Text Analysis
 </figure>
 </div>
 </section>
-<section id="semantic-analysis" class="level3" data-number="3.3">
-<h3 data-number="3.3" class="anchored" data-anchor-id="semantic-analysis"><span class="header-section-number">3.3</span> Semantic Analysis</h3>
-<p>Topic Modeling</p>
-<p>Latent Dirichlet Allocation (LDA) to identify underlying topics</p>
-<p>Topic distribution visualization</p>
-<p>Topic coherence across categories</p>
-<p>Word Embeddings Exploration</p>
-<p>t-SNE or UMAP visualization of word vectors Clustering of semantically similar terms</p>
-<p>Analogy relationships between key terms</p>
-</section>
 </section>
 <section id="sec-meth" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="sec-meth"><span class="header-section-number">4</span> Modeling approach</h2>
@@ -801,7 +799,7 @@ w_i = \frac{n_{\text{samples}}}{n_{\text{classes}} \times n_i}
 <p>We therefore opt for a tri-fold modeling approach. First, the baseline models using ‘CountVectorizer’ for tokenizations are calculated, using Logistic Regression, Balanced Logistic Regression as explained above and a Random Forest Tree Classifier for subsequent classifications. We included a Random Forest model because of its strong performance and high computational efficiency for classification tasks in general. Second, the same models are employed using TF-IDF to tokenize documents. Thirdly, a pre-trained BERT model is fitted to the data. The exploratory data analysis in <a href="#sec-eda" class="quarto-xref">Section&nbsp;3</a> points in various bits, for example the analysis of word frequency according to Zipf’s law, the analysis of most common and distinctive terms as well as the contextual knowledge of UN reporting schemes, that this class of models fits well for the task.</p>
 <section id="term-frequencyinverse-document-frequency-tf-idf" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="term-frequencyinverse-document-frequency-tf-idf"><span class="header-section-number">4.1</span> Term Frequency–Inverse Document Frequency (TF-IDF)</h3>
-<p>As shown in <a href="#sec-eda" class="quarto-xref">Section&nbsp;3</a>, the formalized United nations language in reporting activities combined with the technical and relevant terms for each category lead to restrictions in using simple word count vectors. Replacing raw word counts with Term Frequency–Inverse Document Frequency (TF-IDF) representations can significantly enhance the effectiveness of machine learning models in text analysis, even when stopwords have already been removed. While count-based vectorization (as implemented in ‘CountVectorizer’ from ‘scikit-learn’) simply encodes the frequency of terms in each document, it treats all terms as equally informative. This approach can obscure the underlying semantic structure of the text, particularly when terms appear frequently across many documents but do not meaningfully contribute to document differentiation.</p>
+<p>As shown in <a href="#sec-eda" class="quarto-xref">Section&nbsp;3</a>, the formalized United Nations language in reporting activities combined with the technical and relevant terms for each category lead to restrictions in using simple word count vectors. Replacing raw word counts with Term Frequency–Inverse Document Frequency (TF-IDF) representations can significantly enhance the effectiveness of machine learning models in text analysis, even when stopwords have already been removed. While count-based vectorization (as implemented in ‘CountVectorizer’ from ‘scikit-learn’) simply encodes the frequency of terms in each document, it treats all terms as equally informative. This approach can obscure the underlying semantic structure of the text, particularly when terms appear frequently across many documents but do not meaningfully contribute to document differentiation.</p>
 <p>In contrast, TF-IDF weighting provides a more discriminative representation by scaling term frequencies by the inverse document frequency, thereby down-weighting terms that are common across the corpus and up-weighting those that are more unique to specific documents. This is especially useful in corpora where certain terms recur regularly but do not carry thematic significance. Although removing stopwords mitigates some of this issue, many domain-specific high-frequency terms (e.g., “government”, “peace”, “operation” in peacekeeping corpora) may still dominate the feature space in a count-based model without necessarily improving predictive performance. This is also shown in <a href="#fig-ngrams-1" class="quarto-xref">Figure&nbsp;4 (a)</a>, where many of the most frequent bigrams showed cross-cutting terminology like “human rights”, “reporting period”, “united nations”, “special representative” or “capacity building” (which is to some degree a term for a subgroup of peacekeeping activities, namely peacebuilding activities).</p>
 <p>Moreover, TF-IDF has been shown to improve performance in a range of supervised learning tasks, particularly with linear classifiers such as logistic regression. By emphasizing the relative importance of terms, TF-IDF can enhance the signal-to-noise ratio in the input representation, leading to better generalization and interpretability. This is especially relevant when dealing with large vocabularies or class-imbalanced datasets like in our case, where raw frequency counts may skew model attention toward overly generic patterns.</p>
 </section>
@@ -818,7 +816,7 @@ w_i = \frac{n_{\text{samples}}}{n_{\text{classes}} \times n_i}
 <div id="tbl-class-distribution" class="quarto-float anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-class-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;3: Class distributions in training data.
+Table&nbsp;3: Class Distributions in Training Data.
 </figcaption>
 <div aria-describedby="tbl-class-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="table">
@@ -884,29 +882,134 @@ Table&nbsp;3: Class distributions in training data.
 </div>
 </figure>
 </div>
-<p>As can be seen in <a href="#tbl-class-distribution" class="quarto-xref">Table&nbsp;3</a>, the seven most coded categories selected for this feasibility test were still highly unbalanced. The imbalance ratio between the most frequent and least frequent was 5.1, compared to 5.31 for our target categories among the whole PACT 2.0 data set. The class distribution table for the full PACT 2.0 data set can be found in <a href="#tbl-class-distribution-full" class="quarto-xref">Table&nbsp;4</a> in the Annex.</p>
+<p>As can be seen in <a href="#tbl-class-distribution" class="quarto-xref">Table&nbsp;3</a>, the seven most coded categories selected for this feasibility test were still highly unbalanced. The imbalance ratio between the most frequent and least frequent was 5.1, compared to 5.31 for our target categories among the whole PACT 2.0 data set. The class distribution table for the full PACT 2.0 data set can be found in <a href="#tbl-class-distribution-full" class="quarto-xref">Table&nbsp;5</a> in the Annex.</p>
 <p>To ensure robust model evaluation, we employed Stratified K-Fold Cross-Validation. Specifically, we used the ‘IterativeStratification’ function from the ‘skmultilearn’ library, which is tailored for multilabel classification. This strategy splits the data into <em>K</em> folds while preserving the label distribution across each fold, which is critical given the imbalanced and multi-label nature of the dataset. Unlike standard K-Fold, stratification helps prevent biased performance estimates that can occur if rare labels are unevenly distributed. By training and testing across multiple stratified splits, we obtain a more reliable estimate of model performance and ensure that each model is evaluated on diverse subsets of the data while still maintaining representative label proportions. This makes the approach well-suited for our multi-class, multi-label classification task.</p>
 <p>The typical StratifiedKFold in ‘scikit-learn’ has a random state parameter to shuffle the data before splitting, which is useful to ensure reproducibility. However, ‘IterativeStratification’ from ‘skmultilearn.model_selection’ does not support a random state parameter, because it uses a deterministic algorithm to ensure that label distributions are balanced in each fold. Shuffling or adding randomness would disrupt the iterative label-balancing process, which is the entire point of using this strategy. Since the same cross-validation was used across all models, results are still comparable.</p>
 </section>
 </section>
 <section id="sec-results" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="sec-results"><span class="header-section-number">5</span> Results</h2>
-<p>F1 Score Variants:</p>
-<p>Micro-F1: Calculates F1 globally by counting total true positives, false negatives, and false positives Macro-F1: Calculates F1 for each label and averages them… explain why this is generally higher because of label imbalance</p>
+<p>The results of the models are depicted below in <a href="#tbl-results" class="quarto-xref">Table&nbsp;4</a>. We decided to report both Micro-F1 and Macro-F1 scores, precision and recall, as well as the full confusion matrix for better analysis of where wrong classifications happen. This is important to better assess the data quality of codings and thus make a judgement if NLP tecniques are feasible to implement in a automatic coding pipeline. For research and analysis purposes, the decision makers might have preference for rather conservative false positive classification while giving lesser value to false negatives, to not overreport activity implementation. Regarding the two types of F1 scores, the micro variant counts all missclassifications globally, while the macro variant first calculates the missclassifications for each label and then averages, meaning that despite the prevalence, each target category has the same impact.</p>
+<p>Additionally, the variance across K-fold splits for the F1 macro score (main indicator) is calculated. Reporting variance across K-fold cross-validation splits is essential for robust evaluation of multi-label classification models, particularly when using IterativeStratification to maintain label distribution balance. The variance provides critical insights into model stability and reliability—low variance indicates consistent performance regardless of the specific training-test split, while high variance suggests the model’s effectiveness is heavily dependent on the particular data subset used for training. In multi-label scenarios, this stability assessment becomes even more important because IterativeStratification, despite its sophisticated approach to maintaining proportional label distributions, cannot always achieve perfect stratification due to the complexity of label co-occurrence patterns.</p>
+<div class="cell" data-caption="Results of the Models">
+<div id="tbl-results" class="cell quarto-float anchored" data-caption="Results of the Models">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-results-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Overall Model Performance Ranking (Averaged Across All Labels)
+</figcaption>
+<div aria-describedby="tbl-results-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed do-not-create-environment cell table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">Rank</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">Model</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">Source</th>
+<th data-quarto-table-cell-role="th" style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">F1-Macro</th>
+<th data-quarto-table-cell-role="th" style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">F1-Micro</th>
+<th data-quarto-table-cell-role="th" style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">Precision</th>
+<th data-quarto-table-cell-role="th" style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">Recall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(52, 73, 94, 255) !important; font-weight: bold; background-color: rgba(236, 240, 241, 255) !important;">1</td>
+<td style="text-align: left; font-weight: bold; font-weight: bold; background-color: rgba(236, 240, 241, 255) !important;">Balanced Logistic Regression</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(236, 240, 241, 255) !important;">TF-IDF</td>
+<td style="text-align: center; font-weight: bold; color: rgba(39, 174, 96, 255) !important; font-weight: bold; background-color: rgba(236, 240, 241, 255) !important;">0.506</td>
+<td style="text-align: center; font-weight: bold; background-color: rgba(236, 240, 241, 255) !important;">0.528</td>
+<td style="text-align: center; font-weight: bold; background-color: rgba(236, 240, 241, 255) !important;">0.394</td>
+<td style="text-align: center; font-weight: bold; background-color: rgba(236, 240, 241, 255) !important;">0.715</td>
+</tr>
+<tr class="even">
+<td style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(52, 73, 94, 255) !important;">2</td>
+<td style="text-align: left; font-weight: bold;">Logistic Regression</td>
+<td style="text-align: left;">TF-IDF</td>
+<td style="text-align: center; font-weight: bold; color: rgba(39, 174, 96, 255) !important;">0.466</td>
+<td style="text-align: center;">0.499</td>
+<td style="text-align: center;">0.620</td>
+<td style="text-align: center;">0.382</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(52, 73, 94, 255) !important;">3</td>
+<td style="text-align: left; font-weight: bold;">Logistic Regression</td>
+<td style="text-align: left;">Base model (BoW)</td>
+<td style="text-align: center; font-weight: bold; color: rgba(39, 174, 96, 255) !important;">0.464</td>
+<td style="text-align: center;">0.490</td>
+<td style="text-align: center;">0.567</td>
+<td style="text-align: center;">0.400</td>
+</tr>
+<tr class="even">
+<td style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(52, 73, 94, 255) !important;">4</td>
+<td style="text-align: left; font-weight: bold;">Balanced Logistic Regression</td>
+<td style="text-align: left;">Base model (BoW)</td>
+<td style="text-align: center; font-weight: bold; color: rgba(39, 174, 96, 255) !important;">0.446</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.321</td>
+<td style="text-align: center;">0.745</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(52, 73, 94, 255) !important;">5</td>
+<td style="text-align: left; font-weight: bold;">XLM-RoBERTa</td>
+<td style="text-align: left;">BERT</td>
+<td style="text-align: center; font-weight: bold; color: rgba(39, 174, 96, 255) !important;">0.179</td>
+<td style="text-align: center;">0.373</td>
+<td style="text-align: center;">0.243</td>
+<td style="text-align: center;">0.159</td>
+</tr>
+<tr class="even">
+<td style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(52, 73, 94, 255) !important;">6</td>
+<td style="text-align: left; font-weight: bold;">Random Forest</td>
+<td style="text-align: left;">Base model (BoW)</td>
+<td style="text-align: center; font-weight: bold; color: rgba(39, 174, 96, 255) !important;">0.131</td>
+<td style="text-align: center;">0.183</td>
+<td style="text-align: center;">0.611</td>
+<td style="text-align: center;">0.076</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(52, 73, 94, 255) !important;">7</td>
+<td style="text-align: left; font-weight: bold;">Random Forest</td>
+<td style="text-align: left;">TF-IDF</td>
+<td style="text-align: center; font-weight: bold; color: rgba(39, 174, 96, 255) !important;">0.131</td>
+<td style="text-align: center;">0.174</td>
+<td style="text-align: center;">0.664</td>
+<td style="text-align: center;">0.075</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>The model performance analysis reveals that traditional machine learning approaches significantly outperform modern deep learning methods for this classification task. Balanced Logistic Regression with TF-IDF features emerged as the top performer (F1-Macro: 0.506, F1-Micro: 0.528), demonstrating the critical importance of addressing class imbalance in multi-class problems. Surprisingly, the sophisticated ‘XLM-RoBERTa-base’ BERT model ranked poorly at fifth place with an F1-Macro score of only 0.179, suggesting that the dataset may be too small to leverage the benefits of pre-trained language models or that the task doesn’t require the complex linguistic understanding that BERT provides. The stark contrast between balanced and standard logistic regression models highlights how class imbalance handling can dramatically improve recall (0.715 vs ~0.38) at the cost of some precision. Random Forest models performed disappointingly as we expected, achieving high precision but extremely low recall (~0.07), indicating overly conservative predictions that miss many positive cases. These results suggest that for this particular classification problem, simpler approaches with proper class balancing and appropriate feature engineering (TF-IDF over basic bag-of-words) are more effective than complex deep learning architectures, likely due to limited training data or the nature of the classification task itself.</p>
+<p>Notably, the BERT model performed best on the larger categories ‘Operations’ and ‘PoliceReform’ (see <a href="#tbl-comprehensive-results" class="quarto-xref">Table&nbsp;6</a> in the <a href="#sec-annex" class="quarto-xref">Section&nbsp;7</a>), giving support to our hypopthesis that the model underperformed because of limited training data.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-results-var" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-results-var-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="PACT-ML-Report_files/figure-html/fig-results-var-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-results-var-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11: Cross-Validation Performance Metrics Plot
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Looking at the metric uncertainty across the folds of cross-validation, we can see that the BERT model has comparably very high values. This instability typically stems from the fundamental mismatch between the model’s complexity (110M+ parameters) and the available training data size, causing the model to overfit to specific fold characteristics rather than learning generalizable patterns. In stark contrast, the traditional machine learning approaches—particularly the Logistic Regression variants—demonstrate tight, consistent error bars, indicating reliable and predictable performance across all data splits. While BERT’s average F1-macro score of 0.179 is already concerning, the wide confidence intervals suggest that in real-world deployment, performance could vary dramatically depending on the specific input data encountered. This combination of poor average performance and high variance makes BERT unsuitable for production use in this context, reinforcing why the stable and consistently performing Balanced Logistic Regression with TF-IDF features represents the optimal choice for this classification task, offering both superior average performance and the reliability necessary for practical deployment.</p>
+<p>Thinking of the more general task of categorizing 39 activities across six engagement categories, including all reports in the parsing pipeline and using hyperparameter optimization<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>, the model could still yield valuable results. It can also not be ruled out that ‘IterativeStratification’ and the training did not go well together or were implemented wrongly.</p>
 <p>Random Forest models perform poorly on both TF-IDF and count vectorized text data primarily due to the high-dimensional, sparse nature of these representations. Text vectorization typically creates feature spaces with thousands or tens of thousands of dimensions (in this case 6144), where each paragraph consisting of only around 110 words has non-zero values for only a small fraction of features. Random Forest struggles with this sparsity because its tree-based splitting mechanism becomes inefficient when most features are zero for most samples, making it difficult to find meaningful decision boundaries. Additionally, the algorithm’s random feature sampling at each split becomes less effective in such high-dimensional spaces, and the correlation between text features (related words, overlapping n-grams) violates Random Forest’s assumption of feature independence. The ensemble method works best with dense, lower-dimensional data where individual trees can make clear distinctions, but text data’s extreme sparsity leads to weak individual trees that don’t combine well into a strong ensemble classifier.</p>
-<p>Contrary to popular ML course opinion (ironically in our WhatsApp group: “main takeaway from the class is that Random Forests always win”), for text data, Random Forest models are not a suitable class. We included them in the reporting because a) the model already ran and b) it is important to better rank the base models performance, which is quite good regarding the simplicity of the modeling approach and tokkenization progress.</p>
-<section id="feature-importance" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="feature-importance"><span class="header-section-number">5.1</span> Feature importance</h3>
-<p>When comparing the results across models, it is important to look at the feature importance to better determine differences between models. In general, the interpretability of a model is important to understand and assert that the model is doing what it is intended to do. For working with text data however, cross-mission and cross-label comparisons can be helpful in assessing the model too, as the validity…</p>
-</section>
-<section id="multi-label-codings" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="multi-label-codings"><span class="header-section-number">5.2</span> Multi-label codings</h3>
-<ul>
-<li>table showing how many codings were made on the new paragraphs, label distribution and multi-label results</li>
-</ul>
-</section>
-<section id="parameter-optimization" class="level3" data-number="5.3">
-<h3 data-number="5.3" class="anchored" data-anchor-id="parameter-optimization"><span class="header-section-number">5.3</span> Parameter optimization</h3>
+<p>Contrary to popular ML course opinion (ironically in our WhatsApp group: “main takeaway from the class is that Random Forests always win”), for text data, Random Forest models are not a suitable class. We included them in the reporting because a) the model already ran and b) it is important to better rank the base models performance, which is quite good regarding the simplicity of the modeling approach and tokenization progress.</p>
+<section id="parameter-optimization" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="parameter-optimization"><span class="header-section-number">5.1</span> Parameter optimization</h3>
 <p>All BoW models reported in the results section are parameter optimized using ‘GridSearchCV’. For the logistic regression models, this included the regularization strength (candidates: 0.1, 1, 10) and the type of regularization (lasso or ridge).</p>
 <p>For the Random Forest model, a grid search was performed for the following model parameters and candidates:</p>
 <ul>
@@ -922,14 +1025,14 @@ Table&nbsp;3: Class distributions in training data.
 <p>Limitations: - geographic anchors - subset of missions</p>
 <p>Not done yet: - Use ROC curves, precision-recall curves, or Youden’s J statistic to pick the optimal cutoff. - expected improvements from this for the BoW and TF-IDF (balanced) logistic models: 5-15% in F1 score and 3-10% in missclassification rate.</p>
 <p>Combining word frequency tokenization with TF-IDF plus penalty term logistic regression for the balance between important key terms for detecting an activity and distinctive terms (TF-IDF scores) for fine-grained categorization, capturing the importance and repetition of key activity terminology with the exclusive (distinct) words that allow for a more fine-grained categorization, maybe even to the engagement level.</p>
-<p>SUCESS</p>
+<p>SUCCESS</p>
 </section>
 <section id="sec-annex" class="level2" data-number="7">
 <h2 data-number="7" class="anchored" data-anchor-id="sec-annex"><span class="header-section-number">7</span> Annex</h2>
 <div id="tbl-class-distribution-full" class="quarto-float anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-class-distribution-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4: Class distributions in full PACT 2.0 data.
+Table&nbsp;5: Class Distributions in full PACT 2.0 data.
 </figcaption>
 <div aria-describedby="tbl-class-distribution-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="table">
@@ -1175,13 +1278,546 @@ Table&nbsp;4: Class distributions in full PACT 2.0 data.
 </div>
 </figure>
 </div>
+<section id="model-results-ext." class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="model-results-ext."><span class="header-section-number">7.1</span> Model results (ext.)</h3>
+<div class="cell" data-caption="Comprehensive Model Results by Label">
+<div id="tbl-comprehensive-results" class="cell quarto-float anchored" data-caption="Comprehensive Model Results by Label">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-comprehensive-results-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6: Model Performance Summary (Mean Across Folds)
+</figcaption>
+<div aria-describedby="tbl-comprehensive-results-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-condensed do-not-create-environment cell table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">Source</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">Model</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">Label</th>
+<th data-quarto-table-cell-role="th" style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">F1 Micro</th>
+<th data-quarto-table-cell-role="th" style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">F1 Macro</th>
+<th data-quarto-table-cell-role="th" style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">Precision</th>
+<th data-quarto-table-cell-role="th" style="text-align: center; font-weight: bold; color: white !important; background-color: rgba(44, 62, 80, 255) !important;">Recall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td rowspan="7" style="text-align: left; font-weight: bold; color: black !important; background-color: rgba(247, 247, 247, 255) !important; vertical-align: top !important;">BERT</td>
+<td rowspan="7" style="text-align: left; font-weight: bold; vertical-align: top !important;">XLM-RoBERTa</td>
+<td style="text-align: left;">CivilSocietyAssistance</td>
+<td style="text-align: center;">0.373</td>
+<td style="text-align: center;">0.179</td>
+<td style="text-align: center;">0.067</td>
+<td style="text-align: center;">0.013</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ElectionAssistance</td>
+<td style="text-align: center;">0.373</td>
+<td style="text-align: center;">0.179</td>
+<td style="text-align: center;">0.182</td>
+<td style="text-align: center;">0.091</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LegalReform</td>
+<td style="text-align: center;">0.373</td>
+<td style="text-align: center;">0.179</td>
+<td style="text-align: center;">0.000</td>
+<td style="text-align: center;">0.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Operations_PatrolsInterventions</td>
+<td style="text-align: center;">0.373</td>
+<td style="text-align: center;">0.179</td>
+<td style="text-align: center;">0.651</td>
+<td style="text-align: center;">0.423</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PoliceReform</td>
+<td style="text-align: center;">0.373</td>
+<td style="text-align: center;">0.179</td>
+<td style="text-align: center;">0.603</td>
+<td style="text-align: center;">0.575</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RefugeeAssistance</td>
+<td style="text-align: center;">0.373</td>
+<td style="text-align: center;">0.179</td>
+<td style="text-align: center;">0.000</td>
+<td style="text-align: center;">0.000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">StateAdministration</td>
+<td style="text-align: center;">0.373</td>
+<td style="text-align: center;">0.179</td>
+<td style="text-align: center;">0.200</td>
+<td style="text-align: center;">0.014</td>
+</tr>
+<tr class="even">
+<td rowspan="21" style="text-align: left; font-weight: bold; color: black !important; background-color: rgba(247, 247, 247, 255) !important; vertical-align: top !important;">Base model (BoW)</td>
+<td rowspan="7" style="text-align: left; font-weight: bold; vertical-align: top !important;">Balanced Logistic Regression</td>
+<td style="text-align: left;">CivilSocietyAssistance</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.446</td>
+<td style="text-align: center;">0.295</td>
+<td style="text-align: center;">0.801</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ElectionAssistance</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.446</td>
+<td style="text-align: center;">0.276</td>
+<td style="text-align: center;">0.732</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LegalReform</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.446</td>
+<td style="text-align: center;">0.270</td>
+<td style="text-align: center;">0.714</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Operations_PatrolsInterventions</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.446</td>
+<td style="text-align: center;">0.400</td>
+<td style="text-align: center;">0.768</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PoliceReform</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.446</td>
+<td style="text-align: center;">0.429</td>
+<td style="text-align: center;">0.768</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RefugeeAssistance</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.446</td>
+<td style="text-align: center;">0.293</td>
+<td style="text-align: center;">0.750</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">StateAdministration</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.446</td>
+<td style="text-align: center;">0.285</td>
+<td style="text-align: center;">0.685</td>
+</tr>
+<tr class="odd">
+<td rowspan="7" style="text-align: left; font-weight: bold; vertical-align: top !important;">Logistic Regression</td>
+<td style="text-align: left;">CivilSocietyAssistance</td>
+<td style="text-align: center;">0.490</td>
+<td style="text-align: center;">0.464</td>
+<td style="text-align: center;">0.509</td>
+<td style="text-align: center;">0.385</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ElectionAssistance</td>
+<td style="text-align: center;">0.490</td>
+<td style="text-align: center;">0.464</td>
+<td style="text-align: center;">0.584</td>
+<td style="text-align: center;">0.391</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LegalReform</td>
+<td style="text-align: center;">0.490</td>
+<td style="text-align: center;">0.464</td>
+<td style="text-align: center;">0.536</td>
+<td style="text-align: center;">0.295</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Operations_PatrolsInterventions</td>
+<td style="text-align: center;">0.490</td>
+<td style="text-align: center;">0.464</td>
+<td style="text-align: center;">0.671</td>
+<td style="text-align: center;">0.523</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PoliceReform</td>
+<td style="text-align: center;">0.490</td>
+<td style="text-align: center;">0.464</td>
+<td style="text-align: center;">0.601</td>
+<td style="text-align: center;">0.472</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RefugeeAssistance</td>
+<td style="text-align: center;">0.490</td>
+<td style="text-align: center;">0.464</td>
+<td style="text-align: center;">0.488</td>
+<td style="text-align: center;">0.310</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">StateAdministration</td>
+<td style="text-align: center;">0.490</td>
+<td style="text-align: center;">0.464</td>
+<td style="text-align: center;">0.579</td>
+<td style="text-align: center;">0.425</td>
+</tr>
+<tr class="even">
+<td rowspan="7" style="text-align: left; font-weight: bold; vertical-align: top !important;">Random Forest</td>
+<td style="text-align: left;">CivilSocietyAssistance</td>
+<td style="text-align: center;">0.183</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.267</td>
+<td style="text-align: center;">0.019</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ElectionAssistance</td>
+<td style="text-align: center;">0.183</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.200</td>
+<td style="text-align: center;">0.009</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LegalReform</td>
+<td style="text-align: center;">0.183</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.200</td>
+<td style="text-align: center;">0.008</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Operations_PatrolsInterventions</td>
+<td style="text-align: center;">0.183</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.960</td>
+<td style="text-align: center;">0.159</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PoliceReform</td>
+<td style="text-align: center;">0.183</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.896</td>
+<td style="text-align: center;">0.149</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RefugeeAssistance</td>
+<td style="text-align: center;">0.183</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.800</td>
+<td style="text-align: center;">0.039</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">StateAdministration</td>
+<td style="text-align: center;">0.183</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.953</td>
+<td style="text-align: center;">0.146</td>
+</tr>
+<tr class="odd">
+<td rowspan="21" style="text-align: left; font-weight: bold; color: black !important; background-color: rgba(247, 247, 247, 255) !important; vertical-align: top !important;">TF-IDF</td>
+<td rowspan="7" style="text-align: left; font-weight: bold; vertical-align: top !important;">Balanced Logistic Regression</td>
+<td style="text-align: left;">CivilSocietyAssistance</td>
+<td style="text-align: center;">0.528</td>
+<td style="text-align: center;">0.506</td>
+<td style="text-align: center;">0.362</td>
+<td style="text-align: center;">0.720</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ElectionAssistance</td>
+<td style="text-align: center;">0.528</td>
+<td style="text-align: center;">0.506</td>
+<td style="text-align: center;">0.379</td>
+<td style="text-align: center;">0.767</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LegalReform</td>
+<td style="text-align: center;">0.528</td>
+<td style="text-align: center;">0.506</td>
+<td style="text-align: center;">0.346</td>
+<td style="text-align: center;">0.705</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Operations_PatrolsInterventions</td>
+<td style="text-align: center;">0.528</td>
+<td style="text-align: center;">0.506</td>
+<td style="text-align: center;">0.428</td>
+<td style="text-align: center;">0.761</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PoliceReform</td>
+<td style="text-align: center;">0.528</td>
+<td style="text-align: center;">0.506</td>
+<td style="text-align: center;">0.478</td>
+<td style="text-align: center;">0.771</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RefugeeAssistance</td>
+<td style="text-align: center;">0.528</td>
+<td style="text-align: center;">0.506</td>
+<td style="text-align: center;">0.350</td>
+<td style="text-align: center;">0.631</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">StateAdministration</td>
+<td style="text-align: center;">0.528</td>
+<td style="text-align: center;">0.506</td>
+<td style="text-align: center;">0.414</td>
+<td style="text-align: center;">0.653</td>
+</tr>
+<tr class="even">
+<td rowspan="7" style="text-align: left; font-weight: bold; vertical-align: top !important;">Logistic Regression</td>
+<td style="text-align: left;">CivilSocietyAssistance</td>
+<td style="text-align: center;">0.499</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.523</td>
+<td style="text-align: center;">0.354</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ElectionAssistance</td>
+<td style="text-align: center;">0.499</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.660</td>
+<td style="text-align: center;">0.385</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LegalReform</td>
+<td style="text-align: center;">0.499</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.562</td>
+<td style="text-align: center;">0.287</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Operations_PatrolsInterventions</td>
+<td style="text-align: center;">0.499</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.740</td>
+<td style="text-align: center;">0.503</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PoliceReform</td>
+<td style="text-align: center;">0.499</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.638</td>
+<td style="text-align: center;">0.509</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RefugeeAssistance</td>
+<td style="text-align: center;">0.499</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.599</td>
+<td style="text-align: center;">0.291</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">StateAdministration</td>
+<td style="text-align: center;">0.499</td>
+<td style="text-align: center;">0.466</td>
+<td style="text-align: center;">0.619</td>
+<td style="text-align: center;">0.342</td>
+</tr>
+<tr class="odd">
+<td rowspan="7" style="text-align: left; font-weight: bold; vertical-align: top !important;">Random Forest</td>
+<td style="text-align: left;">CivilSocietyAssistance</td>
+<td style="text-align: center;">0.174</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.300</td>
+<td style="text-align: center;">0.012</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ElectionAssistance</td>
+<td style="text-align: center;">0.174</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.400</td>
+<td style="text-align: center;">0.026</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LegalReform</td>
+<td style="text-align: center;">0.174</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.300</td>
+<td style="text-align: center;">0.015</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Operations_PatrolsInterventions</td>
+<td style="text-align: center;">0.174</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.975</td>
+<td style="text-align: center;">0.159</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PoliceReform</td>
+<td style="text-align: center;">0.174</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.906</td>
+<td style="text-align: center;">0.135</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RefugeeAssistance</td>
+<td style="text-align: center;">0.174</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.800</td>
+<td style="text-align: center;">0.049</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">StateAdministration</td>
+<td style="text-align: center;">0.174</td>
+<td style="text-align: center;">0.131</td>
+<td style="text-align: center;">0.967</td>
+<td style="text-align: center;">0.128</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="codebase" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="codebase"><span class="header-section-number">7.2</span> Codebase</h3>
+<p><a href="https://github.com/flixi67/PACT-ML">GitHub repository</a></p>
 <dl>
-<dt>Title:</dt>
+<dt><a href="https://colab.research.google.com/drive/1EwnhTa3FQxFqi8Wddjk6z9PKBsDN4JEj#scrollTo=nJeU4Pt2mkMr">Google Colab: PACT-ML runtime</a></dt>
 <dd>
-<p>Brief description. (file type)</p>
+<p>Codebase on GitHub and Google Colab. (I will grant access to the Google Colab after request and removal of my secrets.)</p>
 </dd>
 </dl>
+</section>
+<section id="model-parameter-specifications" class="level3" data-number="7.3">
+<h3 data-number="7.3" class="anchored" data-anchor-id="model-parameter-specifications"><span class="header-section-number">7.3</span> Model Parameter Specifications</h3>
+<p><strong>Base Model (CountVectorizer/BoW)</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 15%">
+<col style="width: 12%">
+<col style="width: 4%">
+<col style="width: 12%">
+<col style="width: 19%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Algorithm</th>
+<th>Wrapper</th>
+<th>C</th>
+<th>Penalty</th>
+<th>Class Weight</th>
+<th>Other Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Logistic Regression</td>
+<td>LogisticRegression</td>
+<td>OneVsRestClassifier</td>
+<td>1.0</td>
+<td>l1</td>
+<td>None</td>
+<td>max_iter=1000, solver=liblinear</td>
+</tr>
+<tr class="even">
+<td>Balanced Logistic Regression</td>
+<td>LogisticRegression</td>
+<td>OneVsRestClassifier</td>
+<td>0.1</td>
+<td>l1</td>
+<td>balanced</td>
+<td>max_iter=1000, solver=liblinear</td>
+</tr>
+<tr class="odd">
+<td>Random Forest</td>
+<td>RandomForestClassifier</td>
+<td>None</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>n_estimators=75, max_depth=None, min_samples_split=2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>TF-IDF Model</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 15%">
+<col style="width: 12%">
+<col style="width: 4%">
+<col style="width: 12%">
+<col style="width: 19%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Algorithm</th>
+<th>Wrapper</th>
+<th>C</th>
+<th>Penalty</th>
+<th>Class Weight</th>
+<th>Other Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Logistic Regression</td>
+<td>LogisticRegression</td>
+<td>OneVsRestClassifier</td>
+<td>10.0</td>
+<td>l1</td>
+<td>None</td>
+<td>max_iter=1000, solver=liblinear</td>
+</tr>
+<tr class="even">
+<td>Balanced Logistic Regression</td>
+<td>LogisticRegression</td>
+<td>OneVsRestClassifier</td>
+<td>1.0</td>
+<td>l2</td>
+<td>balanced</td>
+<td>max_iter=1000, solver=liblinear</td>
+</tr>
+<tr class="odd">
+<td>Random Forest</td>
+<td>RandomForestClassifier</td>
+<td>None</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>n_estimators=75, max_depth=None, min_samples_split=2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>BERT Model</strong></p>
+<table class="table">
+<caption>Found using ‘GridSearchCV’.</caption>
+<colgroup>
+<col style="width: 9%">
+<col style="width: 20%">
+<col style="width: 10%">
+<col style="width: 18%">
+<col style="width: 16%">
+<col style="width: 24%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Learning Rate</th>
+<th>Epochs</th>
+<th>Weight Decay</th>
+<th>Batch Size</th>
+<th>Other Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>XLM-RoBERTa</td>
+<td>2e-5</td>
+<td>4</td>
+<td>0.01</td>
+<td>16</td>
+<td>eval_strategy=epoch, logging_steps=50, save_strategy=no</td>
+</tr>
+</tbody>
+</table>
 
+</section>
 </section>
 
 
@@ -1223,6 +1859,7 @@ Zipf, G. K. (1949), <em>Human behavior and the principle of least effort: An int
 <li id="fn2"><p>On a side note, this fine-grained data which would allow us to train our models beyond the scope here, is only available for 143 out of 470 total reports. Therefore, pre-trained BERT-class models were used.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3"><p>Two more reports failed the parsing pipeline due to incompatible PDF formats and were therefore deleted from the pre-selection. While the reports were the standard page size of 612 x 792 units, the bounding box to extract the main text failed to adjust for these reports.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn4"><p>While this could theoretically be the case, we only encountered edge cases with years (e.g.&nbsp;2003), which the regex was adjusted for by only selecting r”“.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Which in my case was impossible, since the model trained for around 2 hours using a T4 GPU on Google Colab.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main>
 <!-- /main column -->
