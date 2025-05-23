@@ -855,13 +855,13 @@ The typical StratifiedKFold in 'scikit-learn' has a random state parameter to sh
 
 ## Results {#sec-results}
 
-The results of the models are depicted below in ###TABLE. We decided to report both Micro-F1 and Macro-F1 scores as well as the full confusion matrix for better analysis of where wrong classifications happen. This is important to better assess the data quality of codings and thus make a judgement if NLP tecniques are feasible to implement in a automatic coding pipeline. For research and analysis purposes, the decision makers might have preference for rather conservative false positive classification while giving lesser value to false negatives, to not overreport activity implementation. Regarding the two types of F1 scores, the micro variant counts all missclassifications globally, while the macro variant first calculates the missclassifications for each label and then averages, meaning that despite the prevalence, each target category has the same impact.
+The results of the models are depicted below in @tbl-results. We decided to report both Micro-F1 and Macro-F1 scores, precision and recall, as well as the full confusion matrix for better analysis of where wrong classifications happen. This is important to better assess the data quality of codings and thus make a judgement if NLP tecniques are feasible to implement in a automatic coding pipeline. For research and analysis purposes, the decision makers might have preference for rather conservative false positive classification while giving lesser value to false negatives, to not overreport activity implementation. Regarding the two types of F1 scores, the micro variant counts all missclassifications globally, while the macro variant first calculates the missclassifications for each label and then averages, meaning that despite the prevalence, each target category has the same impact.
 
 Additionally, the variance across K-fold splits for the F1 macro score (main indicator) is calculated. Reporting variance across K-fold cross-validation splits is essential for robust evaluation of multi-label classification models, particularly when using IterativeStratification to maintain label distribution balance. The variance provides critical insights into model stability and reliability—low variance indicates consistent performance regardless of the specific training-test split, while high variance suggests the model's effectiveness is heavily dependent on the particular data subset used for training. In multi-label scenarios, this stability assessment becomes even more important because IterativeStratification, despite its sophisticated approach to maintaining proportional label distributions, cannot always achieve perfect stratification due to the complexity of label co-occurrence patterns.
 
 ```{r}
 #| label: tbl-results
-#| caption: "Model performance metrics and uncertainty"
+#| caption: "Results of the Models"
 
 # import all .csv from out
 
@@ -871,19 +871,23 @@ print("placeholder (TBD)")
 
 ```
 
+```{r}
+#| label: fig-results-var
+#| fig-cap: "Cross-Validation Performance Metrics Plot"
+
+print("Here comes a nice ")
+
+```
+
 Elaborate on False Positives vs False Negatives, pick best model for each preference case. Pick overall best model and write summary of models. Highlight best model in text ###
 
 Random Forest models perform poorly on both TF-IDF and count vectorized text data primarily due to the high-dimensional, sparse nature of these representations. Text vectorization typically creates feature spaces with thousands or tens of thousands of dimensions (in this case 6144), where each paragraph consisting of only around 110 words has non-zero values for only a small fraction of features. Random Forest struggles with this sparsity because its tree-based splitting mechanism becomes inefficient when most features are zero for most samples, making it difficult to find meaningful decision boundaries. Additionally, the algorithm's random feature sampling at each split becomes less effective in such high-dimensional spaces, and the correlation between text features (related words, overlapping n-grams) violates Random Forest's assumption of feature independence. The ensemble method works best with dense, lower-dimensional data where individual trees can make clear distinctions, but text data's extreme sparsity leads to weak individual trees that don't combine well into a strong ensemble classifier.
 
-Contrary to popular ML course opinion (ironically in our WhatsApp group: "main takeaway from the class is that Random Forests always win"), for text data, Random Forest models are not a suitable class. We included them in the reporting because a) the model already ran and b) it is important to better rank the base models performance, which is quite good regarding the simplicity of the modeling approach and tokkenization progress.
+Contrary to popular ML course opinion (ironically in our WhatsApp group: "main takeaway from the class is that Random Forests always win"), for text data, Random Forest models are not a suitable class. We included them in the reporting because a) the model already ran and b) it is important to better rank the base models performance, which is quite good regarding the simplicity of the modeling approach and tokenization progress.
 
 ### Feature importance
 
 When comparing the results across models, it is important to look at the feature importance to better determine differences between models. In general, the interpretability of a model is important to understand and assert that the model is doing what it is intended to do. For working with text data however,  cross-mission and cross-label comparisons can be helpful in assessing the model too, as the validity...
-
-### Multi-label codings
-
-- table showing how many codings were made on the new paragraphs, label distribution and multi-label results
 
 ### Parameter optimization
 
@@ -956,6 +960,15 @@ SUCCESS
 
 : Class distributions in full PACT 2.0 data. {#tbl-class-distribution-full}
 
-Title:
+## Codebase
 
-:   Brief description. (file type)
+[GitHub repository](https://github.com/flixi67/PACT-ML)
+
+[Google Colab: PACT-ML runtime](https://colab.research.google.com/drive/1EwnhTa3FQxFqi8Wddjk6z9PKBsDN4JEj#scrollTo=nJeU4Pt2mkMr)
+
+:   Codebase on GitHub and Google Colab. (I will grant access to the Google Colab after request and removal of my secrets.)
+
+## Full parameter specification for the models
+
+
+:   Found using 'GridSearchCV'.
