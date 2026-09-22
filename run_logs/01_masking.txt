@@ -1,0 +1,17 @@
+PACT-ML autonomous rework - Modal run log
+Run: 01 - Location masking (NER + mission-acronym + gazetteer)
+Command: python modules/07_location_masking.py --out /artifacts/out/derived/merged_data_masked.csv
+App: ap-RfwlXWhiztagLmSsTwnk7h   (image build + run, ~30 min; includes cold torch install)
+Date: 2026-09-22 ~14:56 - ~15:29 (UTC+8)
+
+STDOUT (tail):
+[masking] loaded 6029 paragraphs from data/merged_data.csv
+[masking] wrote /artifacts/out/derived/merged_data_masked.csv (6029 rows)
+[probe] mission-predictability (5-fold CV acc) unmasked=0.917 masked=0.844 chance=0.167
+[probe] reduction: 0.073
+[probe] location-only probe unmasked=0.7701120951260296 masked=None (None = no location signal left)
+[masking] total masked spans=23840, docs affected=5328/6029
+[masking] wrote /artifacts/out/derived/masking_probe.json
+
+exit code: 0
+Artifacts: out/derived/merged_data_masked.csv (5.17 MB), out/derived/masking_probe.json

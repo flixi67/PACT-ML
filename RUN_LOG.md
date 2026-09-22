@@ -69,3 +69,8 @@ Run window: 2026-09-22 ~13:30 - ~18:20 (UTC+8). GPU: Modal L4.
 
 All 8 acceptance criteria met. Deliverables on branch: pinned env, headless modules, masked derived corpus, three
 model-performance CSVs, regenerated report tables/figures, re-rendered HTML, re-authored report, README, RUN_LOG.
+
+## Audit files
+
+- `AUDIT_TRAIL.md` — full call-by-call record of every tool call, result, failure and decision.
+- `run_logs/*.txt` — per-run Modal output logs (masking, baseline, improved-unmasked, improved-masked, smoke/debug).

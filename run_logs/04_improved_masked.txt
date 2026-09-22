@@ -1,0 +1,17 @@
+PACT-ML autonomous rework - Modal run log
+Run: 04 - Improved model, MASKED (deidentified) corpus  <- final deliverable
+Command: python modules/06_roberta_model.py --mode improved --data /artifacts/out/derived/merged_data_masked.csv --out /artifacts/out/model_performance_summary_bert_improved_masked.csv
+App: ap-dD1ugGs5pWDvhZfpusa0AT   (~33 min, 5 folds; nested inner 80/20)
+Date: 2026-09-22 ~18:00 - ~18:33 (UTC+8)
+
+STDOUT (tail): 5 folds, each ~374 s train_runtime, train_loss ~0.50-0.56
+fold 5 done in 1990.9s cumulative
+[06] wrote /artifacts/out/model_performance_summary_bert_improved_masked.csv (35 rows) in 1991.0s
+
+exit code: 0
+
+Result (downloaded to out/model_performance_summary_bert_improved_masked.csv):
+mean macro-F1 = 0.475   (baseline 0.151; improved-unmasked 0.479)
+per-label F1 (masked): PoliceReform 0.602, Operations 0.679, StateAdmin 0.495,
+Refugee 0.258, Election 0.665, Legal 0.311, CivilSociety 0.419
+Masking cost vs unmasked improved: -0.004 macro-F1 (essentially no cost).

@@ -1,0 +1,27 @@
+PACT-ML autonomous rework - Modal run log
+Run: 05 - Smoke tests + debugging iterations (before the full runs)
+
+These short runs validated the pipeline and surfaced/fixed two bugs before
+spending GPU time on the full 5-fold runs.
+
+05a. baseline smoke (1 fold) - FAILED (expected)
+  Command: --mode baseline --data data/merged_data.csv --max-fold 1
+  Error: TypeError: WeightedTrainer.compute_loss() got an unexpected keyword
+    argument 'num_items_in_batch'  (transformers 4.46 Trainer API)
+  Fix: added **kwargs / num_items_in_batch param to compute_loss() in
+    modules/06_roberta_model.py.
+  App: ap-BfrXvf6cMGmYxpVBPVtbaF
+
+05b. baseline smoke (1 fold) - OK
+  fold 1 macro-F1 0.353, micro 0.502; train_runtime 462 s
+  App: ap-9ZLYJshZVtCrdK9UDNoin7
+
+05c. improved smoke (1 fold) - FAILED (expected)
+  Error: RuntimeError: Expected all tensors on same device (cuda:0 and cpu)
+    - pos_weight tensor created on CPU.
+  Fix: .to(logits.device) when constructing BCEWithLogitsLoss in compute_loss.
+  App: ap-0777zUrV8VAnTEPQMNyrAk
+
+05d. improved smoke (1 fold) - OK (all 7 labels recovered)
+  fold 1 macro-F1 0.535; Refugee 0.247, Legal 0.489, StateAdmin 0.459, Election 0.727
+  App: ap-yEPUNn1oGFYR6WtLpT9CYz

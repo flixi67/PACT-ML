@@ -1,0 +1,17 @@
+PACT-ML autonomous rework - Modal run log
+Run: 03 - Improved model, ORIGINAL (unmasked) corpus
+Command: python modules/06_roberta_model.py --mode improved --data data/merged_data.csv --out /artifacts/out/model_performance_summary_bert_improved.csv
+App: ap-Lfo089FQT1nXLnebPtlVO2   (~36 min, 5 folds; nested inner 80/20)
+Date: 2026-09-22 ~17:23 - ~17:59 (UTC+8)
+
+STDOUT (tail): 5 folds, each ~400 s train_runtime, train_loss ~0.49-0.56
+fold 5 done in 2148.5s cumulative
+[06] wrote /artifacts/out/model_performance_summary_bert_improved.csv (35 rows) in 2148.5s
+
+exit code: 0
+
+Result (downloaded to out/model_performance_summary_bert_improved.csv):
+mean macro-F1 = 0.479   (vs reproduced baseline 0.151, ~3.2x)
+per-label F1 (mean over folds): PoliceReform 0.614, Operations 0.678,
+StateAdmin 0.552, Refugee 0.210, Election 0.652, Legal 0.284, CivilSociety 0.454
+(all 7 labels non-trivial; 4 previously-zero labels recovered)

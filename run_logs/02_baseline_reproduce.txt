@@ -1,0 +1,21 @@
+PACT-ML autonomous rework - Modal run log
+Run: 02 - Reproduce committed BERT baseline (5-fold IterativeStratification)
+Command: python modules/06_roberta_model.py --mode baseline --data data/merged_data.csv --out /artifacts/out/model_performance_summary_bert.csv
+App: ap-oqDPDIQQYccziluI9mo7ue   (~41 min, 5 folds)
+Date: 2026-09-22 ~16:40 - ~17:22 (UTC+8)
+
+STDOUT (tail): 5 folds, each ~472 s train_runtime
+fold 1 done, fold 2 done in 978.8s cumulative
+fold 3 done in 1467.6s cumulative
+fold 4 done in 1957.4s cumulative
+fold 5 done in 2446.7s cumulative
+[06] wrote /artifacts/out/model_performance_summary_bert.csv (35 rows) in 2446.7s
+
+exit code: 0
+
+Result (downloaded to out/model_performance_summary_bert.csv):
+fold-level macro-F1: 0.212 / 0.191 / 0.089 / 0.158 / 0.107  (mean 0.151)
+vs committed:        0.315 / 0.187 / 0.175 / 0.157 / 0.061  (mean 0.179)
+Per-label recall reproduced the same class-collapse: RefugeeAssistance and
+LegalReform at 0.0, StateAdministration ~0.014. Divergence = Trainer/CUDA
+stochasticity (seeds fixed, dropout + nondeterministic reduction remain).
