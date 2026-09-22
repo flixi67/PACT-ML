@@ -1,0 +1,13 @@
+# PACT-ML model-stage environment (module 06 rework)
+# Exact versions verified by a fresh install in the Modal image; see RUN_LOG.md.
+torch==2.5.1
+transformers==4.46.2
+tokenizers==0.20.1
+datasets==3.1.0
+accelerate==1.0.1
+sentencepiece==0.2.0
+scikit-learn==1.5.2
+scikit-multilearn==0.2.0
+pandas==2.2.3
+numpy==1.26.4
+evaluate==0.4.3

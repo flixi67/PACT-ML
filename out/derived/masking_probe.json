@@ -1,0 +1,19 @@
+{
+  "unmasked_full": 0.9169020733125521,
+  "masked_full": 0.8440851069686147,
+  "chance": 0.16666666666666666,
+  "unmasked_loc": 0.7701120951260296,
+  "masked_loc": 0.0,
+  "reduction_full": 0.07281696634393742,
+  "spans_masked": 23840,
+  "docs_affected": 5328,
+  "n_paragraphs": 6029,
+  "missions": [
+    "MINUJUSTH",
+    "MINUSTAH",
+    "UNMIK",
+    "UNMISET",
+    "UNMIT",
+    "UNOMIG"
+  ]
+}
