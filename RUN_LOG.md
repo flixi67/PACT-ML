@@ -74,3 +74,32 @@ model-performance CSVs, regenerated report tables/figures, re-rendered HTML, re-
 
 - `AUDIT_TRAIL.md` — full call-by-call record of every tool call, result, failure and decision.
 - `run_logs/*.txt` — per-run Modal output logs (masking, baseline, improved-unmasked, improved-masked, smoke/debug).
+
+## Phase 6 (post-contract) — original-paper re-authoring + masked recalculation
+
+User requested the report read as the *original paper* (not a 2nd attempt), include the full EDA and
+decomposition of all models (word clouds, n-grams, Zipf, TTR, co-occurrence, distinctive terms), and
+regenerate all figures AND recalculate the classical models on the MASKED corpus.
+
+- Reproduced the classical pipelines from git history (modules/04 & 05) as `modules/04_05_baselines.py`
+  (headless). BoW config: LR C=1.0/l1, Balanced LR C=0.1/l1; TF-IDF config: LR C=10.0/l1, Balanced LR
+  C=1.0/l2 (per-source hyperparams differ). Validated against committed CSVs (BoW and TF-IDF Balanced LR
+  within ~0.003; RF is stochastic without a fixed random_state in the original). Seeds 161.
+- Recalculated classical baselines on the masked corpus -> `out/model_performance_summary_masked.csv` and
+  `out/model_performance_summary_tf_idf_masked.csv`. Masked macro-F1: BoW LR 0.462 / Balanced LR 0.433 / RF 0.140;
+  TF-IDF LR 0.454 / Balanced LR 0.502 / RF 0.124.
+- Ran the plain BERT baseline on the masked corpus (Modal) -> `model_performance_summary_bert_masked.csv`
+  so every number in the paper is masked-consistent.
+- Wrote `modules/08_eda.py` — regenerates all EDA figures from the masked corpus into `report/figures/eda/`
+  (text lengths, Zipf, n-grams, TTR-by-category, co-occurrence, label-by-mission, word clouds, distinctive
+  terms). De-identification placeholder `[LOC]` excluded from lexical statistics and n-grams.
+- Rewrote `report/PACT-ML Report.qmd` as the original paper: full EDA section (Text Corpus + Category-Specific),
+  all models decomposed (BoW, TF-IDF, BERT baseline vs improved), location masking as data prep, all numbers
+  from the masked corpus. Removed all "rework/reproduce/2nd attempt" framing.
+- Updated `report/make_artifacts.py` to consume the masked CSVs (ranking, per-label baseline-vs-improved,
+  masking probe).
+
+Data notes for the report prose (masked corpus): 6,029 paragraphs; text length mean 116.6 / median 101;
+vocabulary 12,175 unique / 352,840 tokens (TTR 0.0345, stopwords removed); missions MINUSTAH 2135 / UNMIK 1963 /
+UNMIT 855 / MINUJUSTH 524 / UNOMIG 302 / UNMISET 250; masking probe full 0.917->0.844, location-only 0.770->0.000;
+BERT improved masked fold macro-F1 0.485/0.475/0.482/0.481/0.454 (mean 0.4753).

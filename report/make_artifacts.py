@@ -36,19 +36,17 @@ LABELS = [
 ]
 
 FILES = {
-    "Bag-of-Words": "model_performance_summary.csv",
-    "TF-IDF": "model_performance_summary_tf_idf.csv",
-    "BERT (baseline)": "model_performance_summary_bert.csv",
-    "BERT (improved)": "model_performance_summary_bert_improved.csv",
-    "BERT (improved, masked)": "model_performance_summary_bert_improved_masked.csv",
+    "Bag-of-Words": "model_performance_summary_masked.csv",
+    "TF-IDF": "model_performance_summary_tf_idf_masked.csv",
+    "BERT (baseline)": "model_performance_summary_bert_masked.csv",
+    "BERT (improved)": "model_performance_summary_bert_improved_masked.csv",
 }
 
 SHORT = {
     "Bag-of-Words": "BoW",
     "TF-IDF": "TF-IDF",
     "BERT (baseline)": "BERT-base",
-    "BERT (improved)": "BERT-imp",
-    "BERT (improved, masked)": "BERT-imp-mask",
+    "BERT (improved)": "BERT",
 }
 
 
@@ -110,9 +108,9 @@ def build_ranking() -> None:
         "| Rank | Model | Source | Macro-F1 | Micro-F1 | Precision | Recall |",
         "|---|---|---|---|---|---|---|",
     ]
-    for i, r in rdf.iterrows():
+    for rank, (_, r) in enumerate(rdf.iterrows(), start=1):
         lines.append(
-            f"| {int(i)+1} | {r['Model']} | {r['Source']} | {r['Macro-F1']} | "
+            f"| {rank} | {r['Model']} | {r['Source']} | {r['Macro-F1']} | "
             f"{r['Micro-F1']} | {r['Precision']} | {r['Recall']} |"
         )
     with open(os.path.join(TABLES, "model_ranking.md"), "w") as f:
@@ -124,15 +122,13 @@ def build_ranking() -> None:
 
 def build_per_label() -> None:
     cols = ["Label", "BERT-base P", "BERT-base R", "BERT-base F1",
-            "BERT-imp P", "BERT-imp R", "BERT-imp F1",
-            "BERT-imp-mask P", "BERT-imp-mask R", "BERT-imp-mask F1"]
+            "BERT P", "BERT R", "BERT F1"]
     rows = []
     base = load("BERT (baseline)")
     imp = load("BERT (improved)")
-    impm = load("BERT (improved, masked)")
     for lab in LABELS:
         row = [lab]
-        for df in (base, imp, impm):
+        for df in (base, imp):
             if df is None:
                 row += ["", "", ""]
                 continue
@@ -148,8 +144,8 @@ def build_per_label() -> None:
     with open(os.path.join(TABLES, "bert_per_label.md"), "w") as f:
         f.write("\n".join(lines) + "\n\n")
         f.write(": Per-label precision, recall and F1 (means over five folds) for the "
-                "reproduced BERT baseline, the improved model on the original corpus, "
-                "and the improved model on the masked corpus. {#tbl-bert-per-label}\n")
+                "naively fine-tuned BERT model and the improved BERT model, both on the "
+                "location-deidentified corpus. {#tbl-bert-per-label}\n")
     print("[artifacts] bert_per_label.md written")
 
 
@@ -175,21 +171,23 @@ def fig_fold_variance() -> None:
 def fig_per_label() -> None:
     fig, ax = plt.subplots(figsize=(9, 4.5))
     x = np.arange(len(LABELS))
-    width = 0.25
-    colors = {"Bag-of-Words": "#cfd8dc", "TF-IDF": "#b0bec5",
-              "BERT (baseline)": "#b0bec5", "BERT (improved)": "#7986cb",
-              "BERT (improved, masked)": "#4a148c"}
-    for i, (src, df) in enumerate([(s, load(s)) for s in FILES]):
-        if df is None:
-            continue
+    width = 0.35
+    base = load("BERT (baseline)")
+    imp = load("BERT (improved)")
+    pairs = []
+    if base is not None:
+        pairs.append(("BERT-base", base, "#b0bec5"))
+    if imp is not None:
+        pairs.append(("BERT", imp, "#4a148c"))
+    for i, (name, df, color) in enumerate(pairs):
         f1 = per_label_f1(df)
         vals = [f1.get(l, 0.0) for l in LABELS]
-        ax.bar(x + (i - 1) * width, vals, width, label=SHORT[src], color=colors[src])
+        ax.bar(x + (i - 0.5) * width, vals, width, label=name, color=color)
     ax.set_xticks(x)
     ax.set_xticklabels([l.replace("_", "\n") for l in LABELS], fontsize=7)
     ax.set_ylabel("Per-label F1")
-    ax.set_title("Per-label F1 by model")
-    ax.legend(fontsize=8)
+    ax.set_title("Per-label F1: BERT baseline vs improved (deidentified corpus)")
+    ax.legend(fontsize=9)
     ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     fig.savefig(os.path.join(FIGURES, "fig_per_label.png"), dpi=150)

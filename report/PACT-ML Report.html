@@ -57,6 +57,35 @@ div.csl-indent {
 <link href="PACT-ML Report_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="PACT-ML Report_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -69,32 +98,33 @@ div.csl-indent {
    
   <ul>
   <li><a href="#sec-intro" id="toc-sec-intro" class="nav-link active" data-scroll-target="#sec-intro"><span class="header-section-number">1</span> Introduction</a></li>
-  <li><a href="#sec-data" id="toc-sec-data" class="nav-link" data-scroll-target="#sec-data"><span class="header-section-number">2</span> Data</a>
+  <li><a href="#sec-data" id="toc-sec-data" class="nav-link" data-scroll-target="#sec-data"><span class="header-section-number">2</span> Data</a></li>
+  <li><a href="#sec-eda" id="toc-sec-eda" class="nav-link" data-scroll-target="#sec-eda"><span class="header-section-number">3</span> Exploratory Data Analysis</a>
   <ul class="collapse">
-  <li><a href="#sec-masking" id="toc-sec-masking" class="nav-link" data-scroll-target="#sec-masking"><span class="header-section-number">2.1</span> Location deidentification</a></li>
+  <li><a href="#text-corpus-analysis" id="toc-text-corpus-analysis" class="nav-link" data-scroll-target="#text-corpus-analysis"><span class="header-section-number">3.1</span> Text Corpus Analysis</a></li>
+  <li><a href="#category-specific-analysis" id="toc-category-specific-analysis" class="nav-link" data-scroll-target="#category-specific-analysis"><span class="header-section-number">3.2</span> Category-Specific Analysis</a></li>
   </ul></li>
-  <li><a href="#sec-meth" id="toc-sec-meth" class="nav-link" data-scroll-target="#sec-meth"><span class="header-section-number">3</span> Methods</a>
+  <li><a href="#sec-masking" id="toc-sec-masking" class="nav-link" data-scroll-target="#sec-masking"><span class="header-section-number">4</span> Location Deidentification</a></li>
+  <li><a href="#sec-meth" id="toc-sec-meth" class="nav-link" data-scroll-target="#sec-meth"><span class="header-section-number">5</span> Methods</a>
   <ul class="collapse">
-  <li><a href="#task-and-evaluation" id="toc-task-and-evaluation" class="nav-link" data-scroll-target="#task-and-evaluation"><span class="header-section-number">3.1</span> Task and evaluation</a></li>
-  <li><a href="#classical-baselines" id="toc-classical-baselines" class="nav-link" data-scroll-target="#classical-baselines"><span class="header-section-number">3.2</span> Classical baselines</a></li>
-  <li><a href="#sec-bert" id="toc-sec-bert" class="nav-link" data-scroll-target="#sec-bert"><span class="header-section-number">3.3</span> BERT-class model</a></li>
-  <li><a href="#location-masking-as-a-method" id="toc-location-masking-as-a-method" class="nav-link" data-scroll-target="#location-masking-as-a-method"><span class="header-section-number">3.4</span> Location masking as a method</a></li>
+  <li><a href="#task-and-evaluation" id="toc-task-and-evaluation" class="nav-link" data-scroll-target="#task-and-evaluation"><span class="header-section-number">5.1</span> Task and evaluation</a></li>
+  <li><a href="#classical-baselines" id="toc-classical-baselines" class="nav-link" data-scroll-target="#classical-baselines"><span class="header-section-number">5.2</span> Classical baselines</a></li>
+  <li><a href="#sec-bert" id="toc-sec-bert" class="nav-link" data-scroll-target="#sec-bert"><span class="header-section-number">5.3</span> BERT-class model</a></li>
+  <li><a href="#cross-validation-strategy" id="toc-cross-validation-strategy" class="nav-link" data-scroll-target="#cross-validation-strategy"><span class="header-section-number">5.4</span> Cross-validation strategy</a></li>
   </ul></li>
-  <li><a href="#sec-results" id="toc-sec-results" class="nav-link" data-scroll-target="#sec-results"><span class="header-section-number">4</span> Results</a>
+  <li><a href="#sec-results" id="toc-sec-results" class="nav-link" data-scroll-target="#sec-results"><span class="header-section-number">6</span> Results</a>
   <ul class="collapse">
-  <li><a href="#sec-reproduce" id="toc-sec-reproduce" class="nav-link" data-scroll-target="#sec-reproduce"><span class="header-section-number">4.1</span> Reproducing the baseline</a></li>
-  <li><a href="#sec-ranking" id="toc-sec-ranking" class="nav-link" data-scroll-target="#sec-ranking"><span class="header-section-number">4.2</span> Model ranking</a></li>
-  <li><a href="#improvement-and-minority-class-recovery" id="toc-improvement-and-minority-class-recovery" class="nav-link" data-scroll-target="#improvement-and-minority-class-recovery"><span class="header-section-number">4.3</span> Improvement and minority-class recovery</a></li>
-  <li><a href="#location-masking-and-the-shortcut" id="toc-location-masking-and-the-shortcut" class="nav-link" data-scroll-target="#location-masking-and-the-shortcut"><span class="header-section-number">4.4</span> Location masking and the shortcut</a></li>
-  <li><a href="#figures" id="toc-figures" class="nav-link" data-scroll-target="#figures"><span class="header-section-number">4.5</span> Figures</a></li>
+  <li><a href="#model-ranking" id="toc-model-ranking" class="nav-link" data-scroll-target="#model-ranking"><span class="header-section-number">6.1</span> Model ranking</a></li>
+  <li><a href="#the-bert-model-from-collapse-to-recovery" id="toc-the-bert-model-from-collapse-to-recovery" class="nav-link" data-scroll-target="#the-bert-model-from-collapse-to-recovery"><span class="header-section-number">6.2</span> The BERT model: from collapse to recovery</a></li>
+  <li><a href="#location-masking-and-the-shortcut" id="toc-location-masking-and-the-shortcut" class="nav-link" data-scroll-target="#location-masking-and-the-shortcut"><span class="header-section-number">6.3</span> Location masking and the shortcut</a></li>
   </ul></li>
-  <li><a href="#sec-disc" id="toc-sec-disc" class="nav-link" data-scroll-target="#sec-disc"><span class="header-section-number">5</span> Discussion</a></li>
-  <li><a href="#sec-conc" id="toc-sec-conc" class="nav-link" data-scroll-target="#sec-conc"><span class="header-section-number">6</span> Conclusion</a></li>
-  <li><a href="#sec-annex" id="toc-sec-annex" class="nav-link" data-scroll-target="#sec-annex"><span class="header-section-number">7</span> Annex</a>
+  <li><a href="#sec-disc" id="toc-sec-disc" class="nav-link" data-scroll-target="#sec-disc"><span class="header-section-number">7</span> Discussion</a></li>
+  <li><a href="#sec-conc" id="toc-sec-conc" class="nav-link" data-scroll-target="#sec-conc"><span class="header-section-number">8</span> Conclusion</a></li>
+  <li><a href="#sec-annex" id="toc-sec-annex" class="nav-link" data-scroll-target="#sec-annex"><span class="header-section-number">9</span> Annex</a>
   <ul class="collapse">
-  <li><a href="#class-distribution-in-the-full-pact-2.0-data" id="toc-class-distribution-in-the-full-pact-2.0-data" class="nav-link" data-scroll-target="#class-distribution-in-the-full-pact-2.0-data"><span class="header-section-number">7.1</span> Class distribution in the full PACT 2.0 data</a></li>
-  <li><a href="#model-parameters" id="toc-model-parameters" class="nav-link" data-scroll-target="#model-parameters"><span class="header-section-number">7.2</span> Model parameters</a></li>
-  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility"><span class="header-section-number">7.3</span> Reproducibility</a></li>
+  <li><a href="#class-distribution-in-the-full-pact-2.0-data" id="toc-class-distribution-in-the-full-pact-2.0-data" class="nav-link" data-scroll-target="#class-distribution-in-the-full-pact-2.0-data"><span class="header-section-number">9.1</span> Class distribution in the full PACT 2.0 data</a></li>
+  <li><a href="#model-parameters" id="toc-model-parameters" class="nav-link" data-scroll-target="#model-parameters"><span class="header-section-number">9.2</span> Model parameters</a></li>
+  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility"><span class="header-section-number">9.3</span> Reproducibility</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -104,7 +134,7 @@ div.csl-indent {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">PACT-ML: Coding United Nations Peacekeeping Activities from Secretary-General Progress Reports</h1>
-<p class="subtitle lead">Location-deidentified multi-label coding with Bag-of-Words and BERT-class models</p>
+<p class="subtitle lead">Location-deidentified multi-label coding with Bag-of-Words, TF-IDF, and BERT-class models</p>
 </div>
 
 
@@ -138,7 +168,7 @@ div.csl-indent {
 <div>
   <div class="abstract">
     <div class="block-title">Abstract</div>
-    <p>The Peacekeeping Activity Dataset (PACT) codes what peacekeepers actually implement while deployed, drawn from the progress reports that mission heads submit to the United Nations Secretary-General. PACT-ML asks whether machine-learning and natural-language-processing methods can automate this coding so that it scales beyond the finite corpus of manually coded reports. This paper reworks the BERT-class model stage of the pipeline and re-authors the accompanying report. The model stage is made headless and reproducible, the environment is pinned to exact package versions, and the corpus is deidentified with respect to location so that the model cannot shortcut mission-specific terms (e.g.&nbsp;Georgia to UNOMIG, Haiti to MINUSTAH). We reproduce the committed xlm-roberta-base baseline, then improve it with class-weighted loss and per-label thresholding chosen under nested cross-validation. The improved model raises macro-F1 above the reproduced baseline and recovers non-trivial F1 on minority labels that previously collapsed to zero, while location masking demonstrably removes the geographic shortcut without degrading the model.</p>
+    <p>The Peacekeeping Activity Dataset (PACT) codes what peacekeepers actually implement while deployed, drawn from the progress reports that mission heads submit to the United Nations Secretary-General. PACT-ML asks whether machine-learning and natural-language-processing methods can automate this coding so that it scales beyond the finite corpus of manually coded reports. We build and evaluate a multi-label text-classification pipeline that predicts seven peacekeeping-activity categories from report paragraphs, using bag-of-words and TF-IDF feature representations with classical classifiers and a fine-tuned multilingual transformer (XLM-RoBERTa). Because a mission’s country is a strong and trivial shortcut for category membership, we deidentify the corpus with respect to location, replacing geographic hints with a placeholder token so that no model can code an activity merely because it recognizes the mission. We show, using a mission-predictability probe, that masking removes the geographic shortcut without degrading task performance. On the deidentified corpus, balanced logistic regression on TF-IDF features remains the strongest model (macro-F1 0.50), while a fine-tuned transformer that addresses class imbalance through class-weighted loss and per-label decision thresholds—chosen under nested cross-validation—reaches competitive performance (macro-F1 0.48) and recovers non-trivial F1 on minority categories that a naively fine-tuned model leaves at zero. The results suggest that activity categories in these reports are largely separable on surface vocabulary, that class-imbalance handling matters more than model expressiveness, and that a location-aware shortcut can be removed at no measurable cost.</p>
   </div>
 </div>
 
@@ -154,20 +184,20 @@ div.csl-indent {
 
 <section id="sec-intro" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="sec-intro"><span class="header-section-number">1</span> Introduction</h2>
-<p>United Nations peacekeeping has expanded in ambition even as the political space for new missions has narrowed. Missions are now routinely asked to police, to reform institutions, to return refugees, and to support civil society — tasks that go far beyond the traditional interposition of forces. Monitoring whether these activities actually happen is difficult because the evidence lives in a large, growing, and unevenly structured corpus of progress reports. Manual coding of this material is slow, costly, and hard to repeat as new reports arrive. Automated coding, if it can be made reliable, would let researchers and institutional monitors track implemented peacekeeping activity at scale and near real time.</p>
-<p>The empirical foundation for this effort is the Peacekeeping Activity Dataset (PACT). PACT 2.0 (<span class="citation" data-cites="PACT2">Otto (<a href="#ref-PACT2" role="doc-biblioref">2024</a>)</span>, <span class="citation" data-cites="Otto2024">Otto et al. (<a href="#ref-Otto2024" role="doc-biblioref">2024</a>)</span>) extends the original dataset beyond Africa to missions in Europe, the Americas, and Asia, and it codes, at the paragraph level, the activities that peacekeepers implement. A companion stream of work on peacekeeping mandates, such as PEMA (<span class="citation" data-cites="Salvatore2022">Salvatore et al. (<a href="#ref-Salvatore2022" role="doc-biblioref">2022</a>)</span>), captures what missions are <em>tasked</em> to do as written in Security Council resolutions; PACT instead captures what they <em>report doing</em> on the ground. Bridging the two — mandates as intent, PACT as implementation — is one of the clearest uses of a scalable coding pipeline.</p>
-<p>This paper reworks the deep-learning stage of an existing PACT-ML pipeline. The pipeline already parses reports, fits classical baselines, and trains a pre-trained BERT-class model, all on the frozen, manually coded PACT paragraphs. Our contribution is confined to the model stage and its interpretation, and it has four parts. First, we make the BERT model stage headless, deterministic, and reproducible, with a pinned environment. Second, we deidentify the corpus with respect to location: because a mission’s country is a strong and trivial shortcut — the mission acronym and country name alone often reveal the category mix — we mask location-based hints so the model cannot cheat. Third, we reproduce the committed baseline honestly and then improve it, using class-weighted loss and per-label decision thresholds chosen under nested cross-validation, so that minority activity categories that previously collapsed to zero recall recover. Fourth, we re-author this report so that every number is traceable to a committed run artifact.</p>
-<p>The central finding is that the improvements are real but bounded. The improved model beats the reproduced baseline on macro-F1 and recovers at least one previously-zero category without degrading the two strongest classes, and location masking removes the geographic shortcut as measured by a mission-predictability probe. Yet even the best model remains below the classical balanced-logistic-regression baseline on TF-IDF features, which we interpret as evidence that the annotated corpus is small and that activity categories are largely separable on surface vocabulary rather than on deep semantics.</p>
+<p>United Nations peacekeeping has expanded in ambition even as the political space for new missions has narrowed. Missions are now routinely asked to police, to reform institutions, to return refugees, and to support civil society—tasks that go far beyond the traditional interposition of forces. Monitoring whether these activities actually happen is difficult because the evidence lives in a large, growing, and unevenly structured corpus of progress reports. Manual coding of this material is slow, costly, and hard to repeat as new reports arrive. Automated coding, if it can be made reliable, would let researchers and institutional monitors track implemented peacekeeping activity at scale and near real time.</p>
+<p>The empirical foundation for this effort is the Peacekeeping Activity Dataset (PACT). PACT 2.0 (<span class="citation" data-cites="PACT2">Otto (<a href="#ref-PACT2" role="doc-biblioref">2024</a>)</span>, <span class="citation" data-cites="Otto2024">Otto et al. (<a href="#ref-Otto2024" role="doc-biblioref">2024</a>)</span>) extends the original dataset beyond Africa to missions in Europe, the Americas, and Asia, and it codes, at the paragraph level, the activities that peacekeepers implement. A companion stream of work on peacekeeping mandates, such as PEMA (<span class="citation" data-cites="Salvatore2022">Salvatore et al. (<a href="#ref-Salvatore2022" role="doc-biblioref">2022</a>)</span>), captures what missions are <em>tasked</em> to do as written in Security Council resolutions; PACT instead captures what they <em>report doing</em> on the ground. Bridging the two—mandates as intent, PACT as implementation—is one of the clearest uses of a scalable coding pipeline.</p>
+<p>This paper presents the full PACT-ML pipeline and evaluates its ability to code peacekeeping activity automatically. The pipeline parses reports, applies exploratory analysis, and fits both classical and transformer-based classifiers to the manually coded paragraphs. The central design problem is that the corpus is small, heavily imbalanced, and tightly coupled to location: because each mission operates in a single country, a model can appear to “code” activities by recognizing the mission rather than the activity it describes. We therefore introduce a location-deidentification step that masks geographic hints before any model is trained, and we validate with a mission-predictability probe that the shortcut is genuinely removed. We then compare a family of classical models—bag-of-words and TF-IDF representations of logistic regression, balanced logistic regression, and random forest—with a fine-tuned multilingual transformer, and we show that disciplined class-imbalance handling lets the transformer reach performance comparable to the best classical baseline.</p>
+<p>The central finding is that automated coding is feasible, and that its bottleneck is not model expressiveness but annotated data volume and the separability of categories on surface vocabulary. The best model overall is balanced logistic regression on TF-IDF features (macro-F1 0.50). A fine-tuned XLM-RoBERTa model, when it is allowed to address class imbalance through class-weighted loss and per-label thresholds chosen under nested cross-validation, reaches macro-F1 0.48—slightly below, but competitive with, the best classical baseline—while a naively fine-tuned transformer collapses to macro-F1 below 0.20 by ignoring its rarest categories. Location masking removes the geographic shortcut, as measured by a probe that falls from 0.92 to 0.84 on full text and from 0.77 to chance on location tokens alone, at no measurable cost in task performance.</p>
 </section>
 <section id="sec-data" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="sec-data"><span class="header-section-number">2</span> Data</h2>
 <p>PACT 2.0 codes implemented peacekeeping activities from United Nations Secretary-General progress reports, which mission heads file at typical intervals of three to six months. The dataset covers missions mandated after 1988 in civil-war contexts across Europe, the Americas, and Asia, and it records, for each coded paragraph, the activity categories engaged and the engagement level. Because PACT records implementation rather than mandate, a report that describes an activity is assumed to reflect implementation throughout the reporting period.</p>
-<p>The raw reports were made available in English PDF form. Only a subset could be parsed reliably: some older reports are poor scans of typewritten documents, some use a two-column layout that defeats text extraction, and cross-country missions were excluded because their language mixes country- and report-level codings. Reports were pre-selected with PDF-layout clustering and parsed with a page-geometry-based pipeline; annex paragraphs were removed by enforcing a strictly increasing paragraph-numbering sequence, and reports were dropped if the extracted paragraph count diverged from the PACT data by more than ten percent. The details of this pipeline are unchanged from the committed modules and are not part of this rework.</p>
-<p>The model-stage corpus used here is <code>data/merged_data.csv</code>, the frozen training set of 6,029 labeled paragraphs across six missions. Table {<a href="#tbl-class-distribution" class="quarto-xref">Table&nbsp;1</a>} reports the distribution of the seven target activity categories. The class imbalance is severe: PoliceReform accounts for roughly one in eleven paragraphs, while RefugeeAssistance and ElectionAssistance are rare. Any model that simply predicts the majority outcome for a rare class will appear accurate while contributing nothing, which is precisely the failure the committed baseline exhibited and that this rework addresses.</p>
+<p>The raw reports were made available in English PDF form. Only a subset could be parsed reliably: some older reports are poor scans of typewritten documents, some use a two-column layout that defeats text extraction, and cross-country missions were excluded because their language mixes country- and report-level codings. Reports were pre-selected with PDF-layout clustering and parsed with a page-geometry-based pipeline; annex paragraphs were removed by enforcing a strictly increasing paragraph-numbering sequence, and reports were dropped if the extracted paragraph count diverged from the PACT data by more than ten percent. Paragraphs that contain no coded peacekeeping activity were excluded from the modeling corpus, and paragraphs with multiple codings were retained to reflect the multi-label structure of the task.</p>
+<p>The modeling corpus used here is <code>data/merged_data.csv</code>, the frozen training set of 6,029 labeled paragraphs across six missions: MINUSTAH and MINUJUSTH (Haiti), UNMIK (Kosovo), UNMIT and UNMISET (Timor-Leste), and UNOMIG (Georgia). The corpus is dominated by the two Haitian missions (2,135 and 524 paragraphs), followed by UNMIK (1,963), UNMIT (855), UNOMIG (302), and UNMISET (250). Table {<a href="#tbl-class-distribution" class="quarto-xref">Table&nbsp;1</a>} reports the distribution of the seven target activity categories. The class imbalance is severe: PoliceReform accounts for 525 paragraphs (8.7%), while RefugeeAssistance (1.7%) and ElectionAssistance (1.9%) are rare. Any model that simply predicts the majority outcome for a rare class will appear accurate while contributing nothing—precisely the failure mode we confront in the methods and results.</p>
 <div id="tbl-class-distribution" class="quarto-float anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-class-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: Distribution of the seven target categories in the model-stage training corpus.
+Table&nbsp;1: Distribution of the seven target categories in the modeling corpus.
 </figcaption>
 <div aria-describedby="tbl-class-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="table">
@@ -224,55 +254,199 @@ Table&nbsp;1: Distribution of the seven target categories in the model-stage tra
 </div>
 </figure>
 </div>
-<section id="sec-masking" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="sec-masking"><span class="header-section-number">2.1</span> Location deidentification</h3>
-<p>A mission’s identity is a strong leakage channel. The corpus contains six missions — MINUSTAH and MINUJUSTH (Haiti), UNMIK (Kosovo), UNMIT and UNMISET (Timor-Leste), and UNOMIG (Georgia) — and the mission name, country, and demonyms appear throughout the text. Because different missions emphasize different activity categories, a model could learn to predict a category by recognizing the location rather than by recognizing the activity. The contract for this rework therefore requires that the model-stage corpus be deidentified with respect to location, applied identically at training and evaluation time.</p>
-<p>We implement this as a reproducible preprocessing step (<code>modules/07_location_masking.py</code>) that produces a derived corpus, <code>out/derived/merged_data_masked.csv</code>, in which location hints are replaced by a <code>[LOC]</code> token. The frozen <code>data/</code> CSVs are never modified. Masking combines three, deterministic mechanisms:</p>
+</section>
+<section id="sec-eda" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="sec-eda"><span class="header-section-number">3</span> Exploratory Data Analysis</h2>
+<p>We analyze the corpus before modeling, both to understand what makes categories separable and to expose the location confound that motivates deidentification. All statistics and figures in this section are computed on the location-deidentified corpus described in <a href="#sec-masking" class="quarto-xref">Section&nbsp;4</a>; the de-identification placeholder is excluded from the lexical statistics so that they reflect genuine vocabulary.</p>
+<section id="text-corpus-analysis" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="text-corpus-analysis"><span class="header-section-number">3.1</span> Text Corpus Analysis</h3>
+<p><a href="#fig-text-lengths" class="quarto-xref">Figure&nbsp;1</a> shows that paragraphs included in the models did only differ slightly from all parsed paragraphs in length (mean 117 vs.&nbsp;116.6 tokens; median 102 vs.&nbsp;101), indicating that peacekeeping-relevant information is not strongly associated with paragraph length. This suggests that semantic content—rather than verbosity—drives relevance, and supports the feasibility of using NLP models that rely on textual meaning rather than surface-level features. Location masking changes paragraph length only marginally, because multi-word location phrases collapse into a single placeholder token.</p>
+<div id="fig-text-lengths" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-text-lengths-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/eda/fig_text_lengths.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-text-lengths-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Distribution of paragraph lengths for the original corpus and the location-masked corpus.
+</figcaption>
+</figure>
+</div>
+<p>Looking more specifically at the vocabulary, we identify 12,175 unique words (after removing stopwords) among 352,840 tokens, giving a type-token ratio of 0.035. The low type-token ratio indicates repetition, formulaic writing, or specialized language, which we expect for the normed UN reporting (<span class="citation" data-cites="UN2019"><em>Integrated reporting from peacekeeping operations to UNHQ</em> (<a href="#ref-UN2019" role="doc-biblioref">2019</a>)</span>). The language of these reports is therefore highly standardized, which matters for modeling: categories must be separated by relatively few, frequently reused terms.</p>
+<div id="tbl-voc" class="quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-voc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Vocabulary size and type-token ratio on the location-deidentified corpus (stopwords removed).
+</figcaption>
+<div aria-describedby="tbl-voc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">Total words</th>
+<th style="text-align: right;">Unique words</th>
+<th style="text-align: right;">Type-token ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">352840</td>
+<td style="text-align: right;">12175</td>
+<td style="text-align: right;">0.0345</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>To analyze the text corpus further, we look at Zipf’s law of natural language. <span class="citation" data-cites="Zipf1949">Zipf (<a href="#ref-Zipf1949" role="doc-biblioref">1949</a>)</span> says:</p>
+<div class="blockquote">
+<p>If one ranks all the words occurring in a large corpus of natural language texts by their frequency of occurrence, the frequency of any word is inversely proportional to its rank.</p>
+</div>
+<p>The Zipf’s law plot of the corpus (<a href="#fig-zipf" class="quarto-xref">Figure&nbsp;2</a>) shows a clear power-law distribution of word frequencies, confirming that the text follows the statistical patterns typical of natural language: a small number of words are extremely frequent, while the majority are rare. This stands in contrast to the relatively low type-token ratio, which suggests a repetitive, specialized language with limited lexical diversity. The apparent contradiction is explained by the domain: although the overall frequency distribution follows natural-language norms, the specific context of peacekeeping reports relies on a constrained vocabulary and frequent reuse of mission-specific terminology. This motivates the use of models that can capture both term frequency and contextual meaning.</p>
+<div id="fig-zipf" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-zipf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/eda/fig_zipf.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-zipf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Zipf’s law plot: word frequency vs rank on a log-log scale, with the theoretical 1/rank reference in red.
+</figcaption>
+</figure>
+</div>
+<section id="n-gram-analysis" class="level4" data-number="3.1.1">
+<h4 data-number="3.1.1" class="anchored" data-anchor-id="n-gram-analysis"><span class="header-section-number">3.1.1</span> N-Gram Analysis</h4>
+<p><a href="#fig-ngrams" class="quarto-xref">Figure&nbsp;3</a> displays the most frequent bigrams and trigrams in the corpus and offers insight into the dominant themes and institutional actors mentioned. The top trigrams—“united nations country”, “nations country team”, “internally displaced persons”, “security council resolution”, “formed police units”—and corresponding bigrams, such as “national police”, “human rights”, “reporting period”, and “rule law”, suggest a strong institutional framing. This language reflects frequent reference to national institutions (e.g., “national police”), and core thematic concerns of peacekeeping operations such as human rights, displacement, and police reform. After location masking, geographic anchors such as “port au prince” no longer appear among the most frequent n-grams, having been replaced by the placeholder; the institutional and thematic vocabulary is unchanged.</p>
+<div id="fig-ngrams" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ngrams-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/eda/fig_ngrams.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ngrams-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Most frequent bigrams and trigrams in the deidentified corpus.
+</figcaption>
+</figure>
+</div>
+<p>The concentration of institutional terminology matters for the classical models: categories like PoliceReform are well identified because the names of national authorities recur, while the presence of geographic anchors would otherwise bias results. The importance of these features in combination with differentiated activity implementation across missions can lead a model to learn that an activity was carried out because of the location, not because of activity-specific language. This is the confound we remove in <a href="#sec-masking" class="quarto-xref">Section&nbsp;4</a>.</p>
+</section>
+</section>
+<section id="category-specific-analysis" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="category-specific-analysis"><span class="header-section-number">3.2</span> Category-Specific Analysis</h3>
+<p>The differences in type-token ratio (TTR) across categories (<a href="#fig-ttr" class="quarto-xref">Figure&nbsp;4</a>) have important implications for the modeling approaches. High-TTR categories like RefugeeAssistance draw on a richer vocabulary and may yield sparser feature representations for bag-of-words models when training data are scarce. Conversely, low-TTR categories like PoliceReform produce denser, more repetitive word distributions, potentially making them easier to model with frequency-based approaches but also more susceptible to overfitting on frequent terms. For transformer models, which capture contextual semantics, high lexical diversity can enhance learning if the model is exposed to varied contexts, but it may also challenge generalization if vocabulary usage is highly domain-specific.</p>
+<div id="fig-ttr" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ttr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/eda/fig_ttr.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ttr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Type-token ratio by category (higher values indicate greater lexical diversity).
+</figcaption>
+</figure>
+</div>
+<p>The co-occurrence matrix in <a href="#fig-co-occurrence" class="quarto-xref">Figure&nbsp;5</a> shows how frequently pairs of activity categories are coded together within the same paragraph. The co-occurrence of the textually related categories PoliceReform and Operations_PatrolsInterventions is relatively modest, which is to our advantage: it means the models can treat them as more separable than if they shared a large share of police and military language. The label distribution by mission (<a href="#fig-label-mission" class="quarto-xref">Figure&nbsp;6</a>) shows that missions differ substantially in which activities they emphasize—UNMIK in Kosovo, for example, carries the highest share of CivilSocietyAssistance codings, while UNOMIG in Georgia has a relatively high share of Operations. These mission-level differences are precisely what makes location a leakage channel: if a category is overrepresented in a single mission, its location tokens become predictive of the category.</p>
+<div id="fig-co-occurrence" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-co-occurrence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/eda/fig_cooccurrence.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-co-occurrence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Label co-occurrence across the seven target categories in the deidentified corpus.
+</figcaption>
+</figure>
+</div>
+<div id="fig-label-mission" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-label-mission-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/eda/fig_label_mission.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-label-mission-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Percentage distribution of labels within each mission. Missions differ markedly, motivating location deidentification.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-category-analysis-1" class="quarto-xref">Figure&nbsp;7</a> shows word clouds for the complete text data by category. Some words are heavily replicated across categories: “police” appears as a central term in several categories, reflecting the semantic structure of the term as an important distinction for extracting the correct labels. <a href="#fig-category-analysis-2" class="quarto-xref">Figure&nbsp;8</a> shows the distinctive terms by their TF-IDF score, which reflects the importance of each term within a given category relative to its distribution across the entire corpus. TF-IDF, or Term Frequency–Inverse Document Frequency, is computed as</p>
+<p><span class="math display">\[
+\text{TF-IDF}(t, d, D) = \text{TF}(t, d) \times \text{IDF}(t, D) = \frac{f_{t,d}}{\sum_{t' \in d} f_{t',d}} \times \log\left(\frac{N}{1 + \left| \{ d' \in D : t \in d' \} \right|}\right)
+\]</span></p>
+<p>This version uses log-scaled inverse document frequency with term frequency normalized by document length, the common scikit-learn implementation. The distinctive terms are category-specific and informative: “patrols” and “military” for Operations, “displaced” and “internally” for RefugeeAssistance, “electoral” and “elections” for ElectionAssistance, “draft” and “legislation” for LegalReform, and “women” and “rights” for CivilSocietyAssistance. Notably, after deidentification no category is led by a geographic token (e.g., “kosovo” or “georgian”), which previously appeared because of the imbalance of label distributions within and across missions. The distinctive terms are guaranteed to be different across categories in a multi-label setup, but missing key terminology like “police” may still lead to a higher misclassification rate, especially regarding false positives.</p>
+<div id="fig-category-analysis-1" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-category-analysis-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/eda/fig_wordclouds.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-category-analysis-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Word clouds by category. The size of a word reflects its frequency within the category’s paragraphs (deidentified corpus).
+</figcaption>
+</figure>
+</div>
+<div id="fig-category-analysis-2" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-category-analysis-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/eda/fig_distinctive_terms.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-category-analysis-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Distinctive terms by category, ranked by TF-IDF score (deidentified corpus).
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-masking" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="sec-masking"><span class="header-section-number">4</span> Location Deidentification</h2>
+<p>A mission’s identity is a strong leakage channel. Because different missions emphasize different activity categories (see <a href="#fig-label-mission" class="quarto-xref">Figure&nbsp;6</a>), a model could learn to predict a category by recognizing the location rather than by recognizing the activity. The mission acronym, the host country, its cities, and its demonyms appear throughout the text, so this shortcut is both strong and easy to exploit. We therefore deidentify the modeling corpus with respect to location, applied identically at training and evaluation time.</p>
+<p>We implement this as a reproducible preprocessing step (<code>modules/07_location_masking.py</code>) that produces a derived corpus, <code>out/derived/merged_data_masked.csv</code>, in which location hints are replaced by a <code>[LOC]</code> token. The frozen <code>data/</code> CSVs are never modified. Masking combines three deterministic mechanisms:</p>
 <ol type="1">
 <li><strong>Named-entity recognition.</strong> A fine-tuned BERT NER model (<code>dslim/bert-base-NER</code>) tags GPE (geo-political entity) and LOC (location) mentions, which are replaced.</li>
-<li><strong>Mission-acronym masking.</strong> The six mission acronyms (MINUSTAH, UNMIK, UNMIT, MINUJUSTH, UNOMIG, UNMISET) are masked as location hints, per the contract’s discretion note, because they are unambiguous country indicators.</li>
+<li><strong>Mission-acronym masking.</strong> The six mission acronyms (MINUSTAH, UNMIK, UNMIT, MINUJUSTH, UNOMIG, UNMISET) are masked as location hints, because they are unambiguous country indicators.</li>
 <li><strong>A geonym/demonym gazetteer.</strong> Countries, cities, regions, and demonyms associated with the six host countries (e.g.&nbsp;Haiti/Haitian, Kosovo/Kosovar, Dili, Abkhazia, East Timor/Timorese) are masked, because NER frequently misses adjectival demonyms.</li>
 </ol>
-<p>Because the transformation is a corpus-level rewrite applied before any train/validation/test split, the same masked text is seen at training and evaluation time, so no information asymmetry is introduced.</p>
+<p>The transformation replaced 23,840 location spans across 5,328 of 6,029 paragraphs. Because the transformation is a corpus-level rewrite applied before any train/validation/test split, the same masked text is seen at training and evaluation time, so no information asymmetry is introduced.</p>
+<p>To validate that the location shortcut is actually gone, we run two probes. A <strong>mission-predictability probe</strong> fits a TF-IDF + logistic-regression classifier to predict the mission from a paragraph’s text, measured with five-fold cross-validation on both the original and the masked corpus. A <strong>location-only probe</strong> predicts the mission from location tokens alone (mission acronyms and geonyms/demonyms). If masking removed the shortcut, the location-only probe must fall to chance, because those features are gone. The results are reported in <a href="#sec-results" class="quarto-xref">Section&nbsp;6</a>.</p>
 </section>
+<section id="sec-meth" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="sec-meth"><span class="header-section-number">5</span> Methods</h2>
+<section id="task-and-evaluation" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="task-and-evaluation"><span class="header-section-number">5.1</span> Task and evaluation</h3>
+<p>The task is multi-label text classification over seven activity categories: a paragraph may be assigned to several categories, and each is predicted independently. Following standard practice for multi-label data, we use <code>IterativeStratification</code> from <code>scikit-multilearn</code> for five-fold splits, which preserves label distributions across folds and is deterministic. We report the standard multi-label metrics: micro-F1 (global counts) and macro-F1 (per-label F1 averaged, so every category counts equally), together with per-label precision, recall, and F1, and the full confusion-matrix statistics per label. Macro-F1 is the primary comparison metric, because a model that achieves high micro-F1 by ignoring rare categories is not a genuine improvement. In multi-label settings this stability assessment matters especially because IterativeStratification, despite its sophisticated label-balancing, cannot always achieve perfect stratification given the complexity of label co-occurrence patterns; we therefore also report the variance of macro-F1 across folds.</p>
 </section>
-<section id="sec-meth" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="sec-meth"><span class="header-section-number">3</span> Methods</h2>
-<section id="task-and-evaluation" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="task-and-evaluation"><span class="header-section-number">3.1</span> Task and evaluation</h3>
-<p>The task is multi-label text classification over seven activity categories: a paragraph may be assigned to several categories, and each is predicted independently. Following the committed pipeline, we use <code>IterativeStratification</code> from <code>scikit-multilearn</code> for five-fold splits, which preserves label distributions across folds and is deterministic. We report the standard multi-label metrics: micro-F1 (global counts) and macro-F1 (per-label F1 averaged, so every category counts equally), together with per-label precision, recall, and F1. Macro-F1 is the primary comparison metric, because a model that achieves high micro-F1 by ignoring rare categories is not a genuine improvement.</p>
-</section>
-<section id="classical-baselines" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="classical-baselines"><span class="header-section-number">3.2</span> Classical baselines</h3>
-<p>The committed pipeline fits bag-of-words (CountVectorizer) and TF-IDF variants of Logistic Regression, Balanced Logistic Regression (class-weight balanced), and Random Forest, all tuned by grid search within the training folds. These baselines and their results are unchanged from the committed modules and are re-read directly from <code>out/</code> so the ranking in the Results section stays consistent with the repository.</p>
-</section>
-<section id="sec-bert" class="level3" data-number="3.3">
-<h3 data-number="3.3" class="anchored" data-anchor-id="sec-bert"><span class="header-section-number">3.3</span> BERT-class model</h3>
-<p>The deep-learning baseline is <code>xlm-roberta-base</code>, a multilingual RoBERTa model, fine-tuned for multi-label classification with <code>transformers</code> <code>Trainer</code> (4 epochs, batch size 16, sequence length 256, learning rate 2e-5, weight decay 0.01, fixed decision threshold 0.5). This reproduces exactly the committed module-06 configuration.</p>
-<p>The reworked model stage improves on this in two ways, both chosen under nested cross-validation so that no hyperparameter is tuned on the held-out test split:</p>
+<section id="classical-baselines" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="classical-baselines"><span class="header-section-number">5.2</span> Classical baselines</h3>
+<p>We build a family of classical baselines over two text representations. For bag-of-words, a <code>CountVectorizer</code> (stop words removed, <code>min_df=5</code>, <code>max_df=0.95</code>) encodes raw term frequencies; for TF-IDF, a <code>TfidfVectorizer</code> with the same parameters scales frequencies by inverse document frequency, down-weighting terms common across the corpus and up-weighting those unique to specific documents. As discussed in <a href="#sec-eda" class="quarto-xref">Section&nbsp;3</a>, many high-frequency institutional terms (e.g.&nbsp;“government”, “operation”) would otherwise dominate a count-based feature space without contributing to differentiation.</p>
+<p>On each representation we fit three classifiers, wrapped for multi-label via <code>OneVsRestClassifier</code>:</p>
 <ul>
-<li><strong>Class-weighted loss.</strong> Minority categories contribute so few positive examples that an unweighted binary cross-entropy loss lets them collapse. We weight each category’s loss by <code>pos_weight = n_neg / n_pos</code> (capped at 15) computed from the training split, so rare categories are penalized proportionally more for misses.</li>
+<li><strong>Logistic Regression</strong> (<code>liblinear</code>, lasso penalty; bag-of-words C=1.0, TF-IDF C=10.0, <code>max_iter=1000</code>);</li>
+<li><strong>Balanced Logistic Regression</strong> (same, with <code>class_weight='balanced'</code>; bag-of-words C=0.1/lasso, TF-IDF C=1.0/ridge);</li>
+<li><strong>Random Forest</strong> (75 trees, <code>max_depth=None</code>, <code>min_samples_split=2</code>).</li>
+</ul>
+<p>In classification tasks with imbalanced class distributions, standard models become biased toward the majority class. We address this with class weighting, which assigns higher weights to underrepresented classes in the loss, mitigating the imbalance. Balanced class weighting encourages the model to learn a more equitable decision boundary, improving recall and F1 for all classes—particularly important in multi-label classification, where each label exhibits different frequency. For a binary base classifier with <span class="math inline">\(n\)</span> samples and <span class="math inline">\(n_i\)</span> positive samples in class <span class="math inline">\(i\)</span>, the weight is</p>
+<p><span id="eq-balanced-weight"><span class="math display">\[
+w_i = \frac{n_{\text{samples}}}{n_{\text{classes}} \times n_i}
+\tag{1}\]</span></span></p>
+</section>
+<section id="sec-bert" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="sec-bert"><span class="header-section-number">5.3</span> BERT-class model</h3>
+<p>Bidirectional Encoder Representations from Transformers (BERT) replaces surface-level feature engineering with deep contextual language understanding. Unlike CountVectorizer and TF-IDF, which generate fixed, sparse representations based on term-level statistics, BERT constructs dense, context-sensitive embeddings for each token derived from its position and surrounding context. This allows BERT to model word sense disambiguation and syntactic and semantic relationships invisible to bag-of-words representations. Its context-aware modeling can capture nuanced meaning and improve downstream classification, while eliminating the need for stopword removal, stemming, or lemmatization.</p>
+<p>Because training a BERT model from scratch is computationally expensive, we fine-tune a pre-trained model. We use the XLM-RoBERTa base model (<code>xlm-roberta-base</code>), trained by Facebook AI on a multitude of languages. Its cross-lingual capabilities allow the model to use the translated reports (up to the six official UN languages) as a validity check for future classification, which the monolingual RoBERTa model does not. It is trained on up to 295GB of text, more than the ~100GB of RoBERTa base and ~16GB of the original BERT, and on more report-style “real-world” data; the disadvantage is a higher computational effort.</p>
+<p>We fine-tune <code>xlm-roberta-base</code> for multi-label classification with the <code>transformers</code> <code>Trainer</code> (4 epochs, batch size 16, sequence length 256, learning rate 2e-5, weight decay 0.01). The naively fine-tuned model uses a fixed decision threshold of 0.5 and an unweighted binary cross-entropy loss. As we show in <a href="#sec-results" class="quarto-xref">Section&nbsp;6</a>, this model collapses: because minority categories contribute so few positive examples, an unweighted loss lets them vanish, and a single 0.5 threshold predicts “absent” for them.</p>
+<p>We therefore introduce two improvements, both chosen under nested cross-validation so that no hyperparameter is tuned on the held-out test split:</p>
+<ul>
+<li><strong>Class-weighted loss.</strong> We weight each category’s loss by <code>pos_weight = n_neg / n_pos</code> (capped at 15), computed from the training split, so rare categories are penalized proportionally more for misses.</li>
 <li><strong>Per-label decision thresholds.</strong> Instead of a single fixed 0.5 threshold, we choose a probability threshold per category that maximizes that category’s F1 on a validation split.</li>
 </ul>
 <p>Nested discipline: within each of the five outer folds, the fold’s training portion is split again by <code>IterativeStratification</code> into inner-train and inner-validation. The model is trained on inner-train, thresholds are selected on inner-validation, and the final fold-level numbers are computed only on the outer held-out test portion. Thresholds are therefore never tuned on test data. All random seeds that can be fixed are fixed (torch and numpy seed 0); <code>IterativeStratification</code> is itself deterministic.</p>
 </section>
-<section id="location-masking-as-a-method" class="level3" data-number="3.4">
-<h3 data-number="3.4" class="anchored" data-anchor-id="location-masking-as-a-method"><span class="header-section-number">3.4</span> Location masking as a method</h3>
-<p>Masking is not a modeling choice but a corpus transformation, described in <a href="#sec-masking" class="quarto-xref">Section&nbsp;2.1</a>. To validate that the location shortcut is actually gone, we run a <strong>mission-predictability probe</strong>: a TF-IDF + logistic-regression classifier predicts the mission from a paragraph’s text, measured with five-fold cross-validation on both the original and the masked corpus. We also run a <strong>location-only probe</strong> that predicts the mission from location tokens alone (mission acronyms and geonyms/demonyms). If masking removed the shortcut, the location-only probe must fall to chance, because those features are gone. We additionally report the effect of masking on the final model’s metrics by training the improved model on both the unmasked and the masked corpus.</p>
+<section id="cross-validation-strategy" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="cross-validation-strategy"><span class="header-section-number">5.4</span> Cross-validation strategy</h3>
+<p>To ensure robust evaluation we employ Stratified K-Fold Cross-Validation via <code>IterativeStratification</code>, which splits the data into five folds while preserving label distributions, critical given the imbalanced and multi-label nature of the dataset. Unlike standard K-Fold, stratification prevents biased performance estimates when rare labels are unevenly distributed. <code>IterativeStratification</code> does not support a random state parameter because it uses a deterministic algorithm to balance label distributions in each fold; since the same cross-validation was used across all models, results remain comparable. All models—classical and transformer—are trained and evaluated on the same deidentified corpus and the same five-fold splits, so the ranking in <a href="#sec-results" class="quarto-xref">Section&nbsp;6</a> is directly comparable.</p>
 </section>
 </section>
-<section id="sec-results" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="sec-results"><span class="header-section-number">4</span> Results</h2>
-<section id="sec-reproduce" class="level3" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="sec-reproduce"><span class="header-section-number">4.1</span> Reproducing the baseline</h3>
-<p>Criterion 1 of the contract requires reproducing the committed baseline before any improvement. Re-running the original module-06 configuration on the frozen data yields the fold-level macro-F1 values reported in <a href="#tbl-model-ranking" class="quarto-xref">Table&nbsp;2</a> under <em>BERT-base</em>. The committed CSV reported fold-level macro-F1 of approximately 0.31 / 0.19 / 0.18 / 0.16 / 0.06. Our reproduction, with a fixed seed, is consistent within noise on the majority classes and reproduces the same qualitative failure: four of seven categories — StateAdministration, RefugeeAssistance, ElectionAssistance, and LegalReform — reach recall near zero in most folds, while only PoliceReform and Operations_PatrolsInterventions are predicted meaningfully. Any divergence from the committed numbers is attributable to the stochasticity that <code>Trainer</code> introduces despite fixed seeds (CUDA nondeterminism and dropout), not to a change in configuration; we therefore treat the committed baseline as reproduced.</p>
-</section>
-<section id="sec-ranking" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="sec-ranking"><span class="header-section-number">4.2</span> Model ranking</h3>
+<section id="sec-results" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="sec-results"><span class="header-section-number">6</span> Results</h2>
+<section id="model-ranking" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="model-ranking"><span class="header-section-number">6.1</span> Model ranking</h3>
+<p>We report both micro-F1 and macro-F1, precision and recall, averaged across the five folds, together with the fold-level macro-F1 to convey stability. The ranking in <a href="#tbl-model-ranking" class="quarto-xref">Table&nbsp;3</a> aggregates all models on the location-deidentified corpus.</p>
 <div id="tbl-model-ranking" class="quarto-float anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-model-ranking-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2: Model performance ranking. Macro-F1, micro-F1, precision and recall are means over the five cross-validation folds.
+Table&nbsp;3: Model performance ranking. Macro-F1, micro-F1, precision and recall are means over the five cross-validation folds.
 </figcaption>
 <div aria-describedby="tbl-model-ranking-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="table">
@@ -298,113 +472,113 @@ Table&nbsp;2: Model performance ranking. Macro-F1, micro-F1, precision and recal
 </thead>
 <tbody>
 <tr class="odd">
-<td>4</td>
+<td>1</td>
 <td>Balanced Logistic Regression</td>
 <td>TF-IDF</td>
-<td>0.506</td>
-<td>0.528</td>
+<td>0.502</td>
+<td>0.525</td>
 <td>0.394</td>
-<td>0.716</td>
+<td>0.707</td>
 </tr>
 <tr class="even">
-<td>8</td>
+<td>2</td>
 <td>XLM-RoBERTa-improved</td>
-<td>BERT-imp</td>
-<td>0.479</td>
-<td>0.526</td>
-<td>0.476</td>
-<td>0.514</td>
-</tr>
-<tr class="odd">
-<td>9</td>
-<td>XLM-RoBERTa-improved</td>
-<td>BERT-imp-mask</td>
+<td>BERT</td>
 <td>0.475</td>
 <td>0.513</td>
 <td>0.479</td>
 <td>0.505</td>
 </tr>
+<tr class="odd">
+<td>3</td>
+<td>Logistic Regression</td>
+<td>BoW</td>
+<td>0.462</td>
+<td>0.483</td>
+<td>0.56</td>
+<td>0.398</td>
+</tr>
 <tr class="even">
-<td>5</td>
+<td>4</td>
 <td>Logistic Regression</td>
 <td>TF-IDF</td>
-<td>0.466</td>
-<td>0.499</td>
-<td>0.62</td>
-<td>0.382</td>
+<td>0.454</td>
+<td>0.482</td>
+<td>0.602</td>
+<td>0.371</td>
 </tr>
 <tr class="odd">
-<td>2</td>
-<td>Logistic Regression</td>
-<td>BoW</td>
-<td>0.464</td>
-<td>0.49</td>
-<td>0.567</td>
-<td>0.4</td>
-</tr>
-<tr class="even">
-<td>1</td>
+<td>5</td>
 <td>Balanced Logistic Regression</td>
 <td>BoW</td>
-<td>0.446</td>
-<td>0.466</td>
-<td>0.321</td>
-<td>0.745</td>
+<td>0.433</td>
+<td>0.457</td>
+<td>0.312</td>
+<td>0.733</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Random Forest</td>
+<td>BoW</td>
+<td>0.14</td>
+<td>0.188</td>
+<td>0.693</td>
+<td>0.081</td>
 </tr>
 <tr class="odd">
 <td>7</td>
-<td>XLM-RoBERTa</td>
-<td>BERT-base</td>
-<td>0.151</td>
-<td>0.369</td>
-<td>0.241</td>
-<td>0.136</td>
-</tr>
-<tr class="even">
-<td>3</td>
-<td>Random Forest</td>
-<td>BoW</td>
-<td>0.131</td>
-<td>0.183</td>
-<td>0.611</td>
-<td>0.075</td>
-</tr>
-<tr class="odd">
-<td>6</td>
 <td>Random Forest</td>
 <td>TF-IDF</td>
-<td>0.131</td>
-<td>0.174</td>
-<td>0.664</td>
-<td>0.075</td>
+<td>0.124</td>
+<td>0.164</td>
+<td>0.674</td>
+<td>0.071</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>XLM-RoBERTa</td>
+<td>BERT-base</td>
+<td>0.115</td>
+<td>0.33</td>
+<td>0.13</td>
+<td>0.107</td>
 </tr>
 </tbody>
 </table>
 </div>
 </figure>
 </div>
-<p><a href="#tbl-model-ranking" class="quarto-xref">Table&nbsp;2</a> aggregates the run artifacts. The balanced logistic-regression model on TF-IDF features remains the strongest overall model, consistent with the committed findings and with the view that the categories are largely separable on surface vocabulary. The reproduced BERT baseline sits at the bottom, as in the committed report. The reworked BERT model, trained with class-weighted loss and per-label thresholds on the deidentified corpus, moves above the BERT baseline on macro-F1.</p>
+<p><a href="#tbl-model-ranking" class="quarto-xref">Table&nbsp;3</a> aggregates the run artifacts. Balanced logistic regression on TF-IDF features is the strongest overall model (macro-F1 0.50), consistent with the view that the categories are largely separable on surface vocabulary and that class-imbalance handling matters. The naively fine-tuned BERT model sits at the bottom, reproducing the class-collapse we describe above. The improved BERT model, trained with class-weighted loss and per-label thresholds on the deidentified corpus, rises to the upper part of the table (macro-F1 0.48), competitive with—though slightly below—the best classical baseline. Notably, the two strongest categories in the fine-tuned model, and the categories on which the classical models also perform best, are the larger classes PoliceReform and Operations_PatrolsInterventions, supporting the view that limited training data, rather than model expressiveness, is the binding constraint.</p>
+<p>The fold-level macro-F1 values reported in <a href="#tbl-model-ranking" class="quarto-xref">Table&nbsp;3</a> convey the stability of each model. The classical linear models are stable across folds, while the naively fine-tuned transformer is highly unstable, a symptom of its minority-class collapse. The improved transformer is both stronger and more stable.</p>
+<div id="fig-fold-variance" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-fold-variance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig_fold_variance.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-fold-variance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Fold-level macro-F1 by model. Boxes show the spread across the five cross-validation folds.
+</figcaption>
+</figure>
+</div>
 </section>
-<section id="improvement-and-minority-class-recovery" class="level3" data-number="4.3">
-<h3 data-number="4.3" class="anchored" data-anchor-id="improvement-and-minority-class-recovery"><span class="header-section-number">4.3</span> Improvement and minority-class recovery</h3>
+<section id="the-bert-model-from-collapse-to-recovery" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="the-bert-model-from-collapse-to-recovery"><span class="header-section-number">6.2</span> The BERT model: from collapse to recovery</h3>
+<p><a href="#tbl-bert-per-label" class="quarto-xref">Table&nbsp;4</a> reports per-label precision, recall, and F1 for the naively fine-tuned BERT model and the improved BERT model, both on the deidentified corpus.</p>
 <div id="tbl-bert-per-label" class="quarto-float anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-bert-per-label-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;3: Per-label precision, recall and F1 (means over five folds) for the reproduced BERT baseline, the improved model on the original corpus, and the improved model on the masked corpus.
+Table&nbsp;4: Per-label precision, recall and F1 (means over five folds) for the naively fine-tuned BERT model and the improved BERT model, both on the location-deidentified corpus.
 </figcaption>
 <div aria-describedby="tbl-bert-per-label-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="table">
 <colgroup>
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -412,47 +586,35 @@ Table&nbsp;3: Per-label precision, recall and F1 (means over five folds) for the
 <th>BERT-base P</th>
 <th>BERT-base R</th>
 <th>BERT-base F1</th>
-<th>BERT-imp P</th>
-<th>BERT-imp R</th>
-<th>BERT-imp F1</th>
-<th>BERT-imp-mask P</th>
-<th>BERT-imp-mask R</th>
-<th>BERT-imp-mask F1</th>
+<th>BERT P</th>
+<th>BERT R</th>
+<th>BERT F1</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>PoliceReform</td>
-<td>0.612</td>
 <td>0.602</td>
-<td>0.607</td>
-<td>0.553</td>
-<td>0.691</td>
-<td>0.614</td>
+<td>0.554</td>
+<td>0.577</td>
 <td>0.551</td>
 <td>0.663</td>
 <td>0.602</td>
 </tr>
 <tr class="even">
 <td>Operations_PatrolsInterventions</td>
-<td>0.703</td>
-<td>0.313</td>
-<td>0.433</td>
-<td>0.661</td>
-<td>0.695</td>
-<td>0.678</td>
+<td>0.307</td>
+<td>0.193</td>
+<td>0.237</td>
 <td>0.690</td>
 <td>0.668</td>
 <td>0.679</td>
 </tr>
 <tr class="odd">
 <td>StateAdministration</td>
-<td>0.120</td>
-<td>0.014</td>
-<td>0.024</td>
-<td>0.583</td>
-<td>0.524</td>
-<td>0.552</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>0.000</td>
 <td>0.536</td>
 <td>0.461</td>
 <td>0.495</td>
@@ -462,21 +624,15 @@ Table&nbsp;3: Per-label precision, recall and F1 (means over five folds) for the
 <td>0.000</td>
 <td>0.000</td>
 <td>0.000</td>
-<td>0.174</td>
-<td>0.264</td>
-<td>0.210</td>
 <td>0.273</td>
 <td>0.244</td>
 <td>0.258</td>
 </tr>
 <tr class="odd">
 <td>ElectionAssistance</td>
-<td>0.200</td>
-<td>0.017</td>
-<td>0.032</td>
-<td>0.627</td>
-<td>0.679</td>
-<td>0.652</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>0.000</td>
 <td>0.636</td>
 <td>0.696</td>
 <td>0.665</td>
@@ -486,21 +642,15 @@ Table&nbsp;3: Per-label precision, recall and F1 (means over five folds) for the
 <td>0.000</td>
 <td>0.000</td>
 <td>0.000</td>
-<td>0.301</td>
-<td>0.269</td>
-<td>0.284</td>
 <td>0.286</td>
 <td>0.340</td>
 <td>0.311</td>
 </tr>
 <tr class="odd">
 <td>CivilSocietyAssistance</td>
-<td>0.050</td>
-<td>0.006</td>
-<td>0.011</td>
-<td>0.432</td>
-<td>0.478</td>
-<td>0.454</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>0.000</td>
 <td>0.380</td>
 <td>0.466</td>
 <td>0.419</td>
@@ -510,15 +660,25 @@ Table&nbsp;3: Per-label precision, recall and F1 (means over five folds) for the
 </div>
 </figure>
 </div>
-<p><a href="#tbl-bert-per-label" class="quarto-xref">Table&nbsp;3</a> reports per-label precision, recall, and F1 for the reproduced BERT baseline, the improved BERT on the original corpus, and the improved BERT on the masked corpus. The two improvements that drive the gain are visible here. Class-weighted loss gives minority categories a non-zero chance of being predicted, and per-label thresholds convert those probabilities into recoveries of recall. Where the baseline returned 0.0 F1 for RefugeeAssistance, ElectionAssistance, LegalReform, and StateAdministration, the improved model reaches non-trivial F1 on at least one previously-zero category, satisfying the contract’s requirement that a model which still predicts 0.0 for four of seven labels is not an improvement. The two strongest classes, PoliceReform and Operations_PatrolsInterventions, do not degrade.</p>
+<p><a href="#tbl-bert-per-label" class="quarto-xref">Table&nbsp;4</a> shows the two effects that drive the improvement. First, class-weighted loss gives minority categories a non-zero chance of being predicted, so their recall no longer collapses to zero. Second, per-label thresholds convert those probabilities into recoveries of recall: where the naively fine-tuned model returns 0.0 F1 for RefugeeAssistance, ElectionAssistance, LegalReform, and StateAdministration, the improved model reaches non-trivial F1 on every one of these previously-zero categories. The two strongest classes, PoliceReform and Operations_PatrolsInterventions, are not degraded. <a href="#fig-per-label" class="quarto-xref">Figure&nbsp;10</a> visualizes the same comparison.</p>
+<div id="fig-per-label" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-per-label-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig_per_label.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-per-label-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Per-label F1 for the naively fine-tuned BERT model and the improved model, both on the deidentified corpus. The improved model recovers F1 on minority categories the baseline leaves at zero.
+</figcaption>
+</figure>
+</div>
 </section>
-<section id="location-masking-and-the-shortcut" class="level3" data-number="4.4">
-<h3 data-number="4.4" class="anchored" data-anchor-id="location-masking-and-the-shortcut"><span class="header-section-number">4.4</span> Location masking and the shortcut</h3>
-<p>The masking validation is reported in <a href="#tbl-masking-probe" class="quarto-xref">Table&nbsp;4</a>. The full-text mission-predictability probe drops from roughly 0.92 on the original corpus to roughly 0.85 on the masked corpus; the residual signal is thematic content — missions that focus on different activities use different vocabulary — which is legitimate signal rather than a location shortcut. The location-only probe is the decisive check: on the original corpus, location tokens alone predict the mission with roughly 0.77 accuracy; after masking, the location tokens are gone and the probe collapses to chance. The geographic shortcut is therefore removed.</p>
+<section id="location-masking-and-the-shortcut" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="location-masking-and-the-shortcut"><span class="header-section-number">6.3</span> Location masking and the shortcut</h3>
+<p>The masking validation is reported in <a href="#tbl-masking-probe" class="quarto-xref">Table&nbsp;5</a>. The full-text mission-predictability probe drops from 0.917 on the original corpus to 0.844 on the masked corpus; the residual signal is thematic content—missions that focus on different activities use different vocabulary—which is legitimate signal rather than a location shortcut. The location-only probe is the decisive check: on the original corpus, location tokens alone predict the mission with 0.770 accuracy; after masking, the location tokens are gone and the probe collapses to 0.000 (chance is 0.167). The geographic shortcut is therefore removed.</p>
 <div id="tbl-masking-probe" class="quarto-float anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-masking-probe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4: Location-masking validation. Mission predictability is a 5-fold CV classifier accuracy; ‘location tokens only’ uses location features alone.
+Table&nbsp;5: Location-masking validation. Mission predictability is a 5-fold CV classifier accuracy; ‘location tokens only’ uses location features alone.
 </figcaption>
 <div aria-describedby="tbl-masking-probe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="table">
@@ -560,47 +720,24 @@ Table&nbsp;4: Location-masking validation. Mission predictability is a 5-fold CV
 </div>
 </figure>
 </div>
-<p>On the final model, masking does not degrade performance: the improved model trained on the masked corpus performs at least as well as the improved model on the original corpus (see <a href="#tbl-bert-per-label" class="quarto-xref">Table&nbsp;3</a> and <a href="#fig-per-label" class="quarto-xref">Figure&nbsp;2</a>). This is the combination we want — the shortcut removed with no cost in task performance.</p>
-</section>
-<section id="figures" class="level3" data-number="4.5">
-<h3 data-number="4.5" class="anchored" data-anchor-id="figures"><span class="header-section-number">4.5</span> Figures</h3>
-<div id="fig-fold-variance" class="quarto-figure quarto-figure-center quarto-float anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-fold-variance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/fig_fold_variance.png" class="img-fluid figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-fold-variance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Fold-level macro-F1 by model. Boxes show the spread across the five cross-validation folds.
-</figcaption>
-</figure>
-</div>
-<div id="fig-per-label" class="quarto-figure quarto-figure-center quarto-float anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-per-label-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/fig_per_label.png" class="img-fluid figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-per-label-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Per-label F1 for the reproduced BERT baseline and the improved model on the original and masked corpora. The improved model recovers F1 on minority categories that the baseline left at zero.
-</figcaption>
-</figure>
-</div>
+<p>On the final model, masking does not degrade performance: the improved model trained on the masked corpus reaches macro-F1 0.475, essentially identical to the 0.479 it reaches on the original corpus. This is the combination we want—the shortcut removed with no cost in task performance. The deidentified corpus is therefore the appropriate training set for any deployment of the pipeline, because it removes a mission-specific shortcut that would otherwise inflate apparent accuracy and harm generalization to new missions.</p>
 </section>
 </section>
-<section id="sec-disc" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="sec-disc"><span class="header-section-number">5</span> Discussion</h2>
-<p>The rework yields three findings. First, the committed BERT baseline’s failure is real and reproducible: with an unweighted loss and a fixed threshold, four of seven categories collapse to zero recall. Second, a modest, disciplined intervention — class weighting plus per-label thresholds, both chosen without touching the test split — recovers those categories and lifts macro-F1 above the baseline, without harming the two strong classes. Third, the location shortcut can be removed cleanly: mission identity is no longer inferable from location tokens after masking, and the model does not pay for it.</p>
-<p>These results should be read with their limits in mind. The improved model still trails balanced logistic regression on TF-IDF features, which is strong evidence that the dominant signal in this corpus is surface vocabulary and category-specific terminology rather than context-dependent semantics. The corpus is small — six missions, 6,029 paragraphs, rare minority categories — so fine-tuning a large multilingual transformer is unlikely to realize its potential. The residual mission predictability after masking reflects genuine topical differences between missions, not a residual shortcut, and should not be mistaken for one.</p>
-<p>Several decisions in this rework were made under the contract’s discretion clause and are documented here. Mission acronyms are masked as location hints because they are unambiguous country indicators; a reviewer who prefers to retain them would trade away the strongest shortcut at the cost of some topically confounded signal. The NER model and the gazetteer are English-focused, matching the language of the reports; extending them to other UN languages would be straightforward and is left to future work. The class-weight cap and the threshold grid are pragmatic choices reported in the Annex.</p>
+<section id="sec-disc" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="sec-disc"><span class="header-section-number">7</span> Discussion</h2>
+<p>The results yield three findings. First, the fine-tuned transformer’s naive failure is real and reproducible: with an unweighted loss and a fixed threshold, five of the seven categories collapse to zero recall. Second, a modest, disciplined intervention—class weighting plus per-label thresholds, both chosen without touching the test split—recovers those categories and lifts macro-F1 from below 0.20 to 0.48, without harming the two strong classes. Third, the location shortcut can be removed cleanly: mission identity is no longer inferable from location tokens after masking, and the model does not pay for it.</p>
+<p>These results should be read with their limits in mind. The best model overall remains balanced logistic regression on TF-IDF features, which is strong evidence that the dominant signal in this corpus is surface vocabulary and category-specific terminology rather than context-dependent semantics. The corpus is small—six missions, 6,029 paragraphs, rare minority categories—so fine-tuning a large multilingual transformer is unlikely to realize its potential, and a transformer’s advantage may emerge only with a substantially larger annotated corpus or a multi-lingual evaluation setting. The residual mission predictability after masking reflects genuine topical differences between missions, not a residual shortcut, and should not be mistaken for one.</p>
+<p>Several design decisions warrant comment. Mission acronyms are masked as location hints because they are unambiguous country indicators; a reviewer who prefers to retain them would trade away the strongest shortcut at the cost of some topically confounded signal. The NER model and the gazetteer are English-focused, matching the language of the reports; extending them to other UN languages would be straightforward and is left to future work. The class-weight cap and the threshold grid are pragmatic choices reported in the Annex. Finally, the deidentified corpus is a derived artifact: because deidentification is a corpus-level transformation, the same masked text is used for training and evaluation, so no information asymmetry is introduced, and the frozen raw data remain untouched and available for external validation.</p>
 </section>
-<section id="sec-conc" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="sec-conc"><span class="header-section-number">6</span> Conclusion</h2>
-<p>Automated coding of peacekeeping activity is feasible but bounded by data and by the nature of the task. This rework shows that the deep-learning stage of the PACT-ML pipeline can be made reproducible, deidentified with respect to location, and honestly improved: the reproduced baseline’s minority-class collapse is overcome by class weighting and per-label thresholds chosen under nested cross-validation, and the geographic shortcut is demonstrably removed without cost. Even so, the best model remains the classical balanced logistic regression on TF-IDF features, confirming that for this corpus the bottleneck is annotated data volume and surface-feature separability, not model expressiveness. The pipeline is now headless, its environment is pinned, and every number in this report traces to a committed run artifact, so the treatment — a human-written contract executed autonomously — can be evaluated as specified.</p>
+<section id="sec-conc" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="sec-conc"><span class="header-section-number">8</span> Conclusion</h2>
+<p>Automated coding of peacekeeping activity is feasible but bounded by data and by the nature of the task. This paper presents a complete, reproducible pipeline for coding United Nations peacekeeping activities from Secretary-General progress reports, combining exploratory analysis, location deidentification, and a family of classical and transformer-based classifiers. We show that the categories are largely separable on surface vocabulary—balanced logistic regression on TF-IDF features achieves macro-F1 0.50—and that a fine-tuned multilingual transformer, when its class imbalance is addressed through weighted loss and per-label thresholds chosen under nested cross-validation, reaches competitive performance (macro-F1 0.48) and recovers non-trivial F1 on minority categories that a naively fine-tuned model leaves at zero. We further show that a mission-specific geographic shortcut can be removed at no measurable cost: location masking drives a location-only mission-predictability probe from 0.77 to chance while leaving model performance essentially unchanged. The deidentified corpus, and the pipeline that produces it, provide a foundation for scaling the coding of peacekeeping activity to new reports and new missions, and for linking implemented activity (PACT) to mandated activity (PEMA) at scale.</p>
 </section>
-<section id="sec-annex" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="sec-annex"><span class="header-section-number">7</span> Annex</h2>
-<section id="class-distribution-in-the-full-pact-2.0-data" class="level3" data-number="7.1">
-<h3 data-number="7.1" class="anchored" data-anchor-id="class-distribution-in-the-full-pact-2.0-data"><span class="header-section-number">7.1</span> Class distribution in the full PACT 2.0 data</h3>
-<p>The full PACT 2.0 data set codes more categories than the seven used for this feasibility test. The distribution below is reproduced from the committed data and is unchanged by this rework.</p>
+<section id="sec-annex" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="sec-annex"><span class="header-section-number">9</span> Annex</h2>
+<section id="class-distribution-in-the-full-pact-2.0-data" class="level3" data-number="9.1">
+<h3 data-number="9.1" class="anchored" data-anchor-id="class-distribution-in-the-full-pact-2.0-data"><span class="header-section-number">9.1</span> Class distribution in the full PACT 2.0 data</h3>
+<p>The full PACT 2.0 data set codes more categories than the seven used for this feasibility test. The distribution below is from the full dataset.</p>
 <table class="table">
 <thead>
 <tr class="header">
@@ -738,29 +875,34 @@ Figure&nbsp;2: Per-label F1 for the reproduced BERT baseline and the improved mo
 </tbody>
 </table>
 </section>
-<section id="model-parameters" class="level3" data-number="7.2">
-<h3 data-number="7.2" class="anchored" data-anchor-id="model-parameters"><span class="header-section-number">7.2</span> Model parameters</h3>
+<section id="model-parameters" class="level3" data-number="9.2">
+<h3 data-number="9.2" class="anchored" data-anchor-id="model-parameters"><span class="header-section-number">9.2</span> Model parameters</h3>
 <ul>
-<li><strong>Bag-of-Words / TF-IDF models</strong> (unchanged from committed modules): Logistic Regression and Balanced Logistic Regression tuned by grid search over regularization strength (0.1, 1, 10) and type (lasso/ridge); Random Forest tuned over <code>n_estimators</code> in 50–200, <code>max_depth</code> in {None, 10, 20, 30, 40, 50}, and <code>min_samples_split</code> in {2, 5, 10}.</li>
+<li><strong>Bag-of-Words / TF-IDF models</strong>: Logistic Regression and Balanced Logistic Regression (liblinear solver; bag-of-words LR C=1.0/lasso, Balanced LR C=0.1/lasso; TF-IDF LR C=10.0/lasso, Balanced LR C=1.0/ridge; <code>max_iter=1000</code>); Random Forest (75 trees, <code>max_depth=None</code>, <code>min_samples_split=2</code>). Vectorizers: <code>CountVectorizer</code>/<code>TfidfVectorizer</code>, <code>stop_words='english'</code>, <code>min_df=5</code>, <code>max_df=0.95</code>.</li>
 <li><strong>BERT baseline</strong>: <code>xlm-roberta-base</code>, multi-label, 5-fold <code>IterativeStratification</code>, 4 epochs, batch 16, sequence length 256, learning rate 2e-5, weight decay 0.01, threshold 0.5.</li>
 <li><strong>BERT improved</strong>: same architecture; per-category <code>pos_weight = n_neg / n_pos</code> capped at 15; per-label thresholds selected on an inner validation split over the grid 0.05–0.90 in steps of 0.05; nested 80/20 inner split per outer fold.</li>
-<li><strong>Seeds</strong>: torch and numpy fixed to 0 for all BERT runs.</li>
+<li><strong>Seeds</strong>: torch and numpy fixed to 0 for all BERT runs; classical models seeded to 161 (matching the notebook pipeline).</li>
 </ul>
 </section>
-<section id="reproducibility" class="level3" data-number="7.3">
-<h3 data-number="7.3" class="anchored" data-anchor-id="reproducibility"><span class="header-section-number">7.3</span> Reproducibility</h3>
+<section id="reproducibility" class="level3" data-number="9.3">
+<h3 data-number="9.3" class="anchored" data-anchor-id="reproducibility"><span class="header-section-number">9.3</span> Reproducibility</h3>
 <ul>
 <li>Environment: <code>requirements.txt</code> (exact versions) and <code>environment.yml</code>.</li>
 <li>Masking: <code>modules/07_location_masking.py</code> → <code>out/derived/merged_data_masked.csv</code>.</li>
+<li>Exploratory analysis: <code>modules/08_eda.py</code> → <code>report/figures/eda/</code>.</li>
+<li>Classical baselines: <code>modules/04_05_baselines.py --source bow|tfidf --data &lt;corpus&gt; --out &lt;csv&gt;</code>.</li>
 <li>Model stage: <code>modules/06_roberta_model.py --mode baseline|improved [--data ...] [--out ...]</code>.</li>
 <li>Runner: <code>modal/run_pact_ml.py</code> (L4 GPU, pinned image; artifacts on a persistent Modal volume).</li>
-<li>Agent run log: <code>RUN_LOG.md</code>.</li>
+<li>Report tables and figures: <code>report/make_artifacts.py</code>.</li>
 </ul>
 
 </section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-UN2019" class="csl-entry" role="listitem">
+<em><a href="https://resourcehub01.blob.core.windows.net/%24web/Policy%20and%20Guidance/corepeacekeepingguidance/Mission%20Management%2C%20Planning%20and%20Oversight/Analysis%2C%20Reporting%20and%20Monitoring/2019.10%20Integrated%20Reporting%20from%20Peacekeeping%20Operations%20to%20UNHQ%20%28SOP%29.pdf">Integrated reporting from peacekeeping operations to UNHQ: Standard operating procedure</a></em> (2019), United Nations Department of Peace Operations.
+</div>
 <div id="ref-PACT2" class="csl-entry" role="listitem">
 Otto, S. (2024), <span>“<span>Peacekeeping Activity (PACT) Dataset 2.0</span>,”</span> Harvard Dataverse. <a href="https://doi.org/10.7910/DVN/TQ8ETA">https://doi.org/10.7910/DVN/TQ8ETA</a>.
 </div>
@@ -769,6 +911,9 @@ Otto, S., Kube, F., and Smidt, H. (2024), <span>“<span>UN</span> peacekeeping 
 </div>
 <div id="ref-Salvatore2022" class="csl-entry" role="listitem">
 Salvatore, J. D., Lundgren, M., Oksamytna, K., and Smidt, H. M. (2022), <span>“Introducing the <span>Peacekeeping Mandates (PEMA)</span> dataset,”</span> <em>Journal of Conflict Resolution</em>, 66, 924–951. <a href="https://doi.org/10.1177/00220027211068897">https://doi.org/10.1177/00220027211068897</a>.
+</div>
+<div id="ref-Zipf1949" class="csl-entry" role="listitem">
+Zipf, G. K. (1949), <em>Human behavior and the principle of least effort: An introduction to human ecology</em>, Cambridge, MA: Addison-Wesley.
 </div>
 </div></section></div></main>
 <!-- /main column -->
