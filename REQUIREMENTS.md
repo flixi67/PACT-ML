@@ -28,7 +28,8 @@ re-write and re-render of the report.
 - Module 06 (the BERT-class model): reproduce, then improve.
 - The environment specification for the model stage (current `environment.yml` is empty — must be made real and pinned).
 - `out/model_performance_summary_bert.csv` and any new result artifacts.
-- The report: full re-write + re-render to HTML via Quarto, with tables/figures generated from actual runs.
+- Location de-identification for the model stage: mask location-based hints (countries, cities, regions, demonyms — GPE/LOC named entities) so the model cannot cheat on mission-specific terms (e.g. Georgia → UNMIK). The frozen `data/` CSVs are untouched; masking produces a derived, reproducible training set, applied identically at train and eval time. Mission-acronym handling (MINUSTAH, UNMIK, ...) is the agent's documented discretion.
+- The report: FULL re-authoring (see criterion 7) + re-render to HTML via Quarto, with tables/figures generated from actual runs.
 - README updates describing the reworked model stage and how to reproduce it.
 
 ### Out of scope (do NOT touch)
@@ -62,18 +63,29 @@ match (report any divergence — do not silently assume the committed CSV is cor
    a model that still predicts 0.0 for 4 of 7 labels is NOT an improvement even with
    higher micro-F1. At minimum one previously-zero label must reach a non-trivial F1
    without degrading PoliceReform/Operations.
-3. HONEST VALIDATION: all hyperparameter, threshold, loss, and architecture choices must
+3. LOCATION MASKING: build a reproducible de-identification step for the model-stage
+   corpus that removes location-based hints — countries, cities, regions, demonyms
+   (at minimum GPE/LOC named entities via NER). Frozen `data/` CSVs stay untouched;
+   masking produces a derived training set, applied identically at train and eval time.
+   Mission acronyms (MINUSTAH, UNMIK, ...) are the agent's documented discretion.
+   Validate that the shortcut is actually gone (feature attribution / ablation, and/or
+   a mission-level hold-out), and report the masking's effect on metrics.
+4. HONEST VALIDATION: all hyperparameter, threshold, loss, and architecture choices must
    be tuned ONLY inside each training fold's validation split (nested discipline).
    Final fold-level numbers must come from the held-out test portion. No tuning on test.
    Fix every seed that can be fixed; report seeds.
-4. HEADLESS: the model stage must run as scripts (no notebooks required to execute).
+5. HEADLESS: the model stage must run as scripts (no notebooks required to execute).
    Notebooks may remain as documentation but must not be the executable path.
-5. ENV: a real, pinned environment (e.g. `requirements.txt` and/or a working
+6. ENV: a real, pinned environment (e.g. `requirements.txt` and/or a working
    `environment.yml`) with exact package versions, verified by a fresh install.
-6. REPORT: `report/PACT-ML Report.qmd` fully re-written so every model-stage claim,
-   table, and figure is produced by the new pipeline; render to HTML with Quarto
-   successfully. All numbers in the report must be traceable to a run artifact.
-7. COMMIT: everything on the branch, committed with clear messages, including a
+7. REPORT — FULL RE-AUTHORING: every section of `report/PACT-ML Report.qmd` is re-written
+   from scratch with new prose (Introduction, Data, Methods, Results, Discussion,
+   Conclusion) — no section retains the original wording. Data and baseline facts stay
+   consistent with the repo (parsing/clustering/TF-IDF values are committed and remain);
+   model-stage numbers come from the new runs; `bibliography.bib` is reused. Quarto
+   render to HTML must succeed, and every number in the report must be traceable to a
+   run artifact.
+8. COMMIT: everything on the branch, committed with clear messages, including a
    `RUN_LOG.md` documenting the agent's own run (steps, failures, fixes, costs).
 
 ## 6. Budget & safety rails (hard)
