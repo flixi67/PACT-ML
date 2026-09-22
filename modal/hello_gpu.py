@@ -16,14 +16,15 @@ def hello_gpu() -> dict:
     import torch
 
     smi = subprocess.run(["nvidia-smi"], capture_output=True, text=True)
-    return {
+    result = {
         "cuda_available": torch.cuda.is_available(),
         "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         "nvidia_smi_head": smi.stdout[:400],
     }
+    print("HELLO_GPU_RESULT:", result)
+    return result
 
 
 if __name__ == "__main__":
     with app.run():
-        result = hello_gpu.remote()
-        print(result)
+        hello_gpu.remote()
